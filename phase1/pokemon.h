@@ -25,7 +25,7 @@ protected:
 	int _baseSpeed;
 	int _expCurve[14];
 	string _skillName[4];
-	string _skillDscp; //skill description
+	string _skillDscp[4]; //skill description
 	int _pp[3];				 //power point, first skill has infinite pp
 
 public:
@@ -90,7 +90,7 @@ public:
 	int lv() const { return _lv; }
 	int exp() const { return _exp; }
 	//race getter
-	string raceName() const { return race->raceName(); }
+	string raceName() const { return _race->raceName(); }
 	string raceType() const;
 	//setter
 	void changeAtk(int count);

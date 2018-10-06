@@ -91,7 +91,6 @@ Race_1::Race_1() : PokemonBase(ATK)
 
 bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 {
-	srand(time(NULL));
 	switch (skillIndex)
 	{
 	case 1: //spark
@@ -116,7 +115,7 @@ bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 	default:
 	{
 		//cause damage
-		int dmg = _atk - aim->def() + rand() % 4 - 2;
+		int dmg = attacker->atk() - aim->def() + rand() % 4 - 2;
 		if (dmg <= 0)
 			dmg = 1;
 		return aim->changeHp(-dmg);
@@ -149,7 +148,6 @@ Race_2::Race_2() : PokemonBase(HP)
 
 bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 {
-	srand(time(NULL));
 	switch (skillIndex)
 	{
 	case 1: //photosynthesis
@@ -176,7 +174,7 @@ bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 	default:
 	{
 		//cause damage
-		int dmg = _atk - aim->def() + rand() % 4 - 2;
+		int dmg = attacker->atk() - aim->def() + rand() % 4 - 2;
 		if (dmg <= 0)
 			dmg = 1;
 		return aim->changeHp(-dmg);
@@ -205,7 +203,6 @@ Pokemon::Pokemon(PokemonBase *race, const string &name)
 	}
 
 	//add some random factor
-	srand(time(NULL));
 	_atk = _race->baseAtk() + rand() % 6 - 3;				 // +-3
 	_def = _race->baseDef() + rand() % 4 - 2;				 // +-2
 	_maxHp = _hp = _race->baseHp() + rand() % 8 - 4; // +-4
@@ -226,7 +223,7 @@ Pokemon::Pokemon(PokemonBase *race, const string &name)
 
 string Pokemon::raceType() const
 {
-	switch (race->type())
+	switch (_race->type())
 	{
 	case ATK:
 		return "High Attack";
@@ -239,6 +236,7 @@ string Pokemon::raceType() const
 	default:
 		break;
 	}
+	return "";
 }
 
 void Pokemon::changeAtk(int count)
@@ -279,13 +277,12 @@ bool Pokemon::getExp(int count)
 		return false;
 
 	_exp += count;
-	if (_exp > _race.expCurve(_lv))
+	if (_exp > _race->expCurve(_lv))
 	{
 		//level-up!
 		++_lv;
 
 		//increase attributes
-		srand(time(NULL));
 		_atk += 4 + rand() % 4 - 2;		// +-2
 		_def += 2 + rand() % 2 - 1;		//+-1
 		_hp += 5 + rand() % 4 - 2;		//+-2

@@ -96,7 +96,7 @@ bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 	{
 	case 1: //spark
 	{
-		int dmg = attacker->atk() - aim->def() / 2 + rand() % 4 - 2;
+		int dmg = attacker->catk() - aim->cdef() / 2 + rand() % 4 - 2;
 		if (dmg < 1)
 			dmg = 1;
 		return aim->changeHp(-dmg);
@@ -107,7 +107,7 @@ bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 		break;
 	case 3: //fireball
 	{
-		int dmg = attacker->atk() - aim->def() + 8 + rand() % 4 - 2;
+		int dmg = attacker->catk() - aim->cdef() + 8 + rand() % 4 - 2;
 		if (dmg < 1)
 			dmg = 1;
 		return aim->changeHp(-dmg);
@@ -116,7 +116,7 @@ bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 	default:
 	{
 		//simple attack
-		int dmg = attacker->atk() - aim->def() + rand() % 4 - 2;
+		int dmg = attacker->catk() - aim->cdef() + rand() % 4 - 2;
 		if (dmg <= 0)
 			dmg = 1;
 		return aim->changeHp(-dmg);
@@ -154,12 +154,12 @@ bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 	{
 	case 1: //photosynthesis
 	{
-		attacker->changeHp(attacker->atk() / 2 + attacker->def() / 2 + rand() % 4 - 2);
+		attacker->changeHp(attacker->catk() / 2 + attacker->cdef() / 2 + rand() % 4 - 2);
 		break;
 	}
 	case 2: //life drain
 	{
-		int dmg = attacker->atk() - aim->def() + rand() % 4 - 3;
+		int dmg = attacker->catk() - aim->cdef() + rand() % 4 - 3;
 		if (dmg < 1)
 			dmg = 1;
 		attacker->changeHp(dmg);
@@ -168,7 +168,7 @@ bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 	}
 	case 3: //razor leaf
 	{
-		int dmg = attacker->atk() - aim->def() + 8 + rand() % 4 - 2;
+		int dmg = attacker->catk() - aim->cdef() + 8 + rand() % 4 - 2;
 		if (dmg < 1)
 			dmg = 1;
 		return aim->changeHp(-dmg);
@@ -177,7 +177,7 @@ bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 	default:
 	{
 		//cause damage
-		int dmg = attacker->atk() - aim->def() + rand() % 4 - 2;
+		int dmg = attacker->catk() - aim->cdef() + rand() % 4 - 2;
 		if (dmg <= 0)
 			dmg = 1;
 		return aim->changeHp(-dmg);
@@ -208,7 +208,7 @@ Pokemon::Pokemon(PokemonBase *race, const string &name)
 	//add some random factor
 	_atk = _race->baseAtk() + rand() % 6 - 3;				 // +-3
 	_def = _race->baseDef() + rand() % 4 - 2;				 // +-2
-	_maxHp = _hp = _race->baseHp() + rand() % 8 - 4; // +-4
+	_maxHp = _chp = _race->baseHp() + rand() % 8 - 4; // +-4
 	_speed = _race->baseSpeed() + rand() % 4 - 2;		 // +-2
 
 	_lv = 1;
@@ -270,9 +270,9 @@ string Pokemon::raceType() const
 
 void Pokemon::changeAtk(int count)
 {
-	_atk += count;
-	if (_atk < 1)
-		_atk = 1;
+	_catk += count;
+	if (_catk < 1)
+		_catk = 1;
 
 	if (count > 0)
 	{
@@ -283,15 +283,15 @@ void Pokemon::changeAtk(int count)
 		msg << _name << "'s Attack " << count << endl;
 	}
 
-	msg << _name << "'s Attack becomes " << _atk << endl
+	msg << _name << "'s Attack becomes " << _catk << endl
 			<< endl;
 }
 
 void Pokemon::changeDef(int count)
 {
-	_def += count;
-	if (_def < 1)
-		_def = 1;
+	_cdef += count;
+	if (_cdef < 1)
+		_cdef = 1;
 
 	if (count > 0)
 	{
@@ -301,15 +301,15 @@ void Pokemon::changeDef(int count)
 	{
 		msg << _name << "'s Defence " << count << endl;
 	}
-	msg << _name << "'s Defence becomes " << _def << endl
+	msg << _name << "'s Defence becomes " << _cdef << endl
 			<< endl;
 }
 
 void Pokemon::changeSpeed(int count)
 {
-	_speed += count;
-	if (_speed < 1)
-		_speed = 1;
+	_cspeed += count;
+	if (_cspeed < 1)
+		_cspeed = 1;
 
 	if (count > 0)
 	{
@@ -319,18 +319,18 @@ void Pokemon::changeSpeed(int count)
 	{
 		msg << _name << "'s Speed " << count << endl;
 	}
-	msg << _name << "'s Speed becomes " << _speed << endl
+	msg << _name << "'s Speed becomes " << _cspeed << endl
 			<< endl;
 }
 
 bool Pokemon::changeHp(int count)
 {
-	_hp += count;
+	_chp += count;
 
-	if (_hp > _maxHp)
-		_hp = _maxHp;
-	if (_hp < 0)
-		_hp = 0;
+	if (_chp > _maxHp)
+		_chp = _maxHp;
+	if (_chp < 0)
+		_chp = 0;
 
 	if (count > 0)
 	{
@@ -340,14 +340,28 @@ bool Pokemon::changeHp(int count)
 	{
 		msg << _name << " takes " << -count << " damage!\n";
 	}
-	if (!_hp)
+	if (!_chp)
 	{
 		msg << _name << " is down!\n";
 		return true;
-	} else {
-		msg<<_name<<"'s HP becomes "<<_hp<<endl;
+	}
+	else
+	{
+		msg << _name << "'s HP becomes " << _chp << endl;
 	}
 	return false;
+}
+
+void Pokemon::restoreAll()
+{
+	_chp = _maxHp;
+	_catk = _atk;
+	_cdef = _def;
+	_cspeed = _speed;
+	for (int i = 0; i < 3; ++i)
+	{
+		_cpp[i] = _race->pp(i);
+	}
 }
 
 bool Pokemon::getExp(int count)
@@ -409,4 +423,15 @@ bool Pokemon::getExp(int count)
 	}
 
 	return false; //default
+}
+
+bool Pokemon::attack(Pokemon *aim, int skillIndex){
+	if (skillIndex >= 1 && skillIndex <= 3){
+		if (_cpp[skillIndex - 1] > 0){
+			--_cpp[skillIndex - 1];
+			return _race->attack(this, aim, skillIndex);
+		}
+	}
+
+	return _race->attack(this, aim, 0);
 }

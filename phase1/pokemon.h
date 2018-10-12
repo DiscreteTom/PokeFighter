@@ -79,7 +79,13 @@ private:
 	int _lv; //level
 	int _exp;
 	int _skillPriority[4];
-	int _pp[3]; //power point
+
+	//in battle
+	int _chp;
+	int _catk;//current atk
+	int _cdef;
+	int _cspeed;
+	int _cpp[3]; //power point
 
 public:
 	Pokemon(PokemonBase *race, const string &name = "");
@@ -97,13 +103,17 @@ public:
 	string raceType() const;
 	string skillName(int n) const {return _race->skillName(n);}
 	string skillDscp(int n) const {return _race->skillDscp(n);}
-	//setter
-	void changeAtk(int count);
+
+	//about battle
+	void restoreAll();
+	bool attack(Pokemon *aim, int skillIndex = 0);
+	bool getExp(int count); //return true if level-up
+	int catk() const { return _catk; }
+	int cdef() const { return _cdef; }
+	int chp() const { return _chp; }
+	int cspeed() const { return _cspeed; }
+	void changeAtk(int count);//change current atk
 	void changeDef(int count);
 	void changeSpeed(int count);
 	bool changeHp(int count); //return true if hp = 0
-
-	//about battle
-	bool attack(Pokemon *aim, int skillIndex = 0) { return _race->attack(this, aim, skillIndex); }
-	bool getExp(int count); //return true if level-up
 };

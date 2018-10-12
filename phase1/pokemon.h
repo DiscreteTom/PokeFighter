@@ -4,6 +4,9 @@
 
 using std::string;
 
+#include <iostream>
+using namespace std;
+#define msg cout
 class Pokemon; //declaration
 
 enum PokemonType
@@ -26,7 +29,7 @@ protected:
 	int _expCurve[14];
 	string _skillName[4];
 	string _skillDscp[4]; //skill description
-	int _pp[3];				 //power point, first skill has infinite pp
+	int _pp[3];						//power point, first skill has infinite pp
 
 public:
 	PokemonBase(PokemonType type);
@@ -79,7 +82,7 @@ private:
 	int _pp[3]; //power point
 
 public:
-	Pokemon(PokemonBase *race = NULL, const string &name = "");
+	Pokemon(PokemonBase *race, const string &name = "");
 
 	//getter
 	string name() const { return _name; }
@@ -92,6 +95,8 @@ public:
 	//race getter
 	string raceName() const { return _race->raceName(); }
 	string raceType() const;
+	string skillName(int n) const {return _race->skillName(n);}
+	string skillDscp(int n) const {return _race->skillDscp(n);}
 	//setter
 	void changeAtk(int count);
 	void changeDef(int count);

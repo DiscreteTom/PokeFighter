@@ -91,6 +91,7 @@ Race_1::Race_1() : PokemonBase(ATK)
 
 bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 {
+	msg << attacker->name() << " uses " << attacker->skillName(skillIndex) << "!\n";
 	switch (skillIndex)
 	{
 	case 1: //spark
@@ -98,6 +99,7 @@ bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 		int dmg = attacker->atk() - aim->def() / 2 + rand() % 4 - 2;
 		if (dmg < 1)
 			dmg = 1;
+		msg << aim->name() << " takes " << dmg << " damage!\n";
 		return aim->changeHp(-dmg);
 		break;
 	}
@@ -109,15 +111,17 @@ bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 		int dmg = attacker->atk() - aim->def() + 8 + rand() % 4 - 2;
 		if (dmg < 1)
 			dmg = 1;
+		msg << aim->name() << " takes " << dmg << " damage!\n";
 		return aim->changeHp(-dmg);
 		break;
 	}
 	default:
 	{
-		//cause damage
+		//simple attack
 		int dmg = attacker->atk() - aim->def() + rand() % 4 - 2;
 		if (dmg <= 0)
 			dmg = 1;
+		msg << aim->name() << " takes " << dmg << " damage!\n";
 		return aim->changeHp(-dmg);
 		break;
 	}
@@ -148,6 +152,7 @@ Race_2::Race_2() : PokemonBase(HP)
 
 bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 {
+	msg << attacker->name() << " uses " << attacker->skillName(skillIndex) << "!\n";
 	switch (skillIndex)
 	{
 	case 1: //photosynthesis
@@ -158,7 +163,10 @@ bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 	case 2: //life drain
 	{
 		int dmg = attacker->atk() - aim->def() + rand() % 4 - 3;
-		if (dmg < 1)dmg = 1;
+		if (dmg < 1)
+			dmg = 1;
+		msg << aim->name() << " takes " << dmg << " damage!\n";
+		msg << attacker->name() << " gains " << dmg << "HP!\n";
 		attacker->changeHp(dmg);
 		return aim->changeHp(-dmg);
 		break;
@@ -168,6 +176,7 @@ bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 		int dmg = attacker->atk() - aim->def() + 8 + rand() % 4 - 2;
 		if (dmg < 1)
 			dmg = 1;
+		msg << aim->name() << " takes " << dmg << " damage!\n";
 		return aim->changeHp(-dmg);
 		break;
 	}
@@ -177,6 +186,7 @@ bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 		int dmg = attacker->atk() - aim->def() + rand() % 4 - 2;
 		if (dmg <= 0)
 			dmg = 1;
+		msg << aim->name() << " takes " << dmg << " damage!\n";
 		return aim->changeHp(-dmg);
 		break;
 	}
@@ -219,6 +229,28 @@ Pokemon::Pokemon(PokemonBase *race, const string &name)
 	{
 		_pp[i] = _race->pp(i);
 	}
+
+	//output info
+	msg << "Init " << _name << " from " << _race->raceName() << endl
+			<< "Type: " << raceType() << endl
+			<< "Atk: " << _atk << endl
+			<< "Def: " << _def << endl
+			<< "MaxHp: " << _maxHp << endl
+			<< "Speed: " << _speed << endl
+			<< "LV: " << _lv << endl
+			<< "Exp: " << _exp << endl;
+	//output skill
+	msg << "Skills:\n";
+	for (int i = 0; i < 4; ++i)
+	{
+		msg << "	Name: " << _race->skillName(i) << endl;
+		msg << "	Description: " << _race->skillDscp(i) << endl;
+		if (i)
+		{
+			msg << "	PP: " << _race->pp(i - 1) << endl;
+		}
+	}
+	msg << endl;
 }
 
 string Pokemon::raceType() const
@@ -244,6 +276,9 @@ void Pokemon::changeAtk(int count)
 	_atk += count;
 	if (_atk < 1)
 		_atk = 1;
+
+	msg << _name << "'s Attack becomes " << _atk << endl
+			<< endl;
 }
 
 void Pokemon::changeDef(int count)
@@ -251,6 +286,8 @@ void Pokemon::changeDef(int count)
 	_def += count;
 	if (_def < 1)
 		_def = 1;
+	msg << _name << "'s Defence becomes " << _def << endl
+			<< endl;
 }
 
 void Pokemon::changeSpeed(int count)
@@ -258,14 +295,20 @@ void Pokemon::changeSpeed(int count)
 	_speed += count;
 	if (_speed < 1)
 		_speed = 1;
+	msg << _name << "'s Speed becomes " << _speed << endl
+			<< endl;
 }
 
-bool Pokemon::changeHp(int count){
+bool Pokemon::changeHp(int count)
+{
 	_hp += count;
 	if (_hp < 0)
 		_hp = 0;
+	msg << _name << "'s HP becomes " << _hp << endl
+			<< endl;
 	if (!_hp)
 	{
+		msg << _name << " is down!\n";
 		return true;
 	}
 	return false;
@@ -277,35 +320,54 @@ bool Pokemon::getExp(int count)
 		return false;
 
 	_exp += count;
+
+	msg << _name << " gains " << count << " exp!\n";
+	msg << "Now " << _name << " has " << _exp << " exp\n"
+			<< endl;
+
 	if (_exp > _race->expCurve(_lv))
 	{
 		//level-up!
 		++_lv;
+		msg << "Level Up!\n";
+		msg << _name << "'s now LV" << _lv << "!\n"
+				<< endl;
 
 		//increase attributes
-		_atk += 4 + rand() % 4 - 2;		// +-2
-		_def += 2 + rand() % 2 - 1;		//+-1
-		_hp += 5 + rand() % 4 - 2;		//+-2
-		_speed += 2 + rand() % 2 - 1; //+-1
+		int atk, def, maxHp, speed;
+		atk = 4 + rand() % 4 - 2;		// +-2
+		def = 2 + rand() % 2 - 1;		//+-1
+		maxHp = 5 + rand() % 4 - 2; //+-2
+		speed = 2 + rand() % 2 - 1; //+-1
 
 		//race talent
 		switch (_race->type())
 		{
 		case ATK:
-			_atk += 2;
+			atk += 2;
 			break;
 		case HP:
-			_hp += 4;
+			maxHp += 4;
 			break;
 		case DEF:
-			_def += 2;
+			def += 2;
 			break;
 		case SPE:
-			_speed += 1;
+			speed += 1;
 			break;
 		default:
 			break;
 		}
+
+		_atk += atk;
+		_def += def;
+		_maxHp += maxHp;
+		_speed += speed;
+
+		msg << "Atk: " << _atk - atk << "->" << _atk << "!\n";
+		msg << "Def: " << _def - def << "->" << _def << "!\n";
+		msg << "MaxHP: " << _maxHp - maxHp << "->" << _maxHp << "!\n";
+		msg << "Speed: " << _speed - speed << "->" << _speed << "!\n\n";
 
 		return true;
 	}

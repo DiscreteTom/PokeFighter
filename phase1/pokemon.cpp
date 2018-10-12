@@ -22,7 +22,7 @@ PokemonBase::PokemonBase(PokemonType type)
 		_baseDef += 3;
 		break;
 	case HP:
-		_baseHp += 5;
+		_baseHp += 10;
 		break;
 	case SPE:
 		_baseSpeed += 5;
@@ -99,7 +99,6 @@ bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 		int dmg = attacker->atk() - aim->def() / 2 + rand() % 4 - 2;
 		if (dmg < 1)
 			dmg = 1;
-		msg << aim->name() << " takes " << dmg << " damage!\n";
 		return aim->changeHp(-dmg);
 		break;
 	}
@@ -111,7 +110,6 @@ bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 		int dmg = attacker->atk() - aim->def() + 8 + rand() % 4 - 2;
 		if (dmg < 1)
 			dmg = 1;
-		msg << aim->name() << " takes " << dmg << " damage!\n";
 		return aim->changeHp(-dmg);
 		break;
 	}
@@ -121,7 +119,6 @@ bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 		int dmg = attacker->atk() - aim->def() + rand() % 4 - 2;
 		if (dmg <= 0)
 			dmg = 1;
-		msg << aim->name() << " takes " << dmg << " damage!\n";
 		return aim->changeHp(-dmg);
 		break;
 	}
@@ -165,8 +162,6 @@ bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 		int dmg = attacker->atk() - aim->def() + rand() % 4 - 3;
 		if (dmg < 1)
 			dmg = 1;
-		msg << aim->name() << " takes " << dmg << " damage!\n";
-		msg << attacker->name() << " gains " << dmg << "HP!\n";
 		attacker->changeHp(dmg);
 		return aim->changeHp(-dmg);
 		break;
@@ -176,7 +171,6 @@ bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 		int dmg = attacker->atk() - aim->def() + 8 + rand() % 4 - 2;
 		if (dmg < 1)
 			dmg = 1;
-		msg << aim->name() << " takes " << dmg << " damage!\n";
 		return aim->changeHp(-dmg);
 		break;
 	}
@@ -186,7 +180,6 @@ bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 		int dmg = attacker->atk() - aim->def() + rand() % 4 - 2;
 		if (dmg <= 0)
 			dmg = 1;
-		msg << aim->name() << " takes " << dmg << " damage!\n";
 		return aim->changeHp(-dmg);
 		break;
 	}
@@ -249,6 +242,10 @@ Pokemon::Pokemon(PokemonBase *race, const string &name)
 		{
 			msg << "	PP: " << _race->pp(i - 1) << endl;
 		}
+		else
+		{
+			msg << "	PP: infinity\n";
+		}
 	}
 	msg << endl;
 }
@@ -277,6 +274,15 @@ void Pokemon::changeAtk(int count)
 	if (_atk < 1)
 		_atk = 1;
 
+	if (count > 0)
+	{
+		msg << _name << "'s Attack +" << count << endl;
+	}
+	else
+	{
+		msg << _name << "'s Attack " << count << endl;
+	}
+
 	msg << _name << "'s Attack becomes " << _atk << endl
 			<< endl;
 }
@@ -286,6 +292,15 @@ void Pokemon::changeDef(int count)
 	_def += count;
 	if (_def < 1)
 		_def = 1;
+
+	if (count > 0)
+	{
+		msg << _name << "'s Defence +" << count << endl;
+	}
+	else
+	{
+		msg << _name << "'s Defence " << count << endl;
+	}
 	msg << _name << "'s Defence becomes " << _def << endl
 			<< endl;
 }
@@ -295,6 +310,15 @@ void Pokemon::changeSpeed(int count)
 	_speed += count;
 	if (_speed < 1)
 		_speed = 1;
+
+	if (count > 0)
+	{
+		msg << _name << "'s Speed +" << count << endl;
+	}
+	else
+	{
+		msg << _name << "'s Speed " << count << endl;
+	}
 	msg << _name << "'s Speed becomes " << _speed << endl
 			<< endl;
 }
@@ -302,14 +326,26 @@ void Pokemon::changeSpeed(int count)
 bool Pokemon::changeHp(int count)
 {
 	_hp += count;
+
+	if (_hp > _maxHp)
+		_hp = _maxHp;
 	if (_hp < 0)
 		_hp = 0;
-	msg << _name << "'s HP becomes " << _hp << endl
-			<< endl;
+
+	if (count > 0)
+	{
+		msg << _name << " restores " << count << "HP!\n";
+	}
+	else
+	{
+		msg << _name << " takes " << -count << " damage!\n";
+	}
 	if (!_hp)
 	{
 		msg << _name << " is down!\n";
 		return true;
+	} else {
+		msg<<_name<<"'s HP becomes "<<_hp<<endl;
 	}
 	return false;
 }

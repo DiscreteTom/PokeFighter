@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <stdlib.h>
 
 using std::string;
 
@@ -117,3 +118,5 @@ public:
 	void changeSpeed(int count);
 	bool changeHp(int count); //return true if hp = 0
 };
+
+int f(int n);

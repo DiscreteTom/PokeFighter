@@ -1,6 +1,4 @@
 #include "pokemon.h"
-#include <stdlib.h>
-#include <time.h>
 
 PokemonBase::PokemonBase(PokemonType type)
 {
@@ -76,12 +74,12 @@ Race_1::Race_1() : PokemonBase(ATK)
 	{
 		_expCurve[i] = _expCurve[i - 1] + 5 * i;
 	}
-	_skillName[0] = "knock";
+	_skillName[0] = "kick";
 	_skillName[1] = "spark";
 	_skillName[2] = "rage";
 	_skillName[3] = "fireball";
 	_skillDscp[0] = "simple attack";
-	_skillDscp[1] = "ignore opponent's half defencce";
+	_skillDscp[1] = "ignore opponent's half defence";
 	_skillDscp[2] = "increase attack";
 	_skillDscp[3] = "cause huge damage";
 	_pp[0] = 10;
@@ -96,18 +94,18 @@ bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 	{
 	case 1: //spark
 	{
-		int dmg = attacker->catk() - aim->cdef() / 2 + rand() % 4 - 2;
+		int dmg = attacker->catk() + attacker->lv()*2 - aim->cdef() / 2 + f(4);
 		if (dmg < 1)
 			dmg = 1;
 		return aim->changeHp(-dmg);
 		break;
 	}
 	case 2: //rage
-		attacker->changeAtk(2);
+		attacker->changeAtk(attacker->atk() / 8);
 		break;
 	case 3: //fireball
 	{
-		int dmg = attacker->catk() - aim->cdef() + 8 + rand() % 4 - 2;
+		int dmg = attacker->catk() * 2 - aim->cdef() + 8 + f(4 + attacker->lv());
 		if (dmg < 1)
 			dmg = 1;
 		return aim->changeHp(-dmg);
@@ -116,7 +114,7 @@ bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 	default:
 	{
 		//simple attack
-		int dmg = attacker->catk() - aim->cdef() + rand() % 4 - 2;
+		int dmg = attacker->catk() - aim->cdef() + f(4);
 		if (dmg <= 0)
 			dmg = 1;
 		return aim->changeHp(-dmg);
@@ -140,7 +138,7 @@ Race_2::Race_2() : PokemonBase(HP)
 	_skillName[3] = "razor leaf";
 	_skillDscp[0] = "simple attack";
 	_skillDscp[1] = "restore HP";
-	_skillDscp[2] = "cause damage and restore HP";
+	_skillDscp[2] = "cause damage and restore HP, ignore defence";
 	_skillDscp[3] = "cause huge damage";
 	_pp[0] = 5;
 	_pp[1] = 10;
@@ -154,12 +152,12 @@ bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 	{
 	case 1: //photosynthesis
 	{
-		attacker->changeHp(attacker->catk() / 2 + attacker->cdef() / 2 + rand() % 4 - 2);
+		attacker->changeHp(attacker->catk() / 2 + attacker->cdef() + f(4));
 		break;
 	}
 	case 2: //life drain
 	{
-		int dmg = attacker->catk() - aim->cdef() + rand() % 4 - 3;
+		int dmg = attacker->catk() + f(4 + attacker->lv());
 		if (dmg < 1)
 			dmg = 1;
 		attacker->changeHp(dmg);
@@ -168,7 +166,7 @@ bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 	}
 	case 3: //razor leaf
 	{
-		int dmg = attacker->catk() - aim->cdef() + 8 + rand() % 4 - 2;
+		int dmg = attacker->catk() * 2 - aim->cdef() + f(3 + attacker->lv());
 		if (dmg < 1)
 			dmg = 1;
 		return aim->changeHp(-dmg);
@@ -177,7 +175,7 @@ bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 	default:
 	{
 		//cause damage
-		int dmg = attacker->catk() - aim->cdef() + rand() % 4 - 2;
+		int dmg = attacker->catk() - aim->cdef() + f(4);
 		if (dmg <= 0)
 			dmg = 1;
 		return aim->changeHp(-dmg);
@@ -206,10 +204,10 @@ Pokemon::Pokemon(PokemonBase *race, const string &name)
 	}
 
 	//add some random factor
-	_atk = _race->baseAtk() + rand() % 6 - 3;				 // +-3
-	_def = _race->baseDef() + rand() % 4 - 2;				 // +-2
-	_maxHp = _chp = _race->baseHp() + rand() % 8 - 4; // +-4
-	_speed = _race->baseSpeed() + rand() % 4 - 2;		 // +-2
+	_atk = _race->baseAtk() + f(3);
+	_def = _race->baseDef() + f(2);
+	_maxHp = _chp = _race->baseHp() + f(4);
+	_speed = _race->baseSpeed() + f(3);
 
 	_lv = 1;
 	_exp = 0;
@@ -220,7 +218,7 @@ Pokemon::Pokemon(PokemonBase *race, const string &name)
 	}
 	for (int i = 0; i < 3; ++i)
 	{
-		_pp[i] = _race->pp(i);
+		_cpp[i] = _race->pp(i);
 	}
 
 	//output info
@@ -375,9 +373,11 @@ bool Pokemon::getExp(int count)
 	msg << "Now " << _name << " has " << _exp << " exp\n"
 			<< endl;
 
-	if (_exp > _race->expCurve(_lv))
+	bool LV_UP = false;
+	while (_lv < 15 && _exp > _race->expCurve(_lv - 1))
 	{
 		//level-up!
+		LV_UP = true;
 		++_lv;
 		msg << "Level Up!\n";
 		msg << _name << "'s now LV" << _lv << "!\n"
@@ -385,25 +385,25 @@ bool Pokemon::getExp(int count)
 
 		//increase attributes
 		int atk, def, maxHp, speed;
-		atk = 4 + rand() % 4 - 2;		// +-2
-		def = 2 + rand() % 2 - 1;		//+-1
-		maxHp = 5 + rand() % 4 - 2; //+-2
-		speed = 2 + rand() % 2 - 1; //+-1
+		atk = 4 + f(2);
+		def = 2 + f(2);
+		maxHp = 8 + f(4);
+		speed = 5 + f(2);
 
 		//race talent
 		switch (_race->type())
 		{
 		case ATK:
-			atk += 2;
+			atk += 3;
 			break;
 		case HP:
-			maxHp += 4;
+			maxHp += 5;
 			break;
 		case DEF:
-			def += 2;
+			def += 3;
 			break;
 		case SPE:
-			speed += 1;
+			speed += 3;
 			break;
 		default:
 			break;
@@ -418,20 +418,28 @@ bool Pokemon::getExp(int count)
 		msg << "Def: " << _def - def << "->" << _def << "!\n";
 		msg << "MaxHP: " << _maxHp - maxHp << "->" << _maxHp << "!\n";
 		msg << "Speed: " << _speed - speed << "->" << _speed << "!\n\n";
-
-		return true;
 	}
+
+	if (LV_UP)
+		return true;
 
 	return false; //default
 }
 
-bool Pokemon::attack(Pokemon *aim, int skillIndex){
-	if (skillIndex >= 1 && skillIndex <= 3){
-		if (_cpp[skillIndex - 1] > 0){
+bool Pokemon::attack(Pokemon *aim, int skillIndex)
+{
+	if (skillIndex >= 1 && skillIndex <= 3)
+	{
+		if (_cpp[skillIndex - 1] > 0)
+		{
 			--_cpp[skillIndex - 1];
 			return _race->attack(this, aim, skillIndex);
 		}
 	}
 
 	return _race->attack(this, aim, 0);
+}
+
+int f(int n) {
+	return rand() % (2 * n) - n;
 }

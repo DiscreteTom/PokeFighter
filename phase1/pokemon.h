@@ -50,27 +50,27 @@ public:
 	int expCurve(int level) const;
 
 	//virtual methods
-	virtual bool attack(Pokemon *attacker, Pokemon *aim, int skillIndex = 0) const = 0;
+	virtual bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const = 0;
 };
 
 class Race_1 : public PokemonBase
 {
 public:
 	Race_1();
-	bool attack(Pokemon *attacker, Pokemon *aim, int skillIndex = 0) const;
+	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
 };
 
 class Race_2 : public PokemonBase
 {
 public:
 	Race_2();
-	bool attack(Pokemon *attacker, Pokemon *aim, int skillIndex = 0) const;
+	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
 };
 
 class Pokemon
 {
 private:
-	const PokemonBase *_race;
+	const PokemonBase &_race;
 	string _name;
 	int _atk;
 	int _def;
@@ -99,10 +99,10 @@ public:
 	int lv() const { return _lv; }
 	int exp() const { return _exp; }
 	//race getter
-	string raceName() const { return _race->raceName(); }
+	string raceName() const { return _race.raceName(); }
 	string raceType() const;
-	string skillName(int n) const { return _race->skillName(n); }
-	string skillDscp(int n) const { return _race->skillDscp(n); }
+	string skillName(int n) const { return _race.skillName(n); }
+	string skillDscp(int n) const { return _race.skillDscp(n); }
 
 	//about battle
 	void restoreAll();

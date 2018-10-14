@@ -87,37 +87,37 @@ Race_1::Race_1() : PokemonBase(ATK)
 	_pp[2] = 5;
 }
 
-bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex) const
+bool Race_1::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
-	msg << attacker->name() << " uses " << attacker->skillName(skillIndex) << "!\n";
+	msg << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
 	switch (skillIndex)
 	{
 	case 1: //spark
 	{
-		int dmg = attacker->catk() + attacker->lv() * 2 - aim->cdef() / 2 + f(4);
+		int dmg = attacker.catk() + attacker.lv() * 2 - aim.cdef() / 2 + f(4);
 		if (dmg < 1)
 			dmg = 1;
-		return aim->changeHp(-dmg);
+		return aim.changeHp(-dmg);
 		break;
 	}
 	case 2: //rage
-		attacker->changeAtk(attacker->atk() / 8);
+		attacker.changeAtk(attacker.atk() / 8);
 		break;
 	case 3: //fireball
 	{
-		int dmg = attacker->catk() * 2 - aim->cdef() + 8 + f(4 + attacker->lv());
+		int dmg = attacker.catk() * 2 - aim.cdef() + 8 + f(4 + attacker.lv());
 		if (dmg < 1)
 			dmg = 1;
-		return aim->changeHp(-dmg);
+		return aim.changeHp(-dmg);
 		break;
 	}
 	default:
 	{
 		//simple attack
-		int dmg = attacker->catk() - aim->cdef() + f(4);
+		int dmg = attacker.catk() - aim.cdef() + f(4);
 		if (dmg <= 0)
 			dmg = 1;
-		return aim->changeHp(-dmg);
+		return aim.changeHp(-dmg);
 		break;
 	}
 	} //switch
@@ -145,51 +145,51 @@ Race_2::Race_2() : PokemonBase(HP)
 	_pp[2] = 5;
 }
 
-bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex) const
+bool Race_2::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
-	msg << attacker->name() << " uses " << attacker->skillName(skillIndex) << "!\n";
+	msg << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
 	switch (skillIndex)
 	{
 	case 1: //photosynthesis
 	{
-		attacker->changeHp(attacker->catk() / 2 + attacker->cdef() + f(4));
+		attacker.changeHp(attacker.catk() / 2 + attacker.cdef() + f(4));
 		break;
 	}
 	case 2: //life drain
 	{
-		int dmg = attacker->catk() + f(4 + attacker->lv());
+		int dmg = attacker.catk() + f(4 + attacker.lv());
 		if (dmg < 1)
 			dmg = 1;
-		attacker->changeHp(dmg);
-		return aim->changeHp(-dmg);
+		attacker.changeHp(dmg);
+		return aim.changeHp(-dmg);
 		break;
 	}
 	case 3: //razor leaf
 	{
-		int dmg = attacker->catk() * 2 - aim->cdef() + f(3 + attacker->lv());
+		int dmg = attacker.catk() * 2 - aim.cdef() + f(3 + attacker.lv());
 		if (dmg < 1)
 			dmg = 1;
-		return aim->changeHp(-dmg);
+		return aim.changeHp(-dmg);
 		break;
 	}
 	default:
 	{
 		//cause damage
-		int dmg = attacker->catk() - aim->cdef() + f(4);
+		int dmg = attacker.catk() - aim.cdef() + f(4);
 		if (dmg <= 0)
 			dmg = 1;
-		return aim->changeHp(-dmg);
+		return aim.changeHp(-dmg);
 		break;
 	}
 	} //switch
 	return false;
 }
 
-Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(&race)
+Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(race)
 {
 	if (!name.length())
 	{
-		_name = _race->raceName();
+		_name = _race.raceName();
 	}
 	else
 	{
@@ -197,21 +197,21 @@ Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(&race)
 	}
 
 	//add some random factor
-	_atk = _race->baseAtk() + f(3);
-	_def = _race->baseDef() + f(2);
-	_maxHp = _chp = _race->baseHp() + f(4);
-	_speed = _race->baseSpeed() + f(3);
+	_atk = _race.baseAtk() + f(3);
+	_def = _race.baseDef() + f(2);
+	_maxHp = _chp = _race.baseHp() + f(4);
+	_speed = _race.baseSpeed() + f(3);
 
 	_lv = 1;
 	_exp = 0;
 
 	for (int i = 0; i < 3; ++i)
 	{
-		_cpp[i] = _race->pp(i);
+		_cpp[i] = _race.pp(i);
 	}
 
 	//output info
-	msg << "Init " << _name << " from " << _race->raceName() << endl
+	msg << "Init " << _name << " from " << _race.raceName() << endl
 			<< "Type: " << raceType() << endl
 			<< "Atk: " << _atk << endl
 			<< "Def: " << _def << endl
@@ -223,11 +223,11 @@ Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(&race)
 	msg << "Skills:\n";
 	for (int i = 0; i < 4; ++i)
 	{
-		msg << "	Name: " << _race->skillName(i) << endl;
-		msg << "	Description: " << _race->skillDscp(i) << endl;
+		msg << "	Name: " << _race.skillName(i) << endl;
+		msg << "	Description: " << _race.skillDscp(i) << endl;
 		if (i)
 		{
-			msg << "	PP: " << _race->pp(i - 1) << endl;
+			msg << "	PP: " << _race.pp(i - 1) << endl;
 		}
 		else
 		{
@@ -239,7 +239,7 @@ Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(&race)
 
 string Pokemon::raceType() const
 {
-	switch (_race->type())
+	switch (_race.type())
 	{
 	case ATK:
 		return "High Attack";
@@ -356,7 +356,7 @@ void Pokemon::restoreAll()
 	_cspeed = _speed;
 	for (int i = 0; i < 3; ++i)
 	{
-		_cpp[i] = _race->pp(i);
+		_cpp[i] = _race.pp(i);
 	}
 }
 
@@ -372,7 +372,7 @@ bool Pokemon::getExp(int count)
 			<< endl;
 
 	bool LV_UP = false;
-	while (_lv < 15 && _exp > _race->expCurve(_lv - 1))
+	while (_lv < 15 && _exp > _race.expCurve(_lv - 1))
 	{
 		//level-up!
 		LV_UP = true;
@@ -389,7 +389,7 @@ bool Pokemon::getExp(int count)
 		speed = 5 + f(2);
 
 		//race talent
-		switch (_race->type())
+		switch (_race.type())
 		{
 		case ATK:
 			atk += 3;
@@ -412,10 +412,10 @@ bool Pokemon::getExp(int count)
 		_maxHp += maxHp;
 		_speed += speed;
 
-		msg << "Atk: " << _atk - atk << "->" << _atk << "!\n";
-		msg << "Def: " << _def - def << "->" << _def << "!\n";
-		msg << "MaxHP: " << _maxHp - maxHp << "->" << _maxHp << "!\n";
-		msg << "Speed: " << _speed - speed << "->" << _speed << "!\n\n";
+		msg << "Atk: " << _atk - atk << "." << _atk << "!\n";
+		msg << "Def: " << _def - def << "." << _def << "!\n";
+		msg << "MaxHP: " << _maxHp - maxHp << "." << _maxHp << "!\n";
+		msg << "Speed: " << _speed - speed << "." << _speed << "!\n\n";
 	}
 
 	if (LV_UP)
@@ -452,17 +452,17 @@ bool Pokemon::attack(Pokemon &aim, bool autoFight, int skillIndex)
 			}
 		}
 		if (skillIndex > 0) --_cpp[skillIndex - 1];
-		return _race->attack(this, &aim, skillIndex);
+		return _race.attack(*this, aim, skillIndex);
 	}
 
 	//manual fight, judge skillIndex
 	if (skillIndex * 5 <= _lv && _cpp[skillIndex - 1])
 	{
 		--_cpp[skillIndex - 1];
-		return _race->attack(this, &aim, skillIndex);
+		return _race.attack(*this, aim, skillIndex);
 	}
 
-	return _race->attack(this, &aim, 0);
+	return _race.attack(*this, aim, 0);
 }
 
 int f(int n)

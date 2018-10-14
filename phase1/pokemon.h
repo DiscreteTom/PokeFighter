@@ -50,27 +50,27 @@ public:
 	int expCurve(int level) const;
 
 	//virtual methods
-	virtual bool attack(Pokemon *attacker, Pokemon *aim, int skillIndex = 0) = 0;
+	virtual bool attack(Pokemon *attacker, Pokemon *aim, int skillIndex = 0) const = 0;
 };
 
 class Race_1 : public PokemonBase
 {
 public:
 	Race_1();
-	bool attack(Pokemon *attacker, Pokemon *aim, int skillIndex = 0);
+	bool attack(Pokemon *attacker, Pokemon *aim, int skillIndex = 0) const;
 };
 
 class Race_2 : public PokemonBase
 {
 public:
 	Race_2();
-	bool attack(Pokemon *attacker, Pokemon *aim, int skillIndex = 0);
+	bool attack(Pokemon *attacker, Pokemon *aim, int skillIndex = 0) const;
 };
 
 class Pokemon
 {
 private:
-	PokemonBase *_race;
+	const PokemonBase *_race;
 	string _name;
 	int _atk;
 	int _def;
@@ -83,13 +83,13 @@ private:
 
 	//in battle
 	int _chp;
-	int _catk;//current atk
+	int _catk; //current atk
 	int _cdef;
 	int _cspeed;
 	int _cpp[3]; //power point
 
 public:
-	Pokemon(PokemonBase *race, const string &name = "");
+	Pokemon(const PokemonBase &race, const string &name = "");
 
 	//getter
 	string name() const { return _name; }
@@ -102,18 +102,18 @@ public:
 	//race getter
 	string raceName() const { return _race->raceName(); }
 	string raceType() const;
-	string skillName(int n) const {return _race->skillName(n);}
-	string skillDscp(int n) const {return _race->skillDscp(n);}
+	string skillName(int n) const { return _race->skillName(n); }
+	string skillDscp(int n) const { return _race->skillDscp(n); }
 
 	//about battle
 	void restoreAll();
-	bool attack(Pokemon *aim, int skillIndex = 0);
+	bool attack(Pokemon &aim, int skillIndex = 0);
 	bool getExp(int count); //return true if level-up
 	int catk() const { return _catk; }
 	int cdef() const { return _cdef; }
 	int chp() const { return _chp; }
 	int cspeed() const { return _cspeed; }
-	void changeAtk(int count);//change current atk
+	void changeAtk(int count); //change current atk
 	void changeDef(int count);
 	void changeSpeed(int count);
 	bool changeHp(int count); //return true if hp = 0

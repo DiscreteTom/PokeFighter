@@ -87,14 +87,14 @@ Race_1::Race_1() : PokemonBase(ATK)
 	_pp[2] = 5;
 }
 
-bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
+bool Race_1::attack(Pokemon *attacker, Pokemon *aim, int skillIndex) const
 {
 	msg << attacker->name() << " uses " << attacker->skillName(skillIndex) << "!\n";
 	switch (skillIndex)
 	{
 	case 1: //spark
 	{
-		int dmg = attacker->catk() + attacker->lv()*2 - aim->cdef() / 2 + f(4);
+		int dmg = attacker->catk() + attacker->lv() * 2 - aim->cdef() / 2 + f(4);
 		if (dmg < 1)
 			dmg = 1;
 		return aim->changeHp(-dmg);
@@ -145,7 +145,7 @@ Race_2::Race_2() : PokemonBase(HP)
 	_pp[2] = 5;
 }
 
-bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
+bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex) const
 {
 	msg << attacker->name() << " uses " << attacker->skillName(skillIndex) << "!\n";
 	switch (skillIndex)
@@ -185,15 +185,8 @@ bool Race_2::attack(Pokemon *attacker, Pokemon *aim, int skillIndex)
 	return false;
 }
 
-Pokemon::Pokemon(PokemonBase *race, const string &name)
+Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(&race)
 {
-	if (!race)
-	{
-		//TODO: error
-	}
-
-	_race = race;
-
 	if (!name.length())
 	{
 		_name = _race->raceName();
@@ -426,20 +419,21 @@ bool Pokemon::getExp(int count)
 	return false; //default
 }
 
-bool Pokemon::attack(Pokemon *aim, int skillIndex)
+bool Pokemon::attack(Pokemon &aim, int skillIndex)
 {
 	if (skillIndex >= 1 && skillIndex <= 3)
 	{
 		if (_cpp[skillIndex - 1] > 0)
 		{
 			--_cpp[skillIndex - 1];
-			return _race->attack(this, aim, skillIndex);
+			return _race->attack(this, &aim, skillIndex);
 		}
 	}
 
-	return _race->attack(this, aim, 0);
+	return _race->attack(this, &aim, 0);
 }
 
-int f(int n) {
+int f(int n)
+{
 	return rand() % (2 * n) - n;
 }

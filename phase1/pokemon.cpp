@@ -205,10 +205,6 @@ Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(&race)
 	_lv = 1;
 	_exp = 0;
 
-	for (int i = 0; i < 4; ++i)
-	{
-		_skillPriority[i] = 0;
-	}
 	for (int i = 0; i < 3; ++i)
 	{
 		_cpp[i] = _race->pp(i);
@@ -257,6 +253,15 @@ string Pokemon::raceType() const
 		break;
 	}
 	return "";
+}
+
+int Pokemon::cpp(int n) const
+{
+	if (n >= 0 || n <= 2)
+	{
+		return _cpp[n];
+	}
+	return 0;
 }
 
 void Pokemon::changeAtk(int count)
@@ -419,15 +424,42 @@ bool Pokemon::getExp(int count)
 	return false; //default
 }
 
-bool Pokemon::attack(Pokemon &aim, int skillIndex)
+bool Pokemon::attack(Pokemon &aim, bool autoFight, int skillIndex)
 {
-	if (skillIndex >= 1 && skillIndex <= 3)
-	{
-		if (_cpp[skillIndex - 1] > 0)
-		{
-			--_cpp[skillIndex - 1];
-			return _race->attack(this, &aim, skillIndex);
+	if (autoFight){
+		//judge usable skill by LV and PP
+		bool usable[3];
+		int usableCount = 1;//can use simple attack by default
+		for (int i = 0; i < 3; ++i){
+			if (_lv >= (i + 1) * 5 && _cpp[i]){
+				usable[i] = true;
+				++usableCount;
+			}
 		}
+		//get a random skill
+		int use = rand() % usableCount;
+		//find the skill
+		if (!use) skillIndex = 0;
+		else {
+			for (int i = 0; i < 3; ++i){
+				if (usable[i]){
+					--use;
+					if (!use){
+						skillIndex = i + 1;
+						break;
+					}
+				}
+			}
+		}
+		if (skillIndex > 0) --_cpp[skillIndex - 1];
+		return _race->attack(this, &aim, skillIndex);
+	}
+
+	//manual fight, judge skillIndex
+	if (skillIndex * 5 <= _lv && _cpp[skillIndex - 1])
+	{
+		--_cpp[skillIndex - 1];
+		return _race->attack(this, &aim, skillIndex);
 	}
 
 	return _race->attack(this, &aim, 0);

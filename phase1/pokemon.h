@@ -79,7 +79,6 @@ private:
 	int _speed;
 	int _lv; //level
 	int _exp;
-	int _skillPriority[4];
 
 	//in battle
 	int _chp;
@@ -107,12 +106,13 @@ public:
 
 	//about battle
 	void restoreAll();
-	bool attack(Pokemon &aim, int skillIndex = 0);
+	bool attack(Pokemon &aim, bool autoFight = true, int skillIndex = 0);
 	bool getExp(int count); //return true if level-up
 	int catk() const { return _catk; }
 	int cdef() const { return _cdef; }
 	int chp() const { return _chp; }
 	int cspeed() const { return _cspeed; }
+	int cpp(int n) const ;
 	void changeAtk(int count); //change current atk
 	void changeDef(int count);
 	void changeSpeed(int count);

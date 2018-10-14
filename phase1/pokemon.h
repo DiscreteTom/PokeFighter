@@ -74,14 +74,13 @@ private:
 	string _name;
 	int _atk;
 	int _def;
-	int _hp;
 	int _maxHp;
 	int _speed;
 	int _lv; //level
 	int _exp;
 
 	//in battle
-	int _chp;
+	int _hp;
 	int _catk; //current atk
 	int _cdef;
 	int _cspeed;
@@ -94,7 +93,7 @@ public:
 	string name() const { return _name; }
 	int atk() const { return _atk; }
 	int def() const { return _def; }
-	int hp() const { return _hp; }
+	int maxHp() const { return _maxHp; }
 	int speed() const { return _speed; }
 	int lv() const { return _lv; }
 	int exp() const { return _exp; }
@@ -110,9 +109,9 @@ public:
 	bool getExp(int count); //return true if level-up
 	int catk() const { return _catk; }
 	int cdef() const { return _cdef; }
-	int chp() const { return _chp; }
+	int hp() const { return _hp; }
 	int cspeed() const { return _cspeed; }
-	int cpp(int n) const ;
+	int cpp(int n) const;
 	void changeAtk(int count); //change current atk
 	void changeDef(int count);
 	void changeSpeed(int count);

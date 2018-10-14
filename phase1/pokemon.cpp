@@ -199,7 +199,7 @@ Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(race)
 	//add some random factor
 	_atk = _race.baseAtk() + f(3);
 	_def = _race.baseDef() + f(2);
-	_maxHp = _chp = _race.baseHp() + f(4);
+	_maxHp = _hp = _race.baseHp() + f(4);
 	_speed = _race.baseSpeed() + f(3);
 
 	_lv = 1;
@@ -321,12 +321,12 @@ void Pokemon::changeSpeed(int count)
 
 bool Pokemon::changeHp(int count)
 {
-	_chp += count;
+	_hp += count;
 
-	if (_chp > _maxHp)
-		_chp = _maxHp;
-	if (_chp < 0)
-		_chp = 0;
+	if (_hp > _maxHp)
+		_hp = _maxHp;
+	if (_hp < 0)
+		_hp = 0;
 
 	if (count > 0)
 	{
@@ -336,21 +336,21 @@ bool Pokemon::changeHp(int count)
 	{
 		msg << _name << " takes " << -count << " damage!\n";
 	}
-	if (!_chp)
+	if (!_hp)
 	{
 		msg << _name << " is down!\n";
 		return true;
 	}
 	else
 	{
-		msg << _name << "'s HP becomes " << _chp << endl;
+		msg << _name << "'s HP becomes " << _hp << endl;
 	}
 	return false;
 }
 
 void Pokemon::restoreAll()
 {
-	_chp = _maxHp;
+	_hp = _maxHp;
 	_catk = _atk;
 	_cdef = _def;
 	_cspeed = _speed;
@@ -412,10 +412,10 @@ bool Pokemon::getExp(int count)
 		_maxHp += maxHp;
 		_speed += speed;
 
-		msg << "Atk: " << _atk - atk << "." << _atk << "!\n";
-		msg << "Def: " << _def - def << "." << _def << "!\n";
-		msg << "MaxHP: " << _maxHp - maxHp << "." << _maxHp << "!\n";
-		msg << "Speed: " << _speed - speed << "." << _speed << "!\n\n";
+		msg << "Atk: " << _atk - atk << "->" << _atk << "!\n";
+		msg << "Def: " << _def - def << "->" << _def << "!\n";
+		msg << "MaxHP: " << _maxHp - maxHp << "->" << _maxHp << "!\n";
+		msg << "Speed: " << _speed - speed << "->" << _speed << "!\n\n";
 	}
 
 	if (LV_UP)

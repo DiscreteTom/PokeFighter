@@ -383,10 +383,10 @@ bool Pokemon::getExp(int count)
 
 		//increase attributes
 		int atk, def, maxHp, speed;
-		atk = 4 + f(2);
-		def = 2 + f(2);
-		maxHp = 8 + f(4);
-		speed = 5 + f(2);
+		atk = 4 + f(1);
+		def = 2 + f(1);
+		maxHp = 8 + f(2);
+		speed = 5 + f(1);
 
 		//race talent
 		switch (_race.type())

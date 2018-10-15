@@ -17,8 +17,10 @@ int main()
 	pokemon1.getExp(1000);
 	pokemon2.getExp(1000);
 
-	BattleController battle(pokemon1, pokemon2);
+	// BattleController battle(pokemon1, pokemon2);				//auto fight
+	BattleController battle(pokemon1, pokemon2, false); //manual fight
 
+	battle.start();
 	battle.start();
 
 	system("pause");

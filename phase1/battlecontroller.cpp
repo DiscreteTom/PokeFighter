@@ -7,6 +7,9 @@ BattleController::BattleController(Pokemon &pokemon1, Pokemon &pokemon2, bool au
 
 void BattleController::start()
 {
+	dbout << p1.name() << " VS " << p2.name() << "!\n";
+	dbout << "Battle Start!\n\n";
+
 	p1.restoreAll();
 	p2.restoreAll();
 
@@ -24,16 +27,16 @@ void BattleController::start()
 		{
 			if (p1.speed() >= p2.speed())
 			{
-				if (p1.attack(p2))
+				if (p1.attack(p2, _auto))
 					break;
-				if (p2.attack(p1))
+				if (p2.attack(p1, _auto))
 					break;
 			}
 			else
 			{
-				if (p2.attack(p1))
+				if (p2.attack(p1, _auto))
 					break;
-				if (p1.attack(p2))
+				if (p1.attack(p2, _auto))
 					break;
 			}
 			timer1 -= MAX_TIMER;
@@ -41,13 +44,13 @@ void BattleController::start()
 		}
 		else if (timer1 >= MAX_TIMER)
 		{
-			if (p1.attack(p2))
+			if (p1.attack(p2, _auto))
 				break;
 			timer1 -= MAX_TIMER;
 		}
 		else
 		{
-			if (p2.attack(p1))
+			if (p2.attack(p1, _auto))
 				break;
 			timer2 -= MAX_TIMER;
 		}
@@ -55,12 +58,12 @@ void BattleController::start()
 
 	if (p1.hp())
 	{
-		msg << p1.name() << " won!\n";
+		dbout << p1.name() << " won!\n\n";
 		return;
 	}
 	else
 	{
-		msg << p2.name() << "won!\n";
+		dbout << p2.name() << "won!\n\n";
 		return;
 	}
 }

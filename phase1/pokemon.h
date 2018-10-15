@@ -2,12 +2,13 @@
 
 #include <string>
 #include <stdlib.h>
-
-using std::string;
-
 #include <iostream>
+
 using namespace std;
-#define msg cout
+
+#define dbout cout
+#define dbin cin
+
 class Pokemon; //declaration
 
 enum PokemonType
@@ -105,7 +106,7 @@ public:
 
 	//about battle
 	void restoreAll();
-	bool attack(Pokemon &aim, bool autoFight = true, int skillIndex = 0);
+	bool attack(Pokemon &aim, bool autoFight = true);
 	bool getExp(int count); //return true if level-up
 	int catk() const { return _catk; }
 	int cdef() const { return _cdef; }

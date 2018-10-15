@@ -5,7 +5,7 @@ BattleController::BattleController(Pokemon &pokemon1, Pokemon &pokemon2, bool au
 	_auto = autoFight;
 }
 
-bool BattleController::start()
+void BattleController::start()
 {
 	p1.restoreAll();
 	p2.restoreAll();
@@ -55,12 +55,12 @@ bool BattleController::start()
 
 	if (p1.hp())
 	{
-		//p1 won
-		return true;
+		msg << p1.name() << " won!\n";
+		return;
 	}
 	else
 	{
-		//p2 won
-		return false;
+		msg << p2.name() << "won!\n";
+		return;
 	}
 }

@@ -5,7 +5,6 @@
 class BattleController
 {
 private:
-	static const int MAX_TIMER = 100;
 	Pokemon &p1, p2;
 	bool _auto; //auto fight
 	int timer1;

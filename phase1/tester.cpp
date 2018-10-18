@@ -11,16 +11,15 @@ int main()
 	Race_1 race1;
 	Race_2 race2;
 
-	Pokemon pokemon1(race1, "DJ");
-	Pokemon pokemon2(race2, "WC");
+	Pokemon pokemon1(race1);
+	Pokemon pokemon2(race2);
 
-	pokemon1.getExp(1000);
-	pokemon2.getExp(1000);
+	pokemon1.gainExp(100);
+	pokemon2.gainExp(100);
 
-	// BattleController battle(pokemon1, pokemon2);				//auto fight
+	//  BattleController battle(pokemon1, pokemon2);				//auto fight
 	BattleController battle(pokemon1, pokemon2, false); //manual fight
 
-	battle.start();
 	battle.start();
 
 	system("pause");

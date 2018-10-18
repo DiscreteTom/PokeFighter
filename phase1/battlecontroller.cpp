@@ -13,17 +13,18 @@ void BattleController::start()
 	p1.restoreAll();
 	p2.restoreAll();
 
-	timer1 = 0;
-	timer2 = 0;
+	timer1 = p1.speed();
+	timer2 = p2.speed();
 
 	while (1)
 	{
-		while (timer1 < MAX_TIMER && timer2 < MAX_TIMER)
+		while (timer1 > 0 && timer2 > 0)
 		{
-			timer1 += p1.speed();
-			timer2 += p2.speed();
+			--timer1;
+			--timer2;
 		}
-		if (timer1 >= MAX_TIMER && timer2 >= MAX_TIMER)
+
+		if (!timer1 && !timer2)
 		{
 			if (p1.speed() >= p2.speed())
 			{
@@ -39,20 +40,17 @@ void BattleController::start()
 				if (p1.attack(p2, _auto))
 					break;
 			}
-			timer1 -= MAX_TIMER;
-			timer2 -= MAX_TIMER;
 		}
-		else if (timer1 >= MAX_TIMER)
+		else if (!timer1)
 		{
-			if (p1.attack(p2, _auto))
+			//p2 attack
+			if (p2.attack(p1, _auto))
 				break;
-			timer1 -= MAX_TIMER;
 		}
 		else
 		{
-			if (p2.attack(p1, _auto))
+			if (p1.attack(p2, _auto))
 				break;
-			timer2 -= MAX_TIMER;
 		}
 	}
 
@@ -63,7 +61,7 @@ void BattleController::start()
 	}
 	else
 	{
-		dbout << p2.name() << "won!\n\n";
+		dbout << p2.name() << " won!\n\n";
 		return;
 	}
 }

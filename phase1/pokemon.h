@@ -21,17 +21,17 @@ enum PokemonType
 
 class PokemonBase
 {
-protected:
+protected: //all those attributes can be changed by derived classes
 	string _raceName;
 	PokemonType _type;
-	int _baseAtk;
+	int _baseAtk; //influenced by PokemonType
 	int _baseDef;
 	int _baseHp;
 	int _baseSpeed;
-	int _expCurve[14];
-	string _skillName[4];
+	int _expCurve[14];		//from LV2 to LV15
+	string _skillName[4]; //one simple attack, 3 special skills
 	string _skillDscp[4]; //skill description
-	int _pp[3];						//power point, first skill has infinite pp
+	int _pp[3];						//power point, simple attack has infinite pp
 
 public:
 	PokemonBase(PokemonType type);
@@ -48,24 +48,10 @@ public:
 	int pp(int n) const;
 
 	//about level-up
-	int expCurve(int level) const;
+	int expCurve(int level) const;// 2 <= level <= 15
 
 	//virtual methods
-	virtual bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const = 0;
-};
-
-class Race_1 : public PokemonBase
-{
-public:
-	Race_1();
-	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
-};
-
-class Race_2 : public PokemonBase
-{
-public:
-	Race_2();
-	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
+	virtual bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const = 0; //yes, this is a CONST method
 };
 
 class Pokemon
@@ -103,20 +89,37 @@ public:
 	string raceType() const;
 	string skillName(int n) const { return _race.skillName(n); }
 	string skillDscp(int n) const { return _race.skillDscp(n); }
+	int pp(int i) const { return _race.pp(i); }
 
 	//about battle
 	void restoreAll();
 	bool attack(Pokemon &aim, bool autoFight = true);
-	bool getExp(int count); //return true if level-up
+	bool gainExp(int count); //return true if level-up
+	//getter
 	int catk() const { return _catk; }
 	int cdef() const { return _cdef; }
 	int hp() const { return _hp; }
 	int cspeed() const { return _cspeed; }
 	int cpp(int n) const;
+	//setter
 	void changeAtk(int count); //change current atk
 	void changeDef(int count);
 	void changeSpeed(int count);
 	bool changeHp(int count); //return true if hp = 0
 };
 
-int f(int n);
+int f(int n); //get a random number from -n to n
+
+class Race_1 : public PokemonBase
+{
+public:
+	Race_1();
+	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
+};
+
+class Race_2 : public PokemonBase
+{
+public:
+	Race_2();
+	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
+};

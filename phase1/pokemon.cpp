@@ -10,7 +10,7 @@ PokemonBase::PokemonBase(PokemonType type)
 	_baseHp = 25;
 	_baseSpeed = 10;
 
-	//race talent
+	//type talent
 	switch (type)
 	{
 	case ATK:
@@ -59,137 +59,18 @@ int PokemonBase::pp(int n) const
 
 int PokemonBase::expCurve(int level) const
 {
-	if (level <= 13 && level >= 0)
+	if (level <= 15 && level >= 2)
 	{
-		return _expCurve[level];
+		return _expCurve[level - 2];
 	}
 	return 0;
-}
-
-Race_1::Race_1() : PokemonBase(ATK)
-{
-	_raceName = "Charmander";
-	_expCurve[0] = 5;
-	for (int i = 1; i < 14; ++i)
-	{
-		_expCurve[i] = _expCurve[i - 1] + 5 * i;
-	}
-	_skillName[0] = "kick";
-	_skillName[1] = "spark";
-	_skillName[2] = "rage";
-	_skillName[3] = "fireball";
-	_skillDscp[0] = "simple attack";
-	_skillDscp[1] = "ignore opponent's half defence";
-	_skillDscp[2] = "increase attack";
-	_skillDscp[3] = "cause huge damage";
-	_pp[0] = 10;
-	_pp[1] = 3;
-	_pp[2] = 5;
-}
-
-bool Race_1::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
-{
-	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
-	switch (skillIndex)
-	{
-	case 1: //spark
-	{
-		int dmg = attacker.catk() + attacker.lv() * 2 - aim.cdef() / 2 + f(4);
-		if (dmg < 1)
-			dmg = 1;
-		return aim.changeHp(-dmg);
-		break;
-	}
-	case 2: //rage
-		attacker.changeAtk(attacker.atk() / 8);
-		break;
-	case 3: //fireball
-	{
-		int dmg = attacker.catk() * 2 - aim.cdef() + 8 + f(4 + attacker.lv());
-		if (dmg < 1)
-			dmg = 1;
-		return aim.changeHp(-dmg);
-		break;
-	}
-	default:
-	{
-		//simple attack
-		int dmg = attacker.catk() - aim.cdef() + f(4);
-		if (dmg <= 0)
-			dmg = 1;
-		return aim.changeHp(-dmg);
-		break;
-	}
-	} //switch
-	return false;
-}
-
-Race_2::Race_2() : PokemonBase(HP)
-{
-	_raceName = "Bulbasaur";
-	_expCurve[0] = 5;
-	for (int i = 1; i < 14; ++i)
-	{
-		_expCurve[i] = _expCurve[i - 1] + 5 * i;
-	}
-	_skillName[0] = "knock";
-	_skillName[1] = "photosynthesis";
-	_skillName[2] = "life drain";
-	_skillName[3] = "razor leaf";
-	_skillDscp[0] = "simple attack";
-	_skillDscp[1] = "restore HP";
-	_skillDscp[2] = "cause damage and restore HP, ignore defence";
-	_skillDscp[3] = "cause huge damage";
-	_pp[0] = 5;
-	_pp[1] = 10;
-	_pp[2] = 5;
-}
-
-bool Race_2::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
-{
-	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
-	switch (skillIndex)
-	{
-	case 1: //photosynthesis
-	{
-		attacker.changeHp(attacker.catk() / 2 + attacker.cdef() + f(4));
-		break;
-	}
-	case 2: //life drain
-	{
-		int dmg = attacker.catk() + f(4 + attacker.lv());
-		if (dmg < 1)
-			dmg = 1;
-		attacker.changeHp(dmg);
-		return aim.changeHp(-dmg);
-		break;
-	}
-	case 3: //razor leaf
-	{
-		int dmg = attacker.catk() * 2 - aim.cdef() + f(3 + attacker.lv());
-		if (dmg < 1)
-			dmg = 1;
-		return aim.changeHp(-dmg);
-		break;
-	}
-	default:
-	{
-		//cause damage
-		int dmg = attacker.catk() - aim.cdef() + f(4);
-		if (dmg <= 0)
-			dmg = 1;
-		return aim.changeHp(-dmg);
-		break;
-	}
-	} //switch
-	return false;
 }
 
 Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(race)
 {
 	if (!name.length())
 	{
-		_name = _race.raceName();
+		_name = _race.raceName(); //use race name as default name
 	}
 	else
 	{
@@ -199,7 +80,7 @@ Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(race)
 	//add some random factor
 	_atk = _race.baseAtk() + f(3);
 	_def = _race.baseDef() + f(2);
-	_maxHp = _hp = _race.baseHp() + f(4);
+	_maxHp = _hp = _race.baseHp() + f(5);
 	_speed = _race.baseSpeed() + f(3);
 
 	_lv = 1;
@@ -361,7 +242,7 @@ void Pokemon::restoreAll()
 	}
 }
 
-bool Pokemon::getExp(int count)
+bool Pokemon::gainExp(int count)
 {
 	if (_lv == 15)
 		return false;
@@ -376,7 +257,7 @@ bool Pokemon::getExp(int count)
 				<< endl;
 
 	bool LV_UP = false;
-	while (_lv < 15 && _exp > _race.expCurve(_lv - 1))
+	while (_lv < 15 && _exp > _race.expCurve(_lv + 1))
 	{
 		//level-up!
 		LV_UP = true;
@@ -435,8 +316,8 @@ bool Pokemon::attack(Pokemon &aim, bool autoFight)
 	{
 		//judge usable skill by LV and PP
 		bool usable[3];
-		int usableCount = 1; //can use simple attack by default
-		for (int i = 0; i < 3; ++i)
+		int usableCount = 1;				//can use simple attack by default
+		for (int i = 0; i < 3; ++i) //get all usable skill
 		{
 			if (_lv >= (i + 1) * 5 && _cpp[i])
 			{
@@ -465,14 +346,14 @@ bool Pokemon::attack(Pokemon &aim, bool autoFight)
 			}
 		}
 		if (skillIndex > 0)
-			--_cpp[skillIndex - 1];
+			--_cpp[skillIndex - 1]; //consume pp
 		return _race.attack(*this, aim, skillIndex);
 	}
 
 	//manual fight, get skillIndex
 	dbout << _name << ", your turn!\n";
 	dbout << "Choose a skill to attack!\n";
-	int space = 0;
+	int space = 0; //count space
 	for (int i = 0; i * 5 <= _lv; ++i)
 	{
 		if (skillName(i).length() > space)
@@ -482,18 +363,42 @@ bool Pokemon::attack(Pokemon &aim, bool autoFight)
 	for (int i = 0; i * 5 <= _lv; ++i)
 	{
 		dbout << "	" << i + 1 << ": " << skillName(i);
+		//print PP
+		if (i)
+		{
+			dbout << '(';
+			if (_cpp[i - 1] < 10)
+			{
+				dbout << ' ';
+			}
+			dbout << _cpp[i - 1] << '/';
+			if (_race.pp(i - 1) < 10)
+			{
+				dbout << ' ';
+			}
+			dbout << _race.pp(i - 1) << ')';
+		}
 		for (int j = 0; j < space - skillName(i).length(); ++j)
 			dbout << " ";
+		if (!i)
+		{
+			dbout << "       ";
+		}
 		dbout << skillDscp(i) << endl;
 	}
 	dbout << "Please input a number: ";
 	dbin >> skillIndex;
+	dbin.clear();
+	dbin.sync();
+	dbin.ignore();
 	dbout << endl;
 	//attack
 	--skillIndex;
-	if (skillIndex * 5 <= _lv && _cpp[skillIndex - 1])
+	if (skillIndex < 0 || skillIndex > 3)
+		skillIndex = 0;
+	if (skillIndex * 5 <= _lv && _cpp[skillIndex - 1]) //check again by LV and PP
 	{
-		--_cpp[skillIndex - 1];
+		--_cpp[skillIndex - 1]; //consume PP
 		return _race.attack(*this, aim, skillIndex);
 	}
 
@@ -502,5 +407,124 @@ bool Pokemon::attack(Pokemon &aim, bool autoFight)
 
 int f(int n)
 {
-	return rand() % (2 * n) - n;
+	return rand() % (2 * n + 1) - n;
+}
+
+Race_1::Race_1() : PokemonBase(ATK)
+{
+	_raceName = "Charmander";
+	_expCurve[0] = 5;
+	for (int i = 1; i < 14; ++i)
+	{
+		_expCurve[i] = _expCurve[i - 1] + 5 * i;
+	}
+	_skillName[0] = "kick";
+	_skillName[1] = "spark";
+	_skillName[2] = "rage";
+	_skillName[3] = "fireball";
+	_skillDscp[0] = "simple attack";
+	_skillDscp[1] = "ignore opponent's half defence";
+	_skillDscp[2] = "increase attack";
+	_skillDscp[3] = "cause huge damage";
+	_pp[0] = 10;
+	_pp[1] = 3;
+	_pp[2] = 5;
+}
+
+bool Race_1::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
+{
+	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
+	switch (skillIndex)
+	{
+	case 1: //spark
+	{
+		int dmg = attacker.catk() + attacker.lv() * 2 - aim.cdef() / 2 + f(4);
+		if (dmg < 1)
+			dmg = 1;
+		return aim.changeHp(-dmg);
+		break;
+	}
+	case 2: //rage
+		attacker.changeAtk(attacker.atk() / 8);
+		break;
+	case 3: //fireball
+	{
+		int dmg = attacker.catk() * 2 - aim.cdef() + 8 + f(4 + attacker.lv());
+		if (dmg < 1)
+			dmg = 1;
+		return aim.changeHp(-dmg);
+		break;
+	}
+	default:
+	{
+		//simple attack
+		int dmg = attacker.catk() - aim.cdef() + f(4);
+		if (dmg <= 0)
+			dmg = 1;
+		return aim.changeHp(-dmg);
+		break;
+	}
+	} //switch
+	return false;
+}
+
+Race_2::Race_2() : PokemonBase(HP)
+{
+	_raceName = "Bulbasaur";
+	_expCurve[0] = 5;
+	for (int i = 1; i < 14; ++i)
+	{
+		_expCurve[i] = _expCurve[i - 1] + 5 * i;
+	}
+	_skillName[0] = "knock";
+	_skillName[1] = "photosynthesis";
+	_skillName[2] = "life drain";
+	_skillName[3] = "razor leaf";
+	_skillDscp[0] = "simple attack";
+	_skillDscp[1] = "restore HP";
+	_skillDscp[2] = "cause damage and restore HP, ignore defence";
+	_skillDscp[3] = "cause huge damage";
+	_pp[0] = 5;
+	_pp[1] = 10;
+	_pp[2] = 5;
+}
+
+bool Race_2::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
+{
+	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
+	switch (skillIndex)
+	{
+	case 1: //photosynthesis
+	{
+		attacker.changeHp(attacker.catk() / 2 + attacker.cdef() + f(4));
+		break;
+	}
+	case 2: //life drain
+	{
+		int dmg = attacker.catk() + f(4 + attacker.lv());
+		if (dmg < 1)
+			dmg = 1;
+		attacker.changeHp(dmg);
+		return aim.changeHp(-dmg);
+		break;
+	}
+	case 3: //razor leaf
+	{
+		int dmg = attacker.catk() * 2 - aim.cdef() + f(3 + attacker.lv());
+		if (dmg < 1)
+			dmg = 1;
+		return aim.changeHp(-dmg);
+		break;
+	}
+	default:
+	{
+		//cause damage
+		int dmg = attacker.catk() - aim.cdef() + f(4);
+		if (dmg <= 0)
+			dmg = 1;
+		return aim.changeHp(-dmg);
+		break;
+	}
+	} //switch
+	return false;
 }

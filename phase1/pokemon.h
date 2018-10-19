@@ -52,6 +52,8 @@ public:
 
 	//virtual methods
 	virtual bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const = 0; //yes, this is a CONST method
+
+	bool dodge(int attacker, int aim) const;
 };
 
 class Pokemon
@@ -94,6 +96,7 @@ public:
 	//about battle
 	void restoreAll();
 	bool attack(Pokemon &aim, bool autoFight = true);
+	bool takeDamage(int n);
 	bool gainExp(int count); //return true if level-up
 	//getter
 	int catk() const { return _catk; }
@@ -121,5 +124,19 @@ class Race_2 : public PokemonBase
 {
 public:
 	Race_2();
+	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
+};
+
+class Race_3 : public PokemonBase
+{
+public:
+	Race_3();
+	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
+};
+
+class Race_4 : public PokemonBase
+{
+public:
+	Race_4();
 	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
 };

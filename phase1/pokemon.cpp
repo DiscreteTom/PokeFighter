@@ -66,6 +66,16 @@ int PokemonBase::expCurve(int level) const
 	return 0;
 }
 
+bool PokemonBase::dodge(int attacker, int aim) const
+{
+	if ((attacker + f(40)) / 80 - aim / 150 < 0)
+	{
+		dbout << "Miss!\n";
+		return true;
+	}
+	return false;
+}
+
 Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(race)
 {
 	if (!name.length())
@@ -405,6 +415,13 @@ bool Pokemon::attack(Pokemon &aim, bool autoFight)
 	return _race.attack(*this, aim, 0);
 }
 
+bool Pokemon::takeDamage(int n)
+{
+	if (n < 10)
+		n = 10;
+	return changeHp(-n);
+}
+
 int f(int n)
 {
 	return rand() % (2 * n + 1) - n;
@@ -434,14 +451,17 @@ Race_1::Race_1() : PokemonBase(ATK)
 bool Race_1::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
 	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
+
 	switch (skillIndex)
 	{
 	case 1: //spark
 	{
+		if (dodge(attacker.cspeed(), aim.cspeed()))
+			return false;
+
 		int dmg = attacker.catk() + attacker.lv() * 2 - aim.cdef() / 2 + f(4);
-		if (dmg < 1)
-			dmg = 1;
-		return aim.changeHp(-dmg);
+		return aim.takeDamage(dmg);
+
 		break;
 	}
 	case 2: //rage
@@ -449,19 +469,23 @@ bool Race_1::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 		break;
 	case 3: //fireball
 	{
-		int dmg = attacker.catk() * 2 - aim.cdef() + 8 + f(4 + attacker.lv());
-		if (dmg < 1)
-			dmg = 1;
-		return aim.changeHp(-dmg);
+		if (dodge(attacker.cspeed(), aim.cspeed()))
+			return false;
+
+		int dmg = attacker.catk() * 1.5 - aim.cdef() + 8 + f(4 + attacker.lv());
+		return aim.takeDamage(dmg);
+
 		break;
 	}
 	default:
 	{
 		//simple attack
+		if (dodge(attacker.cspeed(), aim.cspeed()))
+			return false;
+
 		int dmg = attacker.catk() - aim.cdef() + f(4);
-		if (dmg <= 0)
-			dmg = 1;
-		return aim.changeHp(-dmg);
+		return aim.takeDamage(dmg);
+
 		break;
 	}
 	} //switch
@@ -476,7 +500,7 @@ Race_2::Race_2() : PokemonBase(HP)
 	{
 		_expCurve[i] = _expCurve[i - 1] + 5 * i;
 	}
-	_skillName[0] = "knock";
+	_skillName[0] = "kick";
 	_skillName[1] = "photosynthesis";
 	_skillName[2] = "life drain";
 	_skillName[3] = "razor leaf";
@@ -492,6 +516,7 @@ Race_2::Race_2() : PokemonBase(HP)
 bool Race_2::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
 	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
+
 	switch (skillIndex)
 	{
 	case 1: //photosynthesis
@@ -501,28 +526,170 @@ bool Race_2::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 	}
 	case 2: //life drain
 	{
+		if (dodge(attacker.cspeed(), aim.cspeed()))
+			return false;
+
 		int dmg = attacker.catk() + f(4 + attacker.lv());
-		if (dmg < 1)
-			dmg = 1;
+		if (dmg < 10)
+			dmg = 10;
 		attacker.changeHp(dmg);
-		return aim.changeHp(-dmg);
+		return aim.takeDamage(dmg);
 		break;
 	}
 	case 3: //razor leaf
 	{
+		if (dodge(attacker.cspeed(), aim.cspeed()))
+			return false;
+
 		int dmg = attacker.catk() * 2 - aim.cdef() + f(3 + attacker.lv());
-		if (dmg < 1)
-			dmg = 1;
-		return aim.changeHp(-dmg);
+		return aim.takeDamage(dmg);
+
 		break;
 	}
 	default:
 	{
-		//cause damage
+		//simple attack
+		if (dodge(attacker.cspeed(), aim.cspeed()))
+			return false;
+
 		int dmg = attacker.catk() - aim.cdef() + f(4);
-		if (dmg <= 0)
-			dmg = 1;
-		return aim.changeHp(-dmg);
+		return aim.takeDamage(dmg);
+
+		break;
+	}
+	} //switch
+	return false;
+}
+
+Race_3::Race_3() : PokemonBase(DEF)
+{
+	_raceName = "Squirtle";
+	_expCurve[0] = 5;
+	for (int i = 1; i < 14; ++i)
+	{
+		_expCurve[i] = _expCurve[i - 1] + 5 * i;
+	}
+	_skillName[0] = "kick";
+	_skillName[1] = "iron defence";
+	_skillName[2] = "water pulse";
+	_skillName[3] = "hydro pump";
+	_skillDscp[0] = "simple attack";
+	_skillDscp[1] = "improve defence";
+	_skillDscp[2] = "improve attack then cause damage";
+	_skillDscp[3] = "cause huge damage";
+	_pp[0] = 10;
+	_pp[1] = 10;
+	_pp[2] = 3;
+}
+
+bool Race_3::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
+{
+	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
+
+	switch (skillIndex)
+	{
+	case 1: //iron defence
+	{
+		attacker.changeDef(2);
+		break;
+	}
+	case 2: //water pulse
+	{
+		attacker.changeAtk(2);
+		if (dodge(attacker.cspeed(), aim.cspeed()))
+			return false;
+
+		int dmg = attacker.catk() - aim.cdef() + f(4 + attacker.lv());
+		return aim.takeDamage(dmg);
+
+		break;
+	}
+	case 3: //hydro pump
+	{
+		if (dodge(attacker.cspeed(), aim.cspeed()))
+			return false;
+
+		int dmg = attacker.catk() * 2 - aim.cdef() + f(3 + attacker.lv());
+		return aim.takeDamage(dmg);
+
+		break;
+	}
+	default:
+	{
+		//simple attack
+		if (dodge(attacker.cspeed(), aim.cspeed()))
+			return false;
+
+		int dmg = attacker.catk() - aim.cdef() + f(4);
+		return aim.takeDamage(dmg);
+
+		break;
+	}
+	} //switch
+	return false;
+}
+
+Race_4::Race_4() : PokemonBase(SPE)
+{
+	_raceName = "Pidgey";
+	_expCurve[0] = 5;
+	for (int i = 1; i < 14; ++i)
+	{
+		_expCurve[i] = _expCurve[i - 1] + 5 * i;
+	}
+	_skillName[0] = "kick";
+	_skillName[1] = "agility";
+	_skillName[2] = "wing attack";
+	_skillName[3] = "take down";
+	_skillDscp[0] = "simple attack";
+	_skillDscp[1] = "improve speed";
+	_skillDscp[2] = "cause damage based on current speed";
+	_skillDscp[3] = "cause huge damage based on current speed";
+	_pp[0] = 5;
+	_pp[1] = 10;
+	_pp[2] = 5;
+}
+
+bool Race_4::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
+{
+	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
+
+	switch (skillIndex)
+	{
+	case 1: //agility
+	{
+		attacker.changeSpeed(attacker.speed() / 5);
+		break;
+	}
+	case 2: //wing attack
+	{
+		if (dodge(attacker.cspeed(), aim.cspeed()))
+			return false;
+
+		int dmg = attacker.catk() + attacker.cspeed() / 4 - aim.cdef() + f(4 + attacker.lv());
+		return aim.takeDamage(dmg);
+
+		break;
+	}
+	case 3: //take down
+	{
+		if (dodge(attacker.cspeed(), aim.cspeed()))
+			return false;
+
+		int dmg = attacker.catk() - aim.cdef() + attacker.cspeed() / 2 + f(3 + attacker.lv());
+		return aim.takeDamage(dmg);
+
+		break;
+	}
+	default:
+	{
+		//simple attack
+		if (dodge(attacker.cspeed(), aim.cspeed()))
+			return false;
+
+		int dmg = attacker.catk() - aim.cdef() + f(4);
+		return aim.takeDamage(dmg);
+
 		break;
 	}
 	} //switch

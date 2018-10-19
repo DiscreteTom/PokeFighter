@@ -13,20 +13,20 @@ void BattleController::start()
 	p1.restoreAll();
 	p2.restoreAll();
 
-	timer1 = p1.speed();
-	timer2 = p2.speed();
+	timer1 = 0;
+	timer2 = 0;
 
 	while (1)
 	{
-		while (timer1 > 0 && timer2 > 0)
+		while (timer1 < p1.cspeed() && timer2 < p2.cspeed())
 		{
-			--timer1;
-			--timer2;
+			++timer1;
+			++timer2;
 		}
 
-		if (!timer1 && !timer2)
+		if (timer1 >= p1.cspeed() && timer2 >= p2.cspeed())
 		{
-			if (p1.speed() >= p2.speed())
+			if (p1.cspeed() >= p2.cspeed())
 			{
 				if (p1.attack(p2, _auto))
 					break;
@@ -40,17 +40,20 @@ void BattleController::start()
 				if (p1.attack(p2, _auto))
 					break;
 			}
+			timer1 = timer2 = 0;
 		}
-		else if (!timer1)
+		else if (timer1 >= p1.cspeed())
 		{
 			//p2 attack
 			if (p2.attack(p1, _auto))
 				break;
+			timer1 = 0;
 		}
 		else
 		{
 			if (p1.attack(p2, _auto))
 				break;
+			timer2 = 0;
 		}
 	}
 

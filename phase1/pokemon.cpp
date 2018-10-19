@@ -427,7 +427,8 @@ int f(int n)
 	return rand() % (2 * n + 1) - n;
 }
 
-Race_1::Race_1() : PokemonBase(ATK)
+template<>
+Race<0>::Race() : PokemonBase(ATK)
 {
 	_raceName = "Charmander";
 	_expCurve[0] = 5;
@@ -448,7 +449,8 @@ Race_1::Race_1() : PokemonBase(ATK)
 	_pp[2] = 5;
 }
 
-bool Race_1::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
+template<>
+bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
 	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
 
@@ -492,7 +494,8 @@ bool Race_1::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 	return false;
 }
 
-Race_2::Race_2() : PokemonBase(HP)
+template<>
+Race<1>::Race() : PokemonBase(HP)
 {
 	_raceName = "Bulbasaur";
 	_expCurve[0] = 5;
@@ -513,7 +516,8 @@ Race_2::Race_2() : PokemonBase(HP)
 	_pp[2] = 5;
 }
 
-bool Race_2::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
+template<>
+bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
 	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
 
@@ -561,7 +565,8 @@ bool Race_2::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 	return false;
 }
 
-Race_3::Race_3() : PokemonBase(DEF)
+template<>
+Race<2>::Race() : PokemonBase(DEF)
 {
 	_raceName = "Squirtle";
 	_expCurve[0] = 5;
@@ -582,7 +587,8 @@ Race_3::Race_3() : PokemonBase(DEF)
 	_pp[2] = 3;
 }
 
-bool Race_3::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
+template<>
+bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
 	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
 
@@ -629,7 +635,8 @@ bool Race_3::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 	return false;
 }
 
-Race_4::Race_4() : PokemonBase(SPE)
+template<>
+Race<3>::Race() : PokemonBase(SPE)
 {
 	_raceName = "Pidgey";
 	_expCurve[0] = 5;
@@ -650,7 +657,8 @@ Race_4::Race_4() : PokemonBase(SPE)
 	_pp[2] = 5;
 }
 
-bool Race_4::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
+template<>
+bool Race<3 >::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
 	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
 

@@ -113,30 +113,10 @@ public:
 
 int f(int n); //get a random number from -n to n
 
-class Race_1 : public PokemonBase
+template<int N>
+class Race : public PokemonBase
 {
 public:
-	Race_1();
-	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
-};
-
-class Race_2 : public PokemonBase
-{
-public:
-	Race_2();
-	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
-};
-
-class Race_3 : public PokemonBase
-{
-public:
-	Race_3();
-	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
-};
-
-class Race_4 : public PokemonBase
-{
-public:
-	Race_4();
+	Race();
 	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
 };

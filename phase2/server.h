@@ -14,16 +14,24 @@
 using namespace std;
 
 /**
+ * Network config
+*/
+const int SERVER_PORT = 7500;
+const int SERVER_REQ_QUEUE_LENGTH = 4; // server request queue max length, usually 2-4
+const int BUF_LENGTH = 1024;					 // server buffer length MUST equals client buffer length
+
+/**
  * define interfaces before login
  * use interfaces in class Endpoint after login
 */
 class Server
 {
 private:
-	// about socket
+	// about network
 	SOCKET serverSocket;
 	SOCKET connSocket;
 	bool running;
+	char buf[BUF_LENGTH];
 
 	//about database
 	sqlite3 *db;
@@ -33,7 +41,7 @@ private:
 	void logon(const string &username, const string &password);
 
 	// authentication
-	bool isValid(const string & str);
+	bool isValid(const string &str);
 
 	// thread function
 	void listenFunc();

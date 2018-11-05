@@ -1,7 +1,13 @@
+#define _WINSOCK_DEPRECATED_NO_WARNINGS // ignore inet_ntoa errors
+#define _CRT_SECURE_NO_WARNINGS					// ignore strcpy errors
+
 #include "server.h"
 #include "mystringfunc.h"
 #include <conio.h>
 #include <thread>
+#include <iostream>
+
+using namespace std;
 
 Server::Server()
 {
@@ -66,7 +72,7 @@ void Server::start()
 
 	// bind socket to an address
 	cout << "Server: Socket binding...\n";
-	if (bind(serverSocket, (sockaddr *)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
+	if (::bind(serverSocket, (sockaddr *)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
 	{
 		cout << "Server: Socket bind failed.\n";
 		closesocket(serverSocket);
@@ -90,11 +96,12 @@ void Server::start()
 
 	// now listen successfully
 	cout << "Server: Server is running at " << SERVER_PORT << endl;
+	cout << "Press any key to stop.\n";
 
 	// init thread
 	running = true;
-	thread listenThread(listenFunc, this);
-	thread terminateThread(terminateFunc, this);
+	thread listenThread(&Server::listenFunc, this);
+	thread terminateThread(&Server::terminateFunc, this);
 	listenThread.join();
 	terminateThread.join();
 
@@ -115,7 +122,7 @@ void Server::listenFunc()
 		if (connSocket == INVALID_SOCKET)
 		{
 			cout << "Server: Link to client failed.\n";
-			closesocket(connSock);
+			closesocket(connSocket);
 			continue;
 		}
 
@@ -128,14 +135,13 @@ void Server::listenFunc()
 		 * - "login\n<username>\n<password>"
 		 * - "logon\n<username>\n<password>"
 		*/
-		char buf[BUF_LENGTH] = "";
 		recv(connSocket, buf, BUF_LENGTH, 0);
 		auto strs = split(buf, '\n');
 		if (strs.size() < 3)
 		{
 			//error
 			cout << "Server: Invalid request.\n";
-			strcpy_s(buf, "Reject: Invalid request.\n");
+			strcpy(buf, "Reject: Invalid request.\n");
 			send(connSocket, buf, BUF_LENGTH, 0);
 		}
 		else if (strs[0] == "login")
@@ -145,7 +151,7 @@ void Server::listenFunc()
 		else
 		{
 			cout << "Server: Invalid request.\n";
-			strcpy_s(buf, "Reject: Invalid request.\n");
+			strcpy(buf, "Reject: Invalid request.\n");
 			send(connSocket, buf, BUF_LENGTH, 0);
 		}
 		closesocket(connSocket);
@@ -154,7 +160,7 @@ void Server::listenFunc()
 
 void Server::terminateFunc()
 {
-	getch();
+	_getch();
 	running = false;
 }
 
@@ -166,16 +172,40 @@ void Server::logon(const string &username, const string &password)
 	if (!isValid(username))
 	{
 		cout << "Server: Got an invalid username: " << username << endl;
-		strcpy_s(buf, "Reject: Invalid username.\n");
+		strcpy(buf, "Reject: Invalid username.\n");
 	}
 	else if (!isValid(password))
 	{
 		cout << "Server: Got an invalid password";
-		strcpy_s(buf, "Reject: Invalid password.\n");
+		strcpy(buf, "Reject: Invalid password.\n");
 	}
 	else
 	{
-		// TODO about database
+		char **sqlResult;
+		int nRow;
+		int nColumn;
+		char *errMsg;
+		string sql = "SELECT name FROM User WHERE name = '" + username + "'";
+		if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+		{
+			cout << "Server: Sqlite3 error: " << errMsg << endl;
+			sqlite3_free(errMsg);
+		}
+		else
+		{
+			if (nRow == 0)
+			{
+				// username NOT exist, add this user
+				//TODO
+			}
+			else
+			{
+				// username already exist
+				cout << "Server: Logon: username already exist.\n";
+				strcpy(buf, "Reject: duplicate username.\n");
+			}
+			sqlite3_free_table(sqlResult);
+		}
 	}
 	send(connSocket, buf, BUF_LENGTH, 0);
 }

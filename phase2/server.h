@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "netconfig.h"
+//#include "netconfig.h" // DO NOT INCLUE THIS
 
 // about socket
 #include <WinSock2.h>
@@ -51,5 +51,5 @@ public:
 	Server();
 	~Server();
 
-	void start();
+	void start(); // init database and socket
 };

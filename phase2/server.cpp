@@ -18,7 +18,13 @@ Server::~Server()
 	closesocket(serverSocket); // if serverSocket has been closed, return WSAENOTSOCK
 	closesocket(connSocket);
 	//stop socket DLL
-	while (WSACleanup() != WSANOTINITIALISED)
+
+	/**
+	 * WSACleanup
+	 * - return 0 if WSACleanup has NOT been called(succeed)
+	 * - return -1 if WSACleanup has been called
+	*/
+	while (WSACleanup() != -1)
 		;
 }
 
@@ -71,7 +77,7 @@ void Server::start()
 	serverAddr.sin_addr.S_un.S_addr = htonl(INADDR_ANY); // any ip address
 
 	// bind socket to an address
-	cout << "Server: Socket binding...\n";
+	cout << "Server: Socket binding...";
 	if (::bind(serverSocket, (sockaddr *)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
 	{
 		cout << "Server: Socket bind failed.\n";
@@ -83,6 +89,7 @@ void Server::start()
 	cout << "Done.\n";
 
 	// if request queue is full, client will get error: WSAECONNREFUSED
+	cout << "Server: Socket listen...";
 	if (listen(serverSocket, SERVER_REQ_QUEUE_LENGTH) == SOCKET_ERROR)
 	{
 		cout << WSAGetLastError();
@@ -95,8 +102,8 @@ void Server::start()
 	cout << "Done.\n";
 
 	// now listen successfully
-	cout << "Server: Server is running at " << SERVER_PORT << endl;
-	cout << "Press any key to stop.\n";
+	cout << "\nServer: Server is running at " << SERVER_PORT << endl;
+	cout << "Press any key to stop server.\n\n";
 
 	// init thread
 	running = true;
@@ -109,6 +116,8 @@ void Server::start()
 	WSACleanup();
 
 	sqlite3_close(db);
+
+	cout << "Server stoped.\n\n";
 }
 
 void Server::listenFunc()
@@ -121,7 +130,12 @@ void Server::listenFunc()
 		connSocket = accept(serverSocket, (sockaddr *)&clientAddr, &clientAddrLength);
 		if (connSocket == INVALID_SOCKET)
 		{
-			cout << "Server: Link to client failed.\n";
+			if (running)
+			{
+				// if not running, this thread must be terminated by terminateFunc
+				// in that case the string below is not needed
+				cout << "Server: Link to client failed.\n";
+			}
 			closesocket(connSocket);
 			continue;
 		}
@@ -162,6 +176,7 @@ void Server::terminateFunc()
 {
 	_getch();
 	running = false;
+	closesocket(serverSocket);
 }
 
 void Server::login(const string &username, const string &password)
@@ -208,4 +223,17 @@ void Server::logon(const string &username, const string &password)
 		}
 	}
 	send(connSocket, buf, BUF_LENGTH, 0);
+}
+
+bool Server::isValid(const string &str)
+{
+	for (auto c : str)
+	{
+		if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'))
+		{
+			//not a letter or a digit or '_'
+			return false;
+		}
+	}
+	return true;
 }

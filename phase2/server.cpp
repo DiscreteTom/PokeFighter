@@ -150,7 +150,7 @@ void Server::listenFunc()
 		 * - "logon\n<username>\n<password>"
 		*/
 		recv(connSocket, buf, BUF_LENGTH, 0);
-		auto strs = split(buf, '\n');
+		auto strs = split(buf);
 		if (strs.size() < 3)
 		{
 			//error
@@ -191,7 +191,7 @@ void Server::logon(const string &username, const string &password)
 	}
 	else if (!isValid(password))
 	{
-		cout << "Server: Got an invalid password";
+		cout << "Server: Got an invalid password: " << password << endl;
 		strcpy(buf, "Reject: Invalid password.\n");
 	}
 	else
@@ -211,12 +211,21 @@ void Server::logon(const string &username, const string &password)
 			if (nRow == 0)
 			{
 				// username NOT exist, add this user
-				//TODO
+				string sql = "INSERT INTO User(name, password) VALUES('" + username + "', '" + password + "');";
+				char *errMsg;
+				if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
+				{
+					cout << "Server: Sqlite3 error: " << errMsg << endl;
+				}
+				else
+				{
+					cout << "Server: Add user: " << username << " password: " << password << endl;
+				}
 			}
 			else
 			{
 				// username already exist
-				cout << "Server: Logon: username already exist.\n";
+				cout << "Server: Logon: username '" << username << "' already exist.\n";
 				strcpy(buf, "Reject: duplicate username.\n");
 			}
 			sqlite3_free_table(sqlResult);
@@ -229,7 +238,7 @@ bool Server::isValid(const string &str)
 {
 	for (auto c : str)
 	{
-		if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'))
+		if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_'))
 		{
 			//not a letter or a digit or '_'
 			return false;

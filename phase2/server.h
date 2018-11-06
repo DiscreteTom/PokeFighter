@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-//#include "netconfig.h" // DO NOT INCLUE THIS
+//#include "netconfig.h" // DO NOT INCLUDE THIS
 
 // about socket
 #include <WinSock2.h>
@@ -53,3 +53,5 @@ public:
 
 	void start(); // init database and socket
 };
+
+inline int nonUseCallback(void *notUsed, int argc, char **argv, char **azColName) { return 0; }

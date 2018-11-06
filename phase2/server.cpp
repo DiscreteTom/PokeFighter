@@ -15,12 +15,16 @@ Server::Server()
 
 Server::~Server()
 {
+	// all endpoints should be destroyed in Server::start()
+	while(endpoints.size()){
+		endpoints.pop_back();
+	}
+
 	closesocket(serverSocket); // if serverSocket has been closed, return WSAENOTSOCK
 	closesocket(connSocket);
-	//stop socket DLL
 
 	/**
-	 * WSACleanup
+	 * WSACleanup, stop socket DLL
 	 * - return 0 if WSACleanup has NOT been called(succeed)
 	 * - return -1 if WSACleanup has been called
 	*/
@@ -112,6 +116,11 @@ void Server::start()
 	listenThread.join();
 	terminateThread.join();
 
+	// destroy all endpoints
+	while(endpoints.size()){
+		endpoints.pop_back();
+	}
+
 	closesocket(serverSocket);
 	WSACleanup();
 
@@ -154,7 +163,7 @@ void Server::listenFunc()
 		if (strs.size() < 3)
 		{
 			//error
-			cout << "Server: Invalid request.\n";
+			cout << "Server: Invalid request: " << buf << endl;
 			strcpy(buf, "Reject: Invalid request.\n");
 			send(connSocket, buf, BUF_LENGTH, 0);
 		}
@@ -164,7 +173,7 @@ void Server::listenFunc()
 			logon(strs[1], strs[2]);
 		else
 		{
-			cout << "Server: Invalid request.\n";
+			cout << "Server: Invalid request: " << buf << endl;
 			strcpy(buf, "Reject: Invalid request.\n");
 			send(connSocket, buf, BUF_LENGTH, 0);
 		}
@@ -181,6 +190,47 @@ void Server::terminateFunc()
 
 void Server::login(const string &username, const string &password)
 {
+	if (!isValid(username))
+	{
+		cout << "Server: Got an invalid username: " << username << endl;
+		strcpy(buf, "Reject: Invalid username.\n");
+	}
+	else if (!isValid(password))
+	{
+		cout << "Server: Got an invalid password: " << password << endl;
+		strcpy(buf, "Reject: Invalid password.\n");
+	}
+	else
+	{
+		char **sqlResult;
+		int nRow;
+		int nColumn;
+		char *errMsg;
+		string sql = "SELECT id FROM User WHERE name = '" + username + "'";
+		if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+		{
+			cout << "Server: Sqlite3 error: " << errMsg << endl;
+			sqlite3_free(errMsg);
+		}
+		else
+		{
+			if (nRow == 0)
+			{
+				// username NOT exist
+				cout << "Server: Login: username '" << username << "' NOT exist.\n";
+				strcpy(buf, "Reject: non-exist username.\n");
+			}
+			else
+			{
+				// username exist
+				endpoints.push_back(Endpoint(atoi(sqlResult[0][0]), db));
+				int endpointPort = endpoints[endpoints.size() - 1].start();
+				strcpy(buf, itoa(endpointPort));
+			}
+			sqlite3_free_table(sqlResult);
+		}
+	}
+	send(connSocket, buf, BUF_LENGTH, 0);
 }
 void Server::logon(const string &username, const string &password)
 {

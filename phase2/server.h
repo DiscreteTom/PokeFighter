@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 //#include "netconfig.h" // DO NOT INCLUDE THIS
 
 // about socket
@@ -10,6 +11,9 @@
 // about database
 #include "sqlite3.h"
 #pragma comment(lib, "sqlite3.lib")
+
+// about endpoint
+#include "endpoint.h"
 
 using namespace std;
 
@@ -35,6 +39,9 @@ private:
 
 	//about database
 	sqlite3 *db;
+
+	// about endpoint
+	vector<Endpoint> endpoints;
 
 	// interfaces
 	void login(const string &username, const string &password);

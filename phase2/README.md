@@ -23,3 +23,15 @@
 	- 字母
 	- 数字
 	- 下划线`_`
+
+数据库schema:
+
+```sql
+User(
+	id integer primary key,
+	name text unique not null,
+	password text not null
+);
+```
+
+其中设置User的id为integer类型的primary key的话，可以由sqlite3自动生成id

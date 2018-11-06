@@ -35,3 +35,17 @@ User(
 ```
 
 其中设置User的id为integer类型的primary key的话，可以由sqlite3自动生成id
+
+Endpoint有一个timer，当用户超过timer没有给服务器发数据时服务器会检测socket是否还维持着链接
+
+多Endpoint管理：
+- 使用vector保存Endpoint的指针，使所有Endpoints可以通过下标访问，并方便处理内存。
+- Endpoint结束条件：当timer超时且发现socket链接已断开，则告诉Server关闭此Endpoint。具体方案如下：
+	- public Endpoint::start()函数启动服务并返回端口号，如果返回0则表示启动失败
+	- public Endpoint::process()函数里面写socket的accept函数，并在process函数中处理各种请求，返回时代表endpoint结束（超时或用户退出）
+	- Server::mornitor(Endpoint *)是线程函数，每当新建Endpoint的时候新建一个线程，调用此函数，参数为新的Endpoint的指针
+	- Server首先使用Endpoint::start()获取端口号，然后新建线程把mornitor函数detach。
+	- Server::mornitor函数中调用Endpoint::process()开始recv，当process函数返回时表示此endpoint结束运行，在Server的Endpoint指针容器中清除此对象并delete之
+- 因为Server的mornitor线程和listenFunc线程函数都需要访问Endpoint指针容器，所以设置锁来防止多线程出现故障
+
+通信方式：客户端发送一条请求，服务器回复一条信息，服务端不需持续监听

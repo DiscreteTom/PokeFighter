@@ -2,7 +2,8 @@
 
 #include <string>
 #include <vector>
-//#include "netconfig.h" // DO NOT INCLUDE THIS
+#include <mutex>
+#include "netconfig.h"
 
 // about socket
 #include <WinSock2.h>
@@ -16,13 +17,6 @@
 #include "endpoint.h"
 
 using namespace std;
-
-/**
- * Network config
-*/
-const int SERVER_PORT = 7500;
-const int SERVER_REQ_QUEUE_LENGTH = 4; // server request queue max length, usually 2-4
-const int BUF_LENGTH = 1024;					 // server buffer length MUST equals client buffer length
 
 /**
  * define interfaces before login
@@ -41,7 +35,10 @@ private:
 	sqlite3 *db;
 
 	// about endpoint
-	vector<Endpoint> endpoints;
+	vector<Endpoint *> endpoints;
+
+	// about thread
+	mutex mtx;
 
 	// interfaces
 	void login(const string &username, const string &password);
@@ -53,6 +50,7 @@ private:
 	// thread function
 	void listenFunc();
 	void terminateFunc();
+	void mornitor(Endpoint *const endpoint);
 
 public:
 	Server();

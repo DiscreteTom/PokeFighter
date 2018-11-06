@@ -16,7 +16,8 @@ Server::Server()
 Server::~Server()
 {
 	// all endpoints should be destroyed in Server::start()
-	while(endpoints.size()){
+	while (endpoints.size())
+	{
 		endpoints.pop_back();
 	}
 
@@ -35,13 +36,15 @@ Server::~Server()
 void Server::start()
 {
 	// open database
+	cout << "Server: Init database...";
 	if (sqlite3_open("server.db", &db))
 	{
 		cout << "Server: Can NOT open database: " << sqlite3_errmsg(db) << endl;
 		return;
 	}
+	cout << "Done.\n";
 
-	//init socket DLL
+	// init socket DLL
 	cout << "Server: Init socket DLL...";
 	WSADATA wsadata;
 	if (WSAStartup(MAKEWORD(2, 2), &wsadata))
@@ -117,7 +120,8 @@ void Server::start()
 	terminateThread.join();
 
 	// destroy all endpoints
-	while(endpoints.size()){
+	while (endpoints.size())
+	{
 		endpoints.pop_back();
 	}
 
@@ -126,7 +130,7 @@ void Server::start()
 
 	sqlite3_close(db);
 
-	cout << "Server stoped.\n\n";
+	cout << "\nServer stoped.\n";
 }
 
 void Server::listenFunc()
@@ -210,6 +214,7 @@ void Server::login(const string &username, const string &password)
 		if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
 		{
 			cout << "Server: Sqlite3 error: " << errMsg << endl;
+			strcpy(buf, "Reject: Server database error.\n");
 			sqlite3_free(errMsg);
 		}
 		else
@@ -223,9 +228,32 @@ void Server::login(const string &username, const string &password)
 			else
 			{
 				// username exist
-				endpoints.push_back(Endpoint(atoi(sqlResult[0][0]), db));
-				int endpointPort = endpoints[endpoints.size() - 1].start();
-				strcpy(buf, itoa(endpointPort));
+				auto p = new Endpoint(atoi(sqlResult[1]), db); // sqlResult[0] == "id", sqlResult[1] == value
+				mtx.lock();																		 // protect endpoints
+				endpoints.push_back(p);
+				mtx.unlock();
+				int endpointPort = p->start();
+				if (endpointPort == 0) // start ERROR, remove and delete this new endpoint
+				{
+					mtx.lock(); // protect endpoints
+					for (int i = 0; i < endpoints.size(); ++i)
+					{
+						if (endpoints[i] == p)
+						{
+							endpoints.erase(endpoints.begin() + i);
+							break;
+						}
+					}
+					mtx.unlock();
+					delete p;
+					strcpy(buf, "Reject: Server endpoint error.\n");
+				}
+				else
+				{
+					strcpy(buf, to_string(endpointPort).c_str());
+					thread th(&Server::mornitor, this, p);
+					th.detach();
+				}
 			}
 			sqlite3_free_table(sqlResult);
 		}
@@ -254,6 +282,7 @@ void Server::logon(const string &username, const string &password)
 		if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
 		{
 			cout << "Server: Sqlite3 error: " << errMsg << endl;
+			strcpy(buf, "Reject: Server database error.\n");
 			sqlite3_free(errMsg);
 		}
 		else
@@ -266,10 +295,12 @@ void Server::logon(const string &username, const string &password)
 				if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
 				{
 					cout << "Server: Sqlite3 error: " << errMsg << endl;
+					strcpy(buf, "Reject: Server database error.\n");
 				}
 				else
 				{
 					cout << "Server: Add user: " << username << " password: " << password << endl;
+					strcpy(buf, "Accept.\n");
 				}
 			}
 			else
@@ -295,4 +326,24 @@ bool Server::isValid(const string &str)
 		}
 	}
 	return true;
+}
+
+void Server::mornitor(Endpoint *const endpoint)
+{
+	endpoint->process();
+
+	// now endpoint reaches end
+	mtx.lock(); // protect endpoints
+	// remove from endpoints
+	for (int i = 0; i < endpoints.size(); ++i)
+	{
+		if (endpoints[i] == endpoint)
+		{
+			endpoints.erase(endpoints.begin() + i);
+			break;
+		}
+	}
+	mtx.unlock();
+
+	delete endpoint;
 }

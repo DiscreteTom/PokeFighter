@@ -4,6 +4,7 @@
 #include <thread>
 #include <mutex>
 #include <string>
+#include <condition_variable>
 
 // about socket
 #include <WinSock2.h>
@@ -25,13 +26,16 @@ class Endpoint
 	string ip;
 	SOCKET endpointSocket;
 	SOCKET connSocket;
-	bool running;
+	volatile bool running;
+	volatile bool online;
 
 	// about player
 	int playerID;
 
 	// about thread
 	mutex mtx;
+	condition_variable cv;
+	volatile bool timing; // thread function timer is running
 
 	// thread function
 	void timer();
@@ -43,4 +47,6 @@ public:
 
 	int start();		// return port, return 0 if ERROR
 	void process(); // return to delete this endpoint
+
+	bool isOnline() const { return online; }
 };

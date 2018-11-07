@@ -18,7 +18,6 @@ vector<string> split(const string &str, char ch)
 			t = "";
 		}
 	}
-	if (str.length())
-		result.push_back(t);
+	result.push_back(t);
 	return result;
 }

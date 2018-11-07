@@ -15,13 +15,20 @@ Server::Server()
 
 Server::~Server()
 {
+#pragma region delete endpoints
 	// all endpoints should be destroyed in Server::start()
+	// add these lines here just in case :)
+	mtx.lock();
 	while (endpoints.size())
 	{
+		auto p = endpoints.back();
+		delete p;
 		endpoints.pop_back();
 	}
+	mtx.unlock();
+#pragma endregion
 
-	closesocket(serverSocket); // if serverSocket has been closed, return WSAENOTSOCK
+	closesocket(serverSocket); // if socket has been closed, return WSAENOTSOCK, but that's ok
 	closesocket(connSocket);
 
 	/**
@@ -35,26 +42,28 @@ Server::~Server()
 
 void Server::start()
 {
-	// open database
+#pragma region open database
 	cout << "Server: Init database...";
 	if (sqlite3_open("server.db", &db))
 	{
-		cout << "Server: Can NOT open database: " << sqlite3_errmsg(db) << endl;
+		cout << "\nServer: Can NOT open database: " << sqlite3_errmsg(db) << endl;
 		return;
 	}
 	cout << "Done.\n";
+#pragma endregion
 
 	// init socket DLL
 	cout << "Server: Init socket DLL...";
 	WSADATA wsadata;
 	if (WSAStartup(MAKEWORD(2, 2), &wsadata))
 	{
-		cout << "Server: Init network protocol failed.\n";
-		system("pause");
+		cout << "\nServer: Init network protocol failed.\n";
+		// system("pause");
 		return;
 	}
 	cout << "Done.\n";
 
+#pragma region init socket
 	/**
 	 * init server socket
 	 * function: socket(int domain, int type, int protocol);
@@ -69,10 +78,10 @@ void Server::start()
 	serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (serverSocket == INVALID_SOCKET)
 	{
-		cout << "Server: Init socket failed.\n";
+		cout << "\nServer: Init socket failed.\n";
 		closesocket(serverSocket);
 		WSACleanup();
-		system("pause");
+		// system("pause");
 		return;
 	}
 	cout << "Done.\n";
@@ -85,12 +94,13 @@ void Server::start()
 
 	// bind socket to an address
 	cout << "Server: Socket binding...";
+	// namespace conflicts: thread::bind and global::bind
 	if (::bind(serverSocket, (sockaddr *)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
 	{
-		cout << "Server: Socket bind failed.\n";
+		cout << "\nServer: Socket bind failed.\n";
 		closesocket(serverSocket);
 		WSACleanup();
-		system("pause");
+		// system("pause");
 		return;
 	}
 	cout << "Done.\n";
@@ -100,13 +110,14 @@ void Server::start()
 	if (listen(serverSocket, SERVER_REQ_QUEUE_LENGTH) == SOCKET_ERROR)
 	{
 		cout << WSAGetLastError();
-		cout << "Server: Socket listen failed.\n";
+		cout << "\nServer: Socket listen failed.\n";
 		closesocket(serverSocket);
 		WSACleanup();
-		system("pause");
+		// system("pause");
 		return;
 	}
 	cout << "Done.\n";
+#pragma endregion
 
 	// now listen successfully
 	cout << "\nServer: Server is running at " << SERVER_PORT << endl;
@@ -120,17 +131,21 @@ void Server::start()
 	terminateThread.join();
 
 	// destroy all endpoints
+	mtx.lock();
 	while (endpoints.size())
 	{
+		auto p = endpoints.back();
+		delete p;
 		endpoints.pop_back();
 	}
+	mtx.unlock();
 
 	closesocket(serverSocket);
 	WSACleanup();
 
 	sqlite3_close(db);
 
-	cout << "\nServer stoped.\n";
+	cout << "\nServer: Server stoped.\n";
 }
 
 void Server::listenFunc()
@@ -150,7 +165,7 @@ void Server::listenFunc()
 				cout << "Server: Link to client failed.\n";
 			}
 			closesocket(connSocket);
-			continue;
+			break;
 		}
 
 		// link successfully
@@ -164,7 +179,11 @@ void Server::listenFunc()
 		*/
 		recv(connSocket, buf, BUF_LENGTH, 0);
 		auto strs = split(buf);
-		if (strs.size() < 3)
+		if (strs.size() == 1 && strs[0].length() == 0)
+		{
+			// blank request, maybe client is closed
+		}
+		else if (strs.size() < 3)
 		{
 			//error
 			cout << "Server: Invalid request: " << buf << endl;
@@ -210,46 +229,35 @@ void Server::login(const string &username, const string &password)
 		int nRow;
 		int nColumn;
 		char *errMsg;
-		string sql = "SELECT id FROM User WHERE name = '" + username + "'";
+		string sql = "SELECT id FROM User WHERE name = '" + username + "' AND password = '" + password + "'";
 		if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
 		{
 			cout << "Server: Sqlite3 error: " << errMsg << endl;
 			strcpy(buf, "Reject: Server database error.\n");
 			sqlite3_free(errMsg);
 		}
-		else
+		else // sqlite select succeed
 		{
 			if (nRow == 0)
 			{
-				// username NOT exist
-				cout << "Server: Login: username '" << username << "' NOT exist.\n";
-				strcpy(buf, "Reject: non-exist username.\n");
+				// username and password mismatch
+				cout << "Server: Login: username '" << username << "' and password '" << password << "' mismatch.\n";
+				strcpy(buf, "Reject: Username and password dismatch.\n");
 			}
 			else
 			{
 				// username exist
-				auto p = new Endpoint(atoi(sqlResult[1]), db); // sqlResult[0] == "id", sqlResult[1] == value
-				mtx.lock();																		 // protect endpoints
-				endpoints.push_back(p);
-				mtx.unlock();
+				auto p = new Endpoint(atoi(sqlResult[1]), db); // sqlResult[0] == "id", sqlResult[1] == playerID
 				int endpointPort = p->start();
 				if (endpointPort == 0) // start ERROR, remove and delete this new endpoint
 				{
-					mtx.lock(); // protect endpoints
-					for (int i = 0; i < endpoints.size(); ++i)
-					{
-						if (endpoints[i] == p)
-						{
-							endpoints.erase(endpoints.begin() + i);
-							break;
-						}
-					}
-					mtx.unlock();
 					delete p;
 					strcpy(buf, "Reject: Server endpoint error.\n");
 				}
-				else
+				else // start normally, add this endpoint to endpoints
 				{
+					lock_guard<mutex> lock(mtx);
+					endpoints.push_back(p);
 					strcpy(buf, to_string(endpointPort).c_str());
 					thread th(&Server::mornitor, this, p);
 					th.detach();
@@ -307,7 +315,7 @@ void Server::logon(const string &username, const string &password)
 			{
 				// username already exist
 				cout << "Server: Logon: username '" << username << "' already exist.\n";
-				strcpy(buf, "Reject: duplicate username.\n");
+				strcpy(buf, "Reject: Duplicate username.\n");
 			}
 			sqlite3_free_table(sqlResult);
 		}
@@ -333,17 +341,17 @@ void Server::mornitor(Endpoint *const endpoint)
 	endpoint->process();
 
 	// now endpoint reaches end
-	mtx.lock(); // protect endpoints
+	mtx.lock();
 	// remove from endpoints
 	for (int i = 0; i < endpoints.size(); ++i)
 	{
 		if (endpoints[i] == endpoint)
 		{
 			endpoints.erase(endpoints.begin() + i);
+			// if endpoints doesn't contain endpoint, that means endpoint has been deleted in ~Server()
+			delete endpoint;
 			break;
 		}
 	}
 	mtx.unlock();
-
-	delete endpoint;
 }

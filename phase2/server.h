@@ -28,7 +28,7 @@ private:
 	// about network
 	SOCKET serverSocket;
 	SOCKET connSocket;
-	bool running;
+	volatile bool running;
 	char buf[BUF_LENGTH];
 
 	//about database
@@ -38,7 +38,7 @@ private:
 	vector<Endpoint *> endpoints;
 
 	// about thread
-	mutex mtx;
+	mutex mtx; // to protect endpoints
 
 	// interfaces
 	void login(const string &username, const string &password);

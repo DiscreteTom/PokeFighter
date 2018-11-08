@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Endpoint::Endpoint(int _playerID, sqlite3 *&_db) : db(_db), playerID(_playerID)
+Endpoint::Endpoint(int playerID, sqlite3 *&db) : db(db), playerID(playerID)
 {
 	port = 0;
 	running = false;
@@ -236,7 +236,7 @@ void Endpoint::timer()
 	 * - return true when otherwise
 	*/
 	unique_lock<mutex> lock(mtx);
-	if (!cv.wait_for(lock, 10m, [this] { return online; }))
+	if (!cv.wait_for(lock, 10min, [this] { return online; }))
 	{
 		// player is offline
 		running = false;

@@ -247,20 +247,46 @@ void Server::login(const string &username, const string &password)
 			else
 			{
 				// username exist
-				auto p = new Endpoint(atoi(sqlResult[1]), db); // sqlResult[0] == "id", sqlResult[1] == playerID
-				int endpointPort = p->start();
-				if (endpointPort == 0) // start ERROR, remove and delete this new endpoint
+				// check user state
+				bool userExist = false;
+				mtx.lock();
+				int id = atoi(sqlResult[1]); // sqlResult[0] == "id", sqlResult[1] == playerID
+				for (auto endpoint : endpoints)
 				{
-					delete p;
-					strcpy(buf, "Reject: Server endpoint error.\n");
+					if (endpoint->getPlayerID() == id)
+					{
+						userExist = true;
+						if (endpoint->isOnline())
+						{
+							strcpy(buf, "Reject: Account is already online.\n");
+						}
+						else
+						{
+							// not online, return port
+							strcpy(buf, to_string(endpoint->getPort()).c_str());
+						}
+						break;
+					}
 				}
-				else // start normally, add this endpoint to endpoints
+				mtx.unlock();
+
+				if (!userExist) // add an endpoint
 				{
-					lock_guard<mutex> lock(mtx);
-					endpoints.push_back(p);
-					strcpy(buf, to_string(endpointPort).c_str());
-					thread th(&Server::mornitor, this, p);
-					th.detach();
+					auto p = new Endpoint(id, db);
+					int endpointPort = p->start();
+					if (endpointPort == 0) // start ERROR, remove and delete this new endpoint
+					{
+							delete p;
+							strcpy(buf, "Reject: Server endpoint error.\n");
+					}
+					else // start normally, add this endpoint to endpoints
+					{
+							lock_guard<mutex> lock(mtx);
+							endpoints.push_back(p);
+							strcpy(buf, to_string(endpointPort).c_str());
+							thread th(&Server::mornitor, this, p);
+							th.detach();
+					}
 				}
 			}
 			sqlite3_free_table(sqlResult);

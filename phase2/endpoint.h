@@ -42,11 +42,13 @@ class Endpoint
 	void listenFunc();
 
 public:
-	Endpoint(int _playerID, sqlite3 *&_db);
+	Endpoint(int playerID, sqlite3 *&db);
 	~Endpoint();
 
 	int start();		// return port, return 0 if ERROR
 	void process(); // return to delete this endpoint
 
 	bool isOnline() const { return online; }
+	int getPlayerID() const { return playerID; }
+	int getPort() const { return port; }
 };

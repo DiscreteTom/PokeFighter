@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-	Server server;
+	Server &server = Server::getInstance();
 	server.start();
 	system("pause");
 }

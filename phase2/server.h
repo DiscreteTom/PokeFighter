@@ -52,9 +52,13 @@ private:
 	void terminateFunc();
 	void mornitor(Endpoint *const endpoint);
 
-public:
-	Server();
+	Server(){};
+	Server(Server const &) = delete;
+	Server &operator=(Server const &) = delete;
 	~Server();
+
+public:
+	static Server &getInstance();
 
 	void start(); // init database and socket
 };

@@ -9,8 +9,10 @@
 
 using namespace std;
 
-Server::Server()
+Server &Server::getInstance()
 {
+	static Server result;
+	return result;
 }
 
 Server::~Server()
@@ -276,16 +278,16 @@ void Server::login(const string &username, const string &password)
 					int endpointPort = p->start();
 					if (endpointPort == 0) // start ERROR, remove and delete this new endpoint
 					{
-							delete p;
-							strcpy(buf, "Reject: Server endpoint error.\n");
+						delete p;
+						strcpy(buf, "Reject: Server endpoint error.\n");
 					}
 					else // start normally, add this endpoint to endpoints
 					{
-							lock_guard<mutex> lock(mtx);
-							endpoints.push_back(p);
-							strcpy(buf, to_string(endpointPort).c_str());
-							thread th(&Server::mornitor, this, p);
-							th.detach();
+						lock_guard<mutex> lock(mtx);
+						endpoints.push_back(p);
+						strcpy(buf, to_string(endpointPort).c_str());
+						thread th(&Server::mornitor, this, p);
+						th.detach();
 					}
 				}
 			}

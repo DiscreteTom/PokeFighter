@@ -57,3 +57,20 @@ Endpoint断线重连方案：
 - timer超时后如果online仍为false则判定玩家长时间未登陆而退出
 - 如果timer超时前玩家重新登陆则终止timer
 	- 使用condition_variable实现带有条件的sleep
+
+Server提供的接口：
+```shell
+login <username> <password>
+logon <username> <password>
+```
+
+Endpoint提供的接口：
+```shell
+logout
+resetPassword <oldPassword> <newPassword>
+getPlayerList
+getPokemonList [playerID]
+getPokemonByID <pokemonID>
+battle <pokemonID> [-auto]
+useSkill <skillID>
+```

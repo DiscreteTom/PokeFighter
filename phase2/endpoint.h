@@ -41,6 +41,14 @@ class Endpoint
 	void timer();
 	void listenFunc();
 
+	// interface function
+	void resetPassword(const string &oldPassword, const string &newPassword);
+	void getPlayerList();
+	void getPokemonList(int playerID);
+	void getPokemonByID(int pokemonID);
+	void battle(int pokemonID, bool autoFight = false);
+	void useSkill(int skillID);
+
 public:
 	Endpoint(int playerID, sqlite3 *&db);
 	~Endpoint();

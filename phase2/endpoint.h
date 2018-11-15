@@ -18,6 +18,9 @@ using namespace std;
 
 class Endpoint
 {
+	// about server
+	Hub &hub;
+
 	// about database
 	sqlite3 *&db;
 
@@ -50,7 +53,7 @@ class Endpoint
 	void useSkill(int skillID);
 
 public:
-	Endpoint(int playerID, sqlite3 *&db);
+	Endpoint(int playerID, sqlite3 *&db, Hub &hub);
 	~Endpoint();
 
 	int start();		// return port, return 0 if ERROR

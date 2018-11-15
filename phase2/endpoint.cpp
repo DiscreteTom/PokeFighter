@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Endpoint::Endpoint(int playerID, sqlite3 *&db) : db(db), playerID(playerID)
+Endpoint::Endpoint(int playerID, sqlite3 *&db, Hub &hub) : playerID(playerID), db(db), hub(hub)
 {
 	port = 0;
 	running = false;

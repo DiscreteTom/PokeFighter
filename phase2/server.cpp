@@ -274,7 +274,7 @@ void Hub::login(const string &username, const string &password)
 
 				if (!userExist) // add an endpoint
 				{
-					auto p = new Endpoint(id, db);
+					auto p = new Endpoint(id, db, *this);
 					int endpointPort = p->start();
 					if (endpointPort == 0) // start ERROR, remove and delete this new endpoint
 					{

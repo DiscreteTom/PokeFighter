@@ -9,16 +9,16 @@
 
 using namespace std;
 
-Server &Server::getInstance()
+Hub &Hub::getInstance()
 {
-	static Server result;
+	static Hub result;
 	return result;
 }
 
-Server::~Server()
+Hub::~Hub()
 {
 #pragma region delete endpoints
-	// all endpoints should be destroyed in Server::start()
+	// all endpoints should be destroyed in Hub::start()
 	// add these lines here just in case :)
 	mtx.lock();
 	while (endpoints.size())
@@ -30,7 +30,7 @@ Server::~Server()
 	mtx.unlock();
 #pragma endregion
 
-	closesocket(serverSocket); // if socket has been closed, return WSAENOTSOCK, but that's ok
+	closesocket(hubSocket); // if socket has been closed, return WSAENOTSOCK, but that's ok
 	closesocket(connSocket);
 
 	/**
@@ -42,10 +42,10 @@ Server::~Server()
 		;
 }
 
-void Server::start()
+void Hub::start()
 {
 #pragma region open database
-	cout << "Server: Init database...";
+	cout << "Hub: Init database...";
 	if (sqlite3_open("server.db", &db))
 	{
 		cout << "\nServer: Can NOT open database: " << sqlite3_errmsg(db) << endl;
@@ -55,7 +55,7 @@ void Server::start()
 #pragma endregion
 
 	// init socket DLL
-	cout << "Server: Init socket DLL...";
+	cout << "Hub: Init socket DLL...";
 	WSADATA wsadata;
 	if (WSAStartup(MAKEWORD(2, 2), &wsadata))
 	{
@@ -67,7 +67,7 @@ void Server::start()
 
 #pragma region init socket
 	/**
-	 * init server socket
+	 * init hub socket
 	 * function: socket(int domain, int type, int protocol);
 	 * domain: AF_INET or PF_INET
 	 *   - AF for Address Family
@@ -76,12 +76,12 @@ void Server::start()
 	 * type: SOCK_STREAM or SOCK_DGRAM or SOCK_RAW
 	 * protocol: use IPPROTO_TCP for TCP/IP
 	*/
-	cout << "Server: Init server socket...";
-	serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (serverSocket == INVALID_SOCKET)
+	cout << "Hub: Init hub socket...";
+	hubSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (hubSocket == INVALID_SOCKET)
 	{
 		cout << "\nServer: Init socket failed.\n";
-		closesocket(serverSocket);
+		closesocket(hubSocket);
 		WSACleanup();
 		// system("pause");
 		return;
@@ -89,18 +89,18 @@ void Server::start()
 	cout << "Done.\n";
 
 	// construct an address, including protocol & IP address & port
-	sockaddr_in serverAddr;
-	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(SERVER_PORT);
-	serverAddr.sin_addr.S_un.S_addr = htonl(INADDR_ANY); // any ip address
+	sockaddr_in hubAddr;
+	hubAddr.sin_family = AF_INET;
+	hubAddr.sin_port = htons(HUB_PORT);
+	hubAddr.sin_addr.S_un.S_addr = htonl(INADDR_ANY); // any ip address
 
 	// bind socket to an address
-	cout << "Server: Socket binding...";
+	cout << "Hub: Socket binding...";
 	// namespace conflicts: thread::bind and global::bind
-	if (::bind(serverSocket, (sockaddr *)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
+	if (::bind(hubSocket, (sockaddr *)&hubAddr, sizeof(hubAddr)) == SOCKET_ERROR)
 	{
 		cout << "\nServer: Socket bind failed.\n";
-		closesocket(serverSocket);
+		closesocket(hubSocket);
 		WSACleanup();
 		// system("pause");
 		return;
@@ -108,12 +108,12 @@ void Server::start()
 	cout << "Done.\n";
 
 	// if request queue is full, client will get error: WSAECONNREFUSED
-	cout << "Server: Socket listen...";
-	if (listen(serverSocket, SERVER_REQ_QUEUE_LENGTH) == SOCKET_ERROR)
+	cout << "Hub: Socket listen...";
+	if (listen(hubSocket, REQ_QUEUE_LENGTH) == SOCKET_ERROR)
 	{
 		cout << WSAGetLastError();
 		cout << "\nServer: Socket listen failed.\n";
-		closesocket(serverSocket);
+		closesocket(hubSocket);
 		WSACleanup();
 		// system("pause");
 		return;
@@ -122,13 +122,13 @@ void Server::start()
 #pragma endregion
 
 	// now listen successfully
-	cout << "\nServer: Server is running at " << SERVER_PORT << endl;
-	cout << "Press any key to stop server.\n\n";
+	cout << "\nServer: Hub is running at " << HUB_PORT << endl;
+	cout << "Press any key to stop hub.\n\n";
 
 	// init thread
 	running = true;
-	thread listenThread(&Server::listenFunc, this);
-	thread terminateThread(&Server::terminateFunc, this);
+	thread listenThread(&Hub::listenFunc, this);
+	thread terminateThread(&Hub::terminateFunc, this);
 	listenThread.join();
 	terminateThread.join();
 
@@ -142,36 +142,36 @@ void Server::start()
 	}
 	mtx.unlock();
 
-	closesocket(serverSocket);
+	closesocket(hubSocket);
 	WSACleanup();
 
 	sqlite3_close(db);
 
-	cout << "\nServer: Server stoped.\n";
+	cout << "\nServer: Hub stoped.\n";
 }
 
-void Server::listenFunc()
+void Hub::listenFunc()
 {
 	while (running)
 	{
 		// link
 		sockaddr_in clientAddr; // client address
 		int clientAddrLength = sizeof(clientAddr);
-		connSocket = accept(serverSocket, (sockaddr *)&clientAddr, &clientAddrLength);
+		connSocket = accept(hubSocket, (sockaddr *)&clientAddr, &clientAddrLength);
 		if (connSocket == INVALID_SOCKET)
 		{
 			if (running)
 			{
 				// if not running, this thread must be terminated by terminateFunc
 				// in that case the string below is not needed
-				cout << "Server: Link to client failed.\n";
+				cout << "Hub: Link to client failed.\n";
 			}
 			closesocket(connSocket);
 			break;
 		}
 
 		// link successfully
-		cout << "Server: " << inet_ntoa(clientAddr.sin_addr) << " connected.\n";
+		cout << "Hub: " << inet_ntoa(clientAddr.sin_addr) << " connected.\n";
 
 		/**
 		 * process data
@@ -188,7 +188,7 @@ void Server::listenFunc()
 		else if (strs.size() < 3)
 		{
 			//error
-			cout << "Server: Invalid request: " << buf << endl;
+			cout << "Hub: Invalid request: " << buf << endl;
 			strcpy(buf, "Reject: Invalid request.\n");
 			send(connSocket, buf, BUF_LENGTH, 0);
 		}
@@ -198,7 +198,7 @@ void Server::listenFunc()
 			logon(strs[1], strs[2]);
 		else
 		{
-			cout << "Server: Invalid request: " << buf << endl;
+			cout << "Hub: Invalid request: " << buf << endl;
 			strcpy(buf, "Reject: Invalid request.\n");
 			send(connSocket, buf, BUF_LENGTH, 0);
 		}
@@ -206,23 +206,23 @@ void Server::listenFunc()
 	}
 }
 
-void Server::terminateFunc()
+void Hub::terminateFunc()
 {
 	_getch();
 	running = false;
-	closesocket(serverSocket);
+	closesocket(hubSocket);
 }
 
-void Server::login(const string &username, const string &password)
+void Hub::login(const string &username, const string &password)
 {
 	if (!isValid(username))
 	{
-		cout << "Server: Got an invalid username: " << username << endl;
+		cout << "Hub: Got an invalid username: " << username << endl;
 		strcpy(buf, "Reject: Invalid username.\n");
 	}
 	else if (!isValid(password))
 	{
-		cout << "Server: Got an invalid password: " << password << endl;
+		cout << "Hub: Got an invalid password: " << password << endl;
 		strcpy(buf, "Reject: Invalid password.\n");
 	}
 	else
@@ -234,8 +234,8 @@ void Server::login(const string &username, const string &password)
 		string sql = "SELECT id FROM User WHERE name = '" + username + "' AND password = '" + password + "'";
 		if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
 		{
-			cout << "Server: Sqlite3 error: " << errMsg << endl;
-			strcpy(buf, "Reject: Server database error.\n");
+			cout << "Hub: Sqlite3 error: " << errMsg << endl;
+			strcpy(buf, "Reject: Hub database error.\n");
 			sqlite3_free(errMsg);
 		}
 		else // sqlite select succeed
@@ -243,7 +243,7 @@ void Server::login(const string &username, const string &password)
 			if (nRow == 0)
 			{
 				// username and password mismatch
-				cout << "Server: Login: username '" << username << "' and password '" << password << "' mismatch.\n";
+				cout << "Hub: Login: username '" << username << "' and password '" << password << "' mismatch.\n";
 				strcpy(buf, "Reject: Username and password dismatch.\n");
 			}
 			else
@@ -279,14 +279,14 @@ void Server::login(const string &username, const string &password)
 					if (endpointPort == 0) // start ERROR, remove and delete this new endpoint
 					{
 						delete p;
-						strcpy(buf, "Reject: Server endpoint error.\n");
+						strcpy(buf, "Reject: Hub endpoint error.\n");
 					}
 					else // start normally, add this endpoint to endpoints
 					{
 						lock_guard<mutex> lock(mtx);
 						endpoints.push_back(p);
 						strcpy(buf, to_string(endpointPort).c_str());
-						thread th(&Server::mornitor, this, p);
+						thread th(&Hub::mornitor, this, p);
 						th.detach();
 					}
 				}
@@ -296,16 +296,16 @@ void Server::login(const string &username, const string &password)
 	}
 	send(connSocket, buf, BUF_LENGTH, 0);
 }
-void Server::logon(const string &username, const string &password)
+void Hub::logon(const string &username, const string &password)
 {
 	if (!isValid(username))
 	{
-		cout << "Server: Got an invalid username: " << username << endl;
+		cout << "Hub: Got an invalid username: " << username << endl;
 		strcpy(buf, "Reject: Invalid username.\n");
 	}
 	else if (!isValid(password))
 	{
-		cout << "Server: Got an invalid password: " << password << endl;
+		cout << "Hub: Got an invalid password: " << password << endl;
 		strcpy(buf, "Reject: Invalid password.\n");
 	}
 	else
@@ -317,8 +317,8 @@ void Server::logon(const string &username, const string &password)
 		string sql = "SELECT name FROM User WHERE name = '" + username + "'";
 		if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
 		{
-			cout << "Server: Sqlite3 error: " << errMsg << endl;
-			strcpy(buf, "Reject: Server database error.\n");
+			cout << "Hub: Sqlite3 error: " << errMsg << endl;
+			strcpy(buf, "Reject: Hub database error.\n");
 			sqlite3_free(errMsg);
 		}
 		else
@@ -330,19 +330,19 @@ void Server::logon(const string &username, const string &password)
 				char *errMsg;
 				if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
 				{
-					cout << "Server: Sqlite3 error: " << errMsg << endl;
-					strcpy(buf, "Reject: Server database error.\n");
+					cout << "Hub: Sqlite3 error: " << errMsg << endl;
+					strcpy(buf, "Reject: Hub database error.\n");
 				}
 				else
 				{
-					cout << "Server: Add user: " << username << " password: " << password << endl;
+					cout << "Hub: Add user: " << username << " password: " << password << endl;
 					strcpy(buf, "Accept.\n");
 				}
 			}
 			else
 			{
 				// username already exist
-				cout << "Server: Logon: username '" << username << "' already exist.\n";
+				cout << "Hub: Logon: username '" << username << "' already exist.\n";
 				strcpy(buf, "Reject: Duplicate username.\n");
 			}
 			sqlite3_free_table(sqlResult);
@@ -351,7 +351,7 @@ void Server::logon(const string &username, const string &password)
 	send(connSocket, buf, BUF_LENGTH, 0);
 }
 
-bool Server::isValid(const string &str)
+bool Hub::isValid(const string &str)
 {
 	for (auto c : str)
 	{
@@ -364,7 +364,7 @@ bool Server::isValid(const string &str)
 	return true;
 }
 
-void Server::mornitor(Endpoint *const endpoint)
+void Hub::mornitor(Endpoint *const endpoint)
 {
 	endpoint->process();
 
@@ -376,7 +376,7 @@ void Server::mornitor(Endpoint *const endpoint)
 		if (endpoints[i] == endpoint)
 		{
 			endpoints.erase(endpoints.begin() + i);
-			// if endpoints doesn't contain endpoint, that means endpoint has been deleted in ~Server()
+			// if endpoints doesn't contain endpoint, that means endpoint has been deleted in ~Hub()
 			delete endpoint;
 			break;
 		}

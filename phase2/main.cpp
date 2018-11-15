@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-	Server &server = Server::getInstance();
-	server.start();
+	Hub &hub = Hub::getInstance();
+	hub.start();
 	system("pause");
 }

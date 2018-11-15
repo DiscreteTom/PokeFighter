@@ -128,7 +128,7 @@ int Endpoint::start()
 
 	// if request queue is full, client will get error: WSAECONNREFUSED
 	// cout << "Endpoint[" << playerID << "]: Socket listen...";
-	if (listen(endpointSocket, SERVER_REQ_QUEUE_LENGTH) == SOCKET_ERROR)
+	if (listen(endpointSocket, REQ_QUEUE_LENGTH) == SOCKET_ERROR)
 	{
 		cout << WSAGetLastError();
 		cout << "Endpoint[" << playerID << "]: Socket listen failed.\n";

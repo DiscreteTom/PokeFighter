@@ -34,6 +34,7 @@ class Endpoint
 
 	// about player
 	int playerID;
+	string playerUsername;
 
 	// about thread
 	mutex mtx;
@@ -61,5 +62,6 @@ public:
 
 	bool isOnline() const { return online; }
 	int getPlayerID() const { return playerID; }
+	string getPlayerName() const { return playerUsername; }
 	int getPort() const { return port; }
 };

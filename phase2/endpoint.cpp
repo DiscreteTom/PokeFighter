@@ -34,6 +34,31 @@ Endpoint::~Endpoint()
 
 int Endpoint::start()
 {
+	// get playerUsername
+	char **sqlResult;
+	int nRow;
+	int nColumn;
+	;
+	char *errMsg;
+	string sql = "SELECT name FROM User where id=" + playerID + ";";
+	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+		sqlite3_free(errMsg);
+		return 0;
+	}
+	else if (nRow == 0)
+	{
+		cout << "Endpoint[" << playerID << "]: Database content error.\n";
+		sqlite3_free_table(sqlResult);
+		return 0;
+	}
+	else
+	{
+		playerUsername = sqlResult[1];
+		sqlite3_free_table(sqlResult);
+	}
+
 	/**
 	 * init endpoint socket
 	 * 

@@ -39,7 +39,6 @@ int Endpoint::start()
 	char **sqlResult;
 	int nRow;
 	int nColumn;
-	;
 	char *errMsg;
 	string sql = "SELECT name FROM User where id=" + to_string(playerID) + ";";
 	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
@@ -228,6 +227,9 @@ void Endpoint::listenFunc()
 		{
 			getPlayerList();
 		}
+		else if (strs[0] == "resetPassword" && strs.size() == 3){
+			resetPassword(strs[1], strs[2]);
+		}
 		else
 		{
 			cout << "Endpoint[" << playerID << "]: Invalid request.\n";
@@ -278,6 +280,55 @@ void Endpoint::timer()
 		timing = false;
 		// cout << "Stop timing.\n";
 	}
+}
+
+void Endpoint::resetPassword(const string &oldPassword, const string &newPassword)
+{
+	// check oldPassword
+	char **sqlResult;
+	int nRow;
+	int nColumn;
+	char *errMsg;
+	string sql;
+	sql = "SELECT name FROM User where id=" + to_string(playerID) + " and password='" + oldPassword + "';";
+	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+		sqlite3_free(errMsg);
+		strcpy(buf, "Reject: Server error.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+		return;
+	}
+	else if (nRow == 0)
+	{
+		// wrong password
+		sqlite3_free_table(sqlResult);
+		strcpy(buf, "Reject: wrong old password.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+		return;
+	}
+	else
+	{
+		sqlite3_free_table(sqlResult);
+	}
+
+	// update password
+	sql = "update User set password='" + newPassword + "' where id=" + to_string(playerID) + ";";
+	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+		sqlite3_free(errMsg);
+		strcpy(buf, "Reject: Server error.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+		return;
+	}
+	else
+	{
+		sqlite3_free_table(sqlResult);
+		strcpy(buf, "Accept.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+	}
+	return;
 }
 
 void Endpoint::getPlayerList()

@@ -16,6 +16,8 @@
 
 using namespace std;
 
+class Hub;
+
 class Endpoint
 {
 	// about server
@@ -31,6 +33,7 @@ class Endpoint
 	SOCKET connSocket;
 	volatile bool running;
 	volatile bool online;
+	char buf[BUF_LENGTH];
 
 	// about player
 	int playerID;

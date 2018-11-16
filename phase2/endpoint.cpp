@@ -4,6 +4,7 @@
 #include <iostream>
 // #include <mstcpip.h> // for socket keep_alive
 #include "mystringfunc.h"
+#include "server.h"
 
 using namespace std;
 
@@ -40,7 +41,7 @@ int Endpoint::start()
 	int nColumn;
 	;
 	char *errMsg;
-	string sql = "SELECT name FROM User where id=" + playerID + ";";
+	string sql = "SELECT name FROM User where id=" + to_string(playerID) + ";";
 	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
 	{
 		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
@@ -207,7 +208,6 @@ void Endpoint::listenFunc()
 	}
 
 	// link successfully
-	char buf[BUF_LENGTH] = "";
 	int ret = recv(connSocket, buf, BUF_LENGTH, 0);
 	/**
 	 * recv(connSocket, buf, BUF_LENGTH, 0)
@@ -223,6 +223,10 @@ void Endpoint::listenFunc()
 		if (strs[0] == "logout")
 		{
 			running = false;
+		}
+		else if (strs[0] == "getPlayerList")
+		{
+			getPlayerList();
 		}
 		else
 		{
@@ -274,4 +278,10 @@ void Endpoint::timer()
 		timing = false;
 		// cout << "Stop timing.\n";
 	}
+}
+
+void Endpoint::getPlayerList()
+{
+	strcpy(buf, hub.getAllUser().c_str());
+	send(connSocket, buf, BUF_LENGTH, 0);
 }

@@ -48,7 +48,7 @@ void Hub::start()
 	cout << "Hub: Init database...";
 	if (sqlite3_open("server.db", &db))
 	{
-		cout << "\nServer: Can NOT open database: " << sqlite3_errmsg(db) << endl;
+		cout << "\nHub: Can NOT open database: " << sqlite3_errmsg(db) << endl;
 		return;
 	}
 	cout << "Done.\n";
@@ -59,7 +59,7 @@ void Hub::start()
 	WSADATA wsadata;
 	if (WSAStartup(MAKEWORD(2, 2), &wsadata))
 	{
-		cout << "\nServer: Init network protocol failed.\n";
+		cout << "\nHub: Init network protocol failed.\n";
 		// system("pause");
 		return;
 	}
@@ -80,7 +80,7 @@ void Hub::start()
 	hubSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (hubSocket == INVALID_SOCKET)
 	{
-		cout << "\nServer: Init socket failed.\n";
+		cout << "\nHub: Init socket failed.\n";
 		closesocket(hubSocket);
 		WSACleanup();
 		// system("pause");
@@ -99,7 +99,7 @@ void Hub::start()
 	// namespace conflicts: thread::bind and global::bind
 	if (::bind(hubSocket, (sockaddr *)&hubAddr, sizeof(hubAddr)) == SOCKET_ERROR)
 	{
-		cout << "\nServer: Socket bind failed.\n";
+		cout << "\nHub: Socket bind failed.\n";
 		closesocket(hubSocket);
 		WSACleanup();
 		// system("pause");
@@ -112,7 +112,7 @@ void Hub::start()
 	if (listen(hubSocket, REQ_QUEUE_LENGTH) == SOCKET_ERROR)
 	{
 		cout << WSAGetLastError();
-		cout << "\nServer: Socket listen failed.\n";
+		cout << "\nHub: Socket listen failed.\n";
 		closesocket(hubSocket);
 		WSACleanup();
 		// system("pause");
@@ -122,7 +122,7 @@ void Hub::start()
 #pragma endregion
 
 	// now listen successfully
-	cout << "\nServer: Hub is running at " << HUB_PORT << endl;
+	cout << "\nHub: Hub is running at " << HUB_PORT << endl;
 	cout << "Press any key to stop hub.\n\n";
 
 	// init thread
@@ -147,7 +147,7 @@ void Hub::start()
 
 	sqlite3_close(db);
 
-	cout << "\nServer: Hub stoped.\n";
+	cout << "\nHub: Hub stoped.\n";
 }
 
 void Hub::listenFunc()
@@ -382,4 +382,18 @@ void Hub::mornitor(Endpoint *const endpoint)
 		}
 	}
 	mtx.unlock();
+}
+
+string Hub::getAllUser()
+{
+	string result;
+	mtx.lock();
+	for (auto endpoint : endpoints)
+	{
+		result += to_string(endpoint->getPlayerID());
+		result += ' ';
+		result += endpoint->getPlayerName() + '\n';
+	}
+	mtx.unlock();
+	return result;
 }

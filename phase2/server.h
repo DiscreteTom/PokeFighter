@@ -63,6 +63,7 @@ public:
 	static Hub &getInstance();
 
 	void start(); // init database and socket
+	string getAllUser();
 };
 
 inline int nonUseCallback(void *notUsed, int argc, char **argv, char **azColName) { return 0; }

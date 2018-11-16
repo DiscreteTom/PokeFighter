@@ -22,11 +22,12 @@ using namespace std;
  * define interfaces before login
  * use interfaces in class Endpoint after login
 */
-class Server
+class Hub
 {
 private:
 	// about network
-	SOCKET serverSocket;
+	const int HUB_PORT = 7500;
+	SOCKET hubSocket;
 	SOCKET connSocket;
 	volatile bool running;
 	char buf[BUF_LENGTH];
@@ -52,11 +53,17 @@ private:
 	void terminateFunc();
 	void mornitor(Endpoint *const endpoint);
 
+	Hub(){};
+	Hub(Hub const &) = delete;
+	Hub(Hub &&) = delete;
+	Hub &operator=(Hub const &) = delete;
+	~Hub();
+
 public:
-	Server();
-	~Server();
+	static Hub &getInstance();
 
 	void start(); // init database and socket
+	string getAllUser();
 };
 
 inline int nonUseCallback(void *notUsed, int argc, char **argv, char **azColName) { return 0; }

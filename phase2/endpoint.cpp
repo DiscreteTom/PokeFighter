@@ -4,10 +4,11 @@
 #include <iostream>
 // #include <mstcpip.h> // for socket keep_alive
 #include "mystringfunc.h"
+#include "server.h"
 
 using namespace std;
 
-Endpoint::Endpoint(int _playerID, sqlite3 *&_db) : db(_db), playerID(_playerID)
+Endpoint::Endpoint(int playerID, sqlite3 *&db, Hub &hub) : playerID(playerID), db(db), hub(hub)
 {
 	port = 0;
 	running = false;
@@ -34,6 +35,30 @@ Endpoint::~Endpoint()
 
 int Endpoint::start()
 {
+	// get playerUsername
+	char **sqlResult;
+	int nRow;
+	int nColumn;
+	char *errMsg;
+	string sql = "SELECT name FROM User where id=" + to_string(playerID) + ";";
+	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+		sqlite3_free(errMsg);
+		return 0;
+	}
+	else if (nRow == 0)
+	{
+		cout << "Endpoint[" << playerID << "]: Database content error.\n";
+		sqlite3_free_table(sqlResult);
+		return 0;
+	}
+	else
+	{
+		playerUsername = sqlResult[1];
+		sqlite3_free_table(sqlResult);
+	}
+
 	/**
 	 * init endpoint socket
 	 * 
@@ -128,7 +153,7 @@ int Endpoint::start()
 
 	// if request queue is full, client will get error: WSAECONNREFUSED
 	// cout << "Endpoint[" << playerID << "]: Socket listen...";
-	if (listen(endpointSocket, SERVER_REQ_QUEUE_LENGTH) == SOCKET_ERROR)
+	if (listen(endpointSocket, REQ_QUEUE_LENGTH) == SOCKET_ERROR)
 	{
 		cout << WSAGetLastError();
 		cout << "Endpoint[" << playerID << "]: Socket listen failed.\n";
@@ -182,7 +207,6 @@ void Endpoint::listenFunc()
 	}
 
 	// link successfully
-	char buf[BUF_LENGTH] = "";
 	int ret = recv(connSocket, buf, BUF_LENGTH, 0);
 	/**
 	 * recv(connSocket, buf, BUF_LENGTH, 0)
@@ -198,6 +222,13 @@ void Endpoint::listenFunc()
 		if (strs[0] == "logout")
 		{
 			running = false;
+		}
+		else if (strs[0] == "getPlayerList")
+		{
+			getPlayerList();
+		}
+		else if (strs[0] == "resetPassword" && strs.size() == 3){
+			resetPassword(strs[1], strs[2]);
 		}
 		else
 		{
@@ -236,7 +267,7 @@ void Endpoint::timer()
 	 * - return true when otherwise
 	*/
 	unique_lock<mutex> lock(mtx);
-	if (!cv.wait_for(lock, 10m, [this] { return online; }))
+	if (!cv.wait_for(lock, 10min, [this] { return online; }))
 	{
 		// player is offline
 		running = false;
@@ -249,4 +280,59 @@ void Endpoint::timer()
 		timing = false;
 		// cout << "Stop timing.\n";
 	}
+}
+
+void Endpoint::resetPassword(const string &oldPassword, const string &newPassword)
+{
+	// check oldPassword
+	char **sqlResult;
+	int nRow;
+	int nColumn;
+	char *errMsg;
+	string sql;
+	sql = "SELECT name FROM User where id=" + to_string(playerID) + " and password='" + oldPassword + "';";
+	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+		sqlite3_free(errMsg);
+		strcpy(buf, "Reject: Server error.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+		return;
+	}
+	else if (nRow == 0)
+	{
+		// wrong password
+		sqlite3_free_table(sqlResult);
+		strcpy(buf, "Reject: wrong old password.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+		return;
+	}
+	else
+	{
+		sqlite3_free_table(sqlResult);
+	}
+
+	// update password
+	sql = "update User set password='" + newPassword + "' where id=" + to_string(playerID) + ";";
+	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+		sqlite3_free(errMsg);
+		strcpy(buf, "Reject: Server error.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+		return;
+	}
+	else
+	{
+		sqlite3_free_table(sqlResult);
+		strcpy(buf, "Accept.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+	}
+	return;
+}
+
+void Endpoint::getPlayerList()
+{
+	strcpy(buf, hub.getAllUser().c_str());
+	send(connSocket, buf, BUF_LENGTH, 0);
 }

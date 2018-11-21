@@ -51,6 +51,29 @@ void Hub::start()
 		cout << "\nHub: Can NOT open database: " << sqlite3_errmsg(db) << endl;
 		return;
 	}
+	// create tables whether they are already exist or not
+	string sql = "create table User(";
+	sql += "id integer primary key,";
+	sql += "name text unique not null,";
+	sql += "password text not null";
+	sql += ");";
+	sql += "create table Pokemon(";
+	sql += "userid integer not null,";
+	sql += "name text not null,";
+	sql += "race int not null,";
+	sql += "atk int not null,";
+	sql += "def int not null,";
+	sql += "maxHp int not null,";
+	sql += "speed int not null,";
+	sql += "lv int not null,";
+	sql += "exp int not null,";
+	sql += "primary key(userid, name)";
+	sql += ");";
+	char *errMsg;
+	if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
+	{
+		sqlite3_free(errMsg);
+	}
 	cout << "Done.\n";
 #pragma endregion
 
@@ -331,6 +354,7 @@ void Hub::logon(const string &username, const string &password)
 				if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
 				{
 					cout << "Hub: Sqlite3 error: " << errMsg << endl;
+					sqlite3_free(errMsg);
 					strcpy(buf, "Reject: Hub database error.\n");
 				}
 				else

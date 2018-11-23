@@ -76,11 +76,24 @@ bool PokemonBase::dodge(int attacker, int aim) const
 	return false;
 }
 
-Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(race)
+int Pokemon::objCount = 0;
+
+Pokemon::Pokemon(int raceIndex, const string &name)
 {
+	++objCount;
+	if (objCount == 1)
+	{
+		races[0] = new Race<0>();
+		races[1] = new Race<1>();
+		races[2] = new Race<2>();
+		races[3] = new Race<3>();
+	}
+
+	_raceIndex = raceIndex;
+
 	if (!name.length())
 	{
-		_name = _race.raceName(); //use race name as default name
+		_name = races[_raceIndex]->raceName(); //use race name as default name
 	}
 	else
 	{
@@ -88,21 +101,21 @@ Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(race)
 	}
 
 	//add some random factor
-	_atk = _race.baseAtk() + f(3);
-	_def = _race.baseDef() + f(2);
-	_maxHp = _hp = _race.baseHp() + f(5);
-	_speed = _race.baseSpeed() + f(3);
+	_atk = races[_raceIndex]->baseAtk() + f(3);
+	_def = races[_raceIndex]->baseDef() + f(2);
+	_maxHp = _hp = races[_raceIndex]->baseHp() + f(5);
+	_speed = races[_raceIndex]->baseSpeed() + f(3);
 
 	_lv = 1;
 	_exp = 0;
 
 	for (int i = 0; i < 3; ++i)
 	{
-		_cpp[i] = _race.pp(i);
+		_cpp[i] = races[_raceIndex]->pp(i);
 	}
 
 	//output info
-	dbout << "Init " << _name << " from " << _race.raceName() << endl
+	dbout << "Init " << _name << " from " << races[_raceIndex]->raceName() << endl
 				<< "Type: " << raceType() << endl
 				<< "Atk: " << _atk << endl
 				<< "Def: " << _def << endl
@@ -114,11 +127,11 @@ Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(race)
 	dbout << "Skills:\n";
 	for (int i = 0; i < 4; ++i)
 	{
-		dbout << "	Name: " << _race.skillName(i) << endl;
-		dbout << "	Description: " << _race.skillDscp(i) << endl;
+		dbout << "	Name: " << races[_raceIndex]->skillName(i) << endl;
+		dbout << "	Description: " << races[_raceIndex]->skillDscp(i) << endl;
 		if (i)
 		{
-			dbout << "	PP: " << _race.pp(i - 1) << endl;
+			dbout << "	PP: " << races[_raceIndex]->pp(i - 1) << endl;
 		}
 		else
 		{
@@ -128,9 +141,42 @@ Pokemon::Pokemon(const PokemonBase &race, const string &name) : _race(race)
 	dbout << endl;
 }
 
+Pokemon::Pokemon(const string &name, int raceIndex, int atk, int def, int maxHp, int speed, int lv, int exp)
+{
+	++objCount;
+	if (objCount == 1)
+	{
+		races[0] = new Race<0>();
+		races[1] = new Race<1>();
+		races[2] = new Race<2>();
+		races[3] = new Race<3>();
+	}
+
+	_name = name;
+	_raceIndex = raceIndex;
+	_atk = atk;
+	_def = def;
+	_maxHp = maxHp;
+	_speed = speed;
+	_lv = lv;
+	_exp = exp;
+}
+
+Pokemon::~Pokemon()
+{
+	--objCount;
+	if (objCount == 0)
+	{
+		for (int i = 0; i < 4; ++i)
+		{
+			delete races[i];
+		}
+	}
+}
+
 string Pokemon::raceType() const
 {
-	switch (_race.type())
+	switch (races[_raceIndex]->type())
 	{
 	case ATK:
 		return "High Attack";
@@ -248,7 +294,7 @@ void Pokemon::restoreAll()
 	_cspeed = _speed;
 	for (int i = 0; i < 3; ++i)
 	{
-		_cpp[i] = _race.pp(i);
+		_cpp[i] = races[_raceIndex]->pp(i);
 	}
 }
 
@@ -267,7 +313,7 @@ bool Pokemon::gainExp(int count)
 				<< endl;
 
 	bool LV_UP = false;
-	while (_lv < 15 && _exp > _race.expCurve(_lv + 1))
+	while (_lv < 15 && _exp > races[_raceIndex]->expCurve(_lv + 1))
 	{
 		//level-up!
 		LV_UP = true;
@@ -284,7 +330,7 @@ bool Pokemon::gainExp(int count)
 		speed = 5 + f(1);
 
 		//race talent
-		switch (_race.type())
+		switch (races[_raceIndex]->type())
 		{
 		case ATK:
 			atk += 3;
@@ -357,7 +403,7 @@ bool Pokemon::attack(Pokemon &aim, bool autoFight)
 		}
 		if (skillIndex > 0)
 			--_cpp[skillIndex - 1]; //consume pp
-		return _race.attack(*this, aim, skillIndex);
+		return races[_raceIndex]->attack(*this, aim, skillIndex);
 	}
 
 	//manual fight, get skillIndex
@@ -382,11 +428,11 @@ bool Pokemon::attack(Pokemon &aim, bool autoFight)
 				dbout << ' ';
 			}
 			dbout << _cpp[i - 1] << '/';
-			if (_race.pp(i - 1) < 10)
+			if (races[_raceIndex]->pp(i - 1) < 10)
 			{
 				dbout << ' ';
 			}
-			dbout << _race.pp(i - 1) << ')';
+			dbout << races[_raceIndex]->pp(i - 1) << ')';
 		}
 		for (int j = 0; j < space - skillName(i).length(); ++j)
 			dbout << " ";
@@ -409,10 +455,10 @@ bool Pokemon::attack(Pokemon &aim, bool autoFight)
 	if (skillIndex * 5 <= _lv && _cpp[skillIndex - 1]) //check again by LV and PP
 	{
 		--_cpp[skillIndex - 1]; //consume PP
-		return _race.attack(*this, aim, skillIndex);
+		return races[_raceIndex]->attack(*this, aim, skillIndex);
 	}
 
-	return _race.attack(*this, aim, 0);
+	return races[_raceIndex]->attack(*this, aim, 0);
 }
 
 bool Pokemon::takeDamage(int n)
@@ -427,7 +473,7 @@ int f(int n)
 	return rand() % (2 * n + 1) - n;
 }
 
-template<>
+template <>
 Race<0>::Race() : PokemonBase(ATK)
 {
 	_raceName = "Charmander";
@@ -449,7 +495,7 @@ Race<0>::Race() : PokemonBase(ATK)
 	_pp[2] = 5;
 }
 
-template<>
+template <>
 bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
 	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
@@ -494,7 +540,7 @@ bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 	return false;
 }
 
-template<>
+template <>
 Race<1>::Race() : PokemonBase(HP)
 {
 	_raceName = "Bulbasaur";
@@ -516,7 +562,7 @@ Race<1>::Race() : PokemonBase(HP)
 	_pp[2] = 5;
 }
 
-template<>
+template <>
 bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
 	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
@@ -565,7 +611,7 @@ bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 	return false;
 }
 
-template<>
+template <>
 Race<2>::Race() : PokemonBase(DEF)
 {
 	_raceName = "Squirtle";
@@ -587,7 +633,7 @@ Race<2>::Race() : PokemonBase(DEF)
 	_pp[2] = 3;
 }
 
-template<>
+template <>
 bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
 	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
@@ -635,7 +681,7 @@ bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 	return false;
 }
 
-template<>
+template <>
 Race<3>::Race() : PokemonBase(SPE)
 {
 	_raceName = "Pidgey";
@@ -657,8 +703,8 @@ Race<3>::Race() : PokemonBase(SPE)
 	_pp[2] = 5;
 }
 
-template<>
-bool Race<3 >::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
+template <>
+bool Race<3>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
 	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
 

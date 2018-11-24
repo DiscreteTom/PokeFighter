@@ -1,5 +1,8 @@
 #include "pokemon.h"
 
+int Pokemon::objCount = 0;
+const PokemonBase *Pokemon::races[4] = {0};
+
 PokemonBase::PokemonBase(PokemonType type)
 {
 	_type = type;
@@ -75,8 +78,6 @@ bool PokemonBase::dodge(int attacker, int aim) const
 	}
 	return false;
 }
-
-int Pokemon::objCount = 0;
 
 Pokemon::Pokemon(int raceIndex, const string &name)
 {

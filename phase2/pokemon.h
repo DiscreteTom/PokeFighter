@@ -96,6 +96,7 @@ public:
 	//race getter
 	string raceName() const { return races[_raceIndex]->raceName(); }
 	string raceType() const;
+	int raceIndex() const { return _raceIndex; }
 	string skillName(int n) const { return races[_raceIndex]->skillName(n); }
 	string skillDscp(int n) const { return races[_raceIndex]->skillDscp(n); }
 	int pp(int i) const { return races[_raceIndex]->pp(i); }

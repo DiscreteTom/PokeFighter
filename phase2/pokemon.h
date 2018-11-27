@@ -35,6 +35,7 @@ protected: //all those attributes can be changed by derived classes
 
 public:
 	PokemonBase(PokemonType type);
+	virtual ~PokemonBase() = default;
 
 	//getter
 	string raceName() const { return _raceName; }
@@ -48,7 +49,7 @@ public:
 	int pp(int n) const;
 
 	//about level-up
-	int expCurve(int level) const;// 2 <= level <= 15
+	int expCurve(int level) const; // 2 <= level <= 15
 
 	//virtual methods
 	virtual bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const = 0; //yes, this is a CONST method
@@ -59,7 +60,7 @@ public:
 class Pokemon
 {
 private:
-	const PokemonBase &_race;
+	int _raceIndex;
 	string _name;
 	int _atk;
 	int _def;
@@ -75,8 +76,14 @@ private:
 	int _cspeed;
 	int _cpp[3]; //power point
 
+	static const PokemonBase *races[4];
+	static int objCount;
+
 public:
-	Pokemon(const PokemonBase &race, const string &name = "");
+	Pokemon(int raceIndex, const string &name = "");																										 // init a new pokemon
+	Pokemon(const string &name, int raceIndex, int atk, int def, int maxHp, int speed, int lv, int exp); // ctor for database
+	Pokemon(const Pokemon &) = delete;
+	~Pokemon();
 
 	//getter
 	string name() const { return _name; }
@@ -87,11 +94,12 @@ public:
 	int lv() const { return _lv; }
 	int exp() const { return _exp; }
 	//race getter
-	string raceName() const { return _race.raceName(); }
+	string raceName() const { return races[_raceIndex]->raceName(); }
 	string raceType() const;
-	string skillName(int n) const { return _race.skillName(n); }
-	string skillDscp(int n) const { return _race.skillDscp(n); }
-	int pp(int i) const { return _race.pp(i); }
+	int raceIndex() const { return _raceIndex; }
+	string skillName(int n) const { return races[_raceIndex]->skillName(n); }
+	string skillDscp(int n) const { return races[_raceIndex]->skillDscp(n); }
+	int pp(int i) const { return races[_raceIndex]->pp(i); }
 
 	//about battle
 	void restoreAll();
@@ -109,14 +117,17 @@ public:
 	void changeDef(int count);
 	void changeSpeed(int count);
 	bool changeHp(int count); //return true if hp = 0
+
+	Pokemon &operator=(const Pokemon &) = delete;
 };
 
 int f(int n); //get a random number from -n to n
 
-template<int N>
+template <int N>
 class Race : public PokemonBase
 {
 public:
 	Race();
+	virtual ~Race() = default;
 	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
 };

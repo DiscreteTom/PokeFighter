@@ -32,6 +32,18 @@ User(
 	name text unique not null,
 	password text not null
 );
+Pokemon(
+	id integer primary key,
+	userid integer not null,
+	name text not null,
+	race int not null,
+	atk int not null,
+	def int not null,
+	maxHp int not null,
+	speed int not null,
+	lv int not null,
+	exp int not null,
+);
 ```
 
 其中设置User的id为integer类型的primary key的话，可以由sqlite3自动生成id
@@ -70,7 +82,7 @@ logout
 resetPassword <oldPassword> <newPassword>
 getPlayerList
 getPokemonList [playerID]
-getPokemonByID <pokemonID>
+getPokemon <pokemonID>
 battle <pokemonID> [-auto]
 useSkill <skillID>
 ```

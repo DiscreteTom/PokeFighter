@@ -5,7 +5,7 @@
 class BattleController
 {
 private:
-	Pokemon &p1, p2;
+	Pokemon &p1, &p2;
 	bool _auto; //auto fight
 	int timer1;
 	int timer2;

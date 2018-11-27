@@ -52,12 +52,18 @@ void Hub::start()
 		return;
 	}
 	// create tables whether they are already exist or not
+	char *errMsg;
 	string sql = "create table User(";
 	sql += "id integer primary key,";
 	sql += "name text unique not null,";
 	sql += "password text not null";
 	sql += ");";
-	sql += "create table Pokemon(";
+	if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
+	{
+		sqlite3_free(errMsg);
+	}
+	sql = "create table Pokemon(";
+	sql += "id integer primary key,";
 	sql += "userid integer not null,";
 	sql += "name text not null,";
 	sql += "race int not null,";
@@ -66,10 +72,8 @@ void Hub::start()
 	sql += "maxHp int not null,";
 	sql += "speed int not null,";
 	sql += "lv int not null,";
-	sql += "exp int not null,";
-	sql += "primary key(userid, name)";
+	sql += "exp int not null";
 	sql += ");";
-	char *errMsg;
 	if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
 	{
 		sqlite3_free(errMsg);

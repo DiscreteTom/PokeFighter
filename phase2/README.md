@@ -33,6 +33,7 @@ User(
 	password text not null
 );
 Pokemon(
+	id integer primary key,
 	userid integer not null,
 	name text not null,
 	race int not null,
@@ -42,7 +43,6 @@ Pokemon(
 	speed int not null,
 	lv int not null,
 	exp int not null,
-	primary key(userid, name)
 );
 ```
 

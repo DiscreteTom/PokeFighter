@@ -82,7 +82,7 @@ logout
 resetPassword <oldPassword> <newPassword>
 getPlayerList
 getPokemonList [playerID]
-getPokemonByName <pokemonName>
-battle <pokemonName> [-auto]
+getPokemonByName <pokemonID>
+battle <pokemonID> [-auto]
 useSkill <skillID>
 ```

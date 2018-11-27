@@ -251,7 +251,8 @@ void Endpoint::listenFunc()
 		if (running)
 			ret = recv(connSocket, buf, BUF_LENGTH, 0);
 	}
-	if (ret == SOCKET_ERROR || ret == 0)
+	if (!running);// this object was destroyed by dtor
+	else if (ret == SOCKET_ERROR || ret == 0)
 	{
 		cout << "Endpoint[" << playerID << "]: Client unexpected offline, start timing.\n";
 	}

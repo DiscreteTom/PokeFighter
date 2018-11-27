@@ -366,10 +366,10 @@ void Endpoint::getPokemonList(int playerID)
 		send(connSocket, buf, BUF_LENGTH, 0);
 		return;
 	}
-	if (nRow == 0 && playerID == this->playerID)
+	if (nRow < 3 && playerID == this->playerID)
 	{
-		// add 3 pokemons for new user
-		for (int i = 0; i < 3; ++i)
+		// add pokemons for user till his pokemon number be 3
+		for (int i = 0; i < 3 - nRow; ++i)
 		{
 			int raceIndex = rand() % 4;
 			Pokemon t(raceIndex);

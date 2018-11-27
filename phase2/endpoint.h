@@ -5,6 +5,7 @@
 #include <mutex>
 #include <string>
 #include <condition_variable>
+#include "pokemon.h"
 
 // about socket
 #include <WinSock2.h>
@@ -55,6 +56,9 @@ class Endpoint
 	void getPokemonByID(int pokemonID);
 	void battle(int pokemonID, bool autoFight = false);
 	void useSkill(int skillID);
+
+	// other functions
+	void savePokemonToDB(const Pokemon &p);
 
 public:
 	Endpoint(int playerID, sqlite3 *&db, Hub &hub);

@@ -227,8 +227,20 @@ void Endpoint::listenFunc()
 		{
 			getPlayerList();
 		}
-		else if (strs[0] == "resetPassword" && strs.size() == 3){
+		else if (strs[0] == "resetPassword" && strs.size() == 3)
+		{
 			resetPassword(strs[1], strs[2]);
+		}
+		else if (strs[0] == "getPokemonList" && strs.size() < 3)
+		{
+			if (strs.size() == 2)
+			{
+				getPokemonList(stoi(strs[1]));
+			}
+			else
+			{
+				getPokemonList(playerID);
+			}
 		}
 		else
 		{
@@ -335,4 +347,69 @@ void Endpoint::getPlayerList()
 {
 	strcpy(buf, hub.getAllUser().c_str());
 	send(connSocket, buf, BUF_LENGTH, 0);
+}
+
+void Endpoint::getPokemonList(int playerID)
+{
+	char **sqlResult;
+	int nRow;
+	int nColumn;
+	char *errMsg;
+	string sql;
+	sql = "SELECT name, race, lv FROM Pokemon where userid=" + to_string(playerID) + ";";
+	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+		sqlite3_free(errMsg);
+		strcpy(buf, "Reject: Server error.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+		return;
+	}
+	if (nRow == 0 && playerID == this->playerID)
+	{
+		// add 3 pokemons for new user
+		for (int i = 0; i < 3; ++i)
+		{
+			int raceIndex = rand() % 4;
+			Pokemon t(raceIndex);
+			savePokemonToDB(t);
+		}
+		getPokemonList(playerID);
+	}
+	else
+	{
+		string result;
+		for (int i = 0; i < nRow; ++i)
+		{
+			result += sqlResult[3 * (i + 1)];
+			result += '\n';
+			result += sqlResult[3 * (i + 1) + 1];
+			result += '\n';
+			result += sqlResult[3 * (i + 1) + 2];
+			result += '\n';
+		}
+		strcpy(buf, result.c_str());
+		send(connSocket, buf, BUF_LENGTH, 0);
+	}
+	sqlite3_free_table(sqlResult);
+}
+
+void Endpoint::savePokemonToDB(const Pokemon &p)
+{
+	string sql = "INSERT INTO Pokemon(userid, name, race, atk, def, maxHp, speed, lv, exp) VALUES('";
+	sql += to_string(playerID) + "','";
+	sql += p.name() + "',";
+	sql += to_string(p.raceIndex()) + ",";
+	sql += to_string(p.atk()) + ",";
+	sql += to_string(p.def()) + ",";
+	sql += to_string(p.maxHp()) + ",";
+	sql += to_string(p.speed()) + ",";
+	sql += to_string(p.lv()) + ",";
+	sql += to_string(p.exp()) + ");";
+	char *errMsg;
+	if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+		sqlite3_free(errMsg);
+	}
 }

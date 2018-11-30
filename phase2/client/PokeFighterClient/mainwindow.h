@@ -8,6 +8,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QGridLayout>
+#include "logondlg.h"
 
 namespace Ui {
 class MainWindow;
@@ -45,6 +46,9 @@ private:
 	QPushButton * btnLogin;
 	QPushButton * btnLogon;
 	QPushButton * btnBack;
+
+	// logon window
+	LogonDlg * logonDlg;
 
 	void changeState(State aim);
 };

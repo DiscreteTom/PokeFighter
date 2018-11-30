@@ -24,8 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	btnPlay = new QPushButton(tr("开始游戏"), this);
 	btnExit = new QPushButton(tr("退出"), this);
 
-
-	//login layout
+	// login layout
 	lbLoginLabel = new QLabel(tr("登录"), this);
 	leUsername = new QLineEdit(this);
 	lePassword = new QLineEdit(this);
@@ -33,9 +32,13 @@ MainWindow::MainWindow(QWidget *parent) :
 	btnLogon = new QPushButton(tr("注册"), this);
 	btnBack = new QPushButton(tr("返回"), this);
 
+	// logon window
+	logonDlg = new LogonDlg(this);
+
 	connect(btnPlay, &QPushButton::clicked, this, [this]{ changeState(LOGIN); });
-	connect(btnBack, &QPushButton::clicked, this, [this]{ changeState(START); });
+	connect(btnLogon, &QPushButton::clicked, this, [this]{ logonDlg->exec(); });
 	connect(btnExit, &QPushButton::clicked, this, [this]{ qApp->quit(); });
+	connect(btnBack, &QPushButton::clicked, this, [this]{ changeState(START); });
 
 	changeState(START);
 }

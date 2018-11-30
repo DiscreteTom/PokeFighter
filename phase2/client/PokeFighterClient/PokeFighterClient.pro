@@ -24,11 +24,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    logondlg.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    logondlg.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    logondlg.ui
 
 RESOURCES += \
     qss.qrc

@@ -126,3 +126,9 @@ int LogonDlg::exec()
 	leUsername->setFocus();
 	return QDialog::exec();
 }
+
+void LogonDlg::reject()
+{
+	client->disconnectFromHost();
+	QDialog::reject();
+}

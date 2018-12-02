@@ -24,6 +24,7 @@ public:
 
 public slots:
 	int exec();
+	void reject();
 
 private:
 	Ui::LogonDlg *ui;

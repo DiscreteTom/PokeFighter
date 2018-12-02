@@ -49,6 +49,10 @@ private:
 	QPushButton * btnLogon;
 	QPushButton * btnBack;
 
+	// main layout
+	QPushButton * btnLogout;
+	QPushButton * btnDisplayAllPlayer;
+
 	// logon window
 	LogonDlg * logonDlg;
 

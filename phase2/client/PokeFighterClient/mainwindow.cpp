@@ -37,6 +37,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	btnLogon = new QPushButton(tr("注册"), this);
 	btnBack = new QPushButton(tr("返回"), this);
 
+	// main layout
+	btnLogout = new QPushButton(tr("退出登录"), this);
+	btnDisplayAllPlayer = new QPushButton(tr("查看当前在线玩家"), this);
+
 	// logon window
 	logonDlg = new LogonDlg(this);
 
@@ -53,6 +57,13 @@ MainWindow::MainWindow(QWidget *parent) :
 		changeState(START);
 		client->disconnectFromHost();
 	});
+	connect(btnLogout, &QPushButton::clicked, this, [this]{
+		changeState(LOGIN);
+		client->write("logout", BUF_LENGTH);
+		client->disconnectFromHost();
+	});
+	connect(leUsername, &QLineEdit::returnPressed, btnLogin, &QPushButton::click);
+	connect(lePassword, &QLineEdit::returnPressed, btnLogin, &QPushButton::click);
 
 	client = new QTcpSocket(this);
 	connect(client, &QTcpSocket::readyRead, this, &MainWindow::getServerMsg);
@@ -78,6 +89,8 @@ void MainWindow::changeState(MainWindow::State aim)
 	btnLogin->hide();
 	btnLogon->hide();
 	btnBack->hide();
+	btnLogout->hide();
+	btnDisplayAllPlayer->hide();
 
 	state = aim;
 
@@ -94,6 +107,7 @@ void MainWindow::changeState(MainWindow::State aim)
 		layout->addWidget(lbStartTitle, 0, 0, Qt::AlignCenter);
 		layout->addWidget(btnPlay, 1, 0, Qt::AlignCenter);
 		layout->addWidget(btnExit, 2, 0, Qt::AlignCenter);
+		btnPlay->setDefault(true);
 		break;
 	case LOGIN:
 		lbLoginLabel->show();
@@ -108,11 +122,24 @@ void MainWindow::changeState(MainWindow::State aim)
 		layout->addWidget(btnLogin, 3, 0, Qt::AlignCenter);
 		layout->addWidget(btnLogon, 4, 0, Qt::AlignCenter);
 		layout->addWidget(btnBack, 5, 0, Qt::AlignCenter);
+		btnLogin->setDefault(true);
+		leUsername->setFocus();
+		break;
+	case MAIN:
+		btnLogout->show();
+		btnDisplayAllPlayer->show();
+		layout->addWidget(btnDisplayAllPlayer, 0, 0, Qt::AlignCenter);
+		layout->addWidget(btnLogout, 1, 0, Qt::AlignCenter);
 		break;
 	default:
 		break;
 	}
 	ui->centralWidget->setLayout(layout);
+
+	// special settings, must behind ui->centralWidget->setLayout()
+	if (state == LOGIN){
+		leUsername->setFocus();
+	}
 }
 
 void MainWindow::login()
@@ -131,6 +158,7 @@ void MainWindow::login()
 		QMessageBox::warning(this, tr("错误"), tr("服务器错误"));
 		btnLogin->setDisabled(false);
 	}
+	lePassword->clear();
 }
 
 void MainWindow::getServerMsg()

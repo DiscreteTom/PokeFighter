@@ -49,6 +49,16 @@ LogonDlg::~LogonDlg()
 	delete ui;
 }
 
+QString LogonDlg::getUsername() const
+{
+	return leUsername->text();
+}
+
+QString LogonDlg::getPassword() const
+{
+	return lePassword->text();
+}
+
 void LogonDlg::logon()
 {
 	if (!isValid(leUsername->text())){
@@ -95,15 +105,17 @@ void LogonDlg::readServerMsg()
 {
 	auto ret = client->read(BUF_LENGTH);
 
+	btnOK->setDisabled(false);
+	client->disconnectFromHost();
+
 	if (QString(ret) == "Accept.\n"){
 		QMessageBox::information(this, tr("注册成功"), tr("注册成功"));
+		accept();
 	}
 	else{
 		QMessageBox::warning(this, tr("错误"), ret);
 	}
 
-	btnOK->setDisabled(false);
-	client->disconnectFromHost();
 }
 
 int LogonDlg::exec()

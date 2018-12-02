@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	leUsername->setPlaceholderText(tr("请输入用户名"));
 	lePassword = new QLineEdit(this);
 	lePassword->setPlaceholderText(tr("请输入密码"));
+	lePassword->setEchoMode(QLineEdit::Password);
 	btnLogin = new QPushButton(tr("登录"), this);
 	btnLogon = new QPushButton(tr("注册"), this);
 	btnBack = new QPushButton(tr("返回"), this);
@@ -38,7 +39,12 @@ MainWindow::MainWindow(QWidget *parent) :
 	logonDlg = new LogonDlg(this);
 
 	connect(btnPlay, &QPushButton::clicked, this, [this]{ changeState(LOGIN); });
-	connect(btnLogon, &QPushButton::clicked, this, [this]{ logonDlg->exec(); });
+	connect(btnLogon, &QPushButton::clicked, this, [this]{
+		if (logonDlg->exec() == QDialog::Accepted){
+			leUsername->setText(logonDlg->getUsername());
+			lePassword->setText(logonDlg->getPassword());
+		}
+	});
 	connect(btnExit, &QPushButton::clicked, this, [this]{ qApp->quit(); });
 	connect(btnBack, &QPushButton::clicked, this, [this]{ changeState(START); });
 

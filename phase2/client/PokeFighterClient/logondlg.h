@@ -19,6 +19,9 @@ public:
 	explicit LogonDlg(QWidget *parent = 0);
 	~LogonDlg();
 
+	QString getUsername() const;
+	QString getPassword() const;
+
 public slots:
 	int exec();
 

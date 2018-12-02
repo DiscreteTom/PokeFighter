@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include <QFile>
 #include <QTextStream>
+#include <QHostAddress>
+#include "netconfig.h"
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -39,20 +41,28 @@ MainWindow::MainWindow(QWidget *parent) :
 	logonDlg = new LogonDlg(this);
 
 	connect(btnPlay, &QPushButton::clicked, this, [this]{ changeState(LOGIN); });
+	connect(btnExit, &QPushButton::clicked, this, [this]{ qApp->quit(); });
+	connect(btnLogin, &QPushButton::clicked, this, &MainWindow::login);
 	connect(btnLogon, &QPushButton::clicked, this, [this]{
 		if (logonDlg->exec() == QDialog::Accepted){
 			leUsername->setText(logonDlg->getUsername());
 			lePassword->setText(logonDlg->getPassword());
 		}
 	});
-	connect(btnExit, &QPushButton::clicked, this, [this]{ qApp->quit(); });
-	connect(btnBack, &QPushButton::clicked, this, [this]{ changeState(START); });
+	connect(btnBack, &QPushButton::clicked, this, [this]{
+		changeState(START);
+		client->disconnectFromHost();
+	});
+
+	client = new QTcpSocket(this);
+	connect(client, &QTcpSocket::readyRead, this, &MainWindow::getServerMsg);
 
 	changeState(START);
 }
 
 MainWindow::~MainWindow()
 {
+	delete client;
 	delete ui;
 }
 
@@ -103,4 +113,47 @@ void MainWindow::changeState(MainWindow::State aim)
 		break;
 	}
 	ui->centralWidget->setLayout(layout);
+}
+
+void MainWindow::login()
+{
+	client->connectToHost(QHostAddress("127.0.0.1"), 7500);
+	QString msg = "login";
+	msg += ' ';
+	msg += leUsername->text();
+	msg += ' ';
+	msg += lePassword->text();
+
+	btnLogin->setDisabled(true);
+
+	if (client->write(msg.toStdString().c_str(), BUF_LENGTH) == -1){
+		// error
+		QMessageBox::warning(this, tr("错误"), tr("服务器错误"));
+		btnLogin->setDisabled(false);
+	}
+}
+
+void MainWindow::getServerMsg()
+{
+	auto ret = client->read(BUF_LENGTH);
+	client->disconnectFromHost();
+
+	QString msg(ret);
+
+	switch (state){
+	case LOGIN:{
+		btnLogin->setDisabled(false);
+		int port = msg.toInt();
+		if (port == 0){
+			// login failed
+			QMessageBox::warning(this, tr("错误"), tr("用户名或密码错误"));
+		} else {
+			client->connectToHost(QHostAddress("127.0.0.1"), port);
+			changeState(MAIN);
+		}
+		break;
+	}
+	default:
+		break;
+	}
 }

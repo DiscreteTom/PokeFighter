@@ -8,6 +8,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QGridLayout>
+#include <QTcpSocket>
 #include "logondlg.h"
 
 namespace Ui {
@@ -27,7 +28,8 @@ private:
 
 	enum State{
 		START,
-		LOGIN
+		LOGIN,
+		MAIN
 	};
 
 	State state;
@@ -50,7 +52,13 @@ private:
 	// logon window
 	LogonDlg * logonDlg;
 
+	QTcpSocket * client;
+
 	void changeState(State aim);
+	void login();
+
+private slots:
+	void getServerMsg();
 };
 
 #endif // MAINWINDOW_H

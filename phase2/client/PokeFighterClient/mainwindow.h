@@ -11,6 +11,7 @@
 #include <QTcpSocket>
 #include "logondlg.h"
 #include <QListWidget>
+#include <QList>
 
 namespace Ui {
 class MainWindow;
@@ -57,10 +58,17 @@ private:
 	QPushButton * btnShowPokemonList;
 	QPushButton * btnDisplayAllPlayer;
 
+	// pokemon list and player list
+	QListWidget * list;
+	QList<int> * playerID_List;
+
 	// logon window
 	LogonDlg * logonDlg;
 
 	QTcpSocket * client;
+
+	// user data
+	QString username;
 
 	void changeState(State aim);
 	void login();

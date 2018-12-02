@@ -3,3 +3,6 @@ phase1/tester.cpp
 .vscode
 phase2/server.db
 phase2/tester
+phase2/server/tester
+phase2/client/build-PokeFighterClient-Desktop_Qt_5_8_0_MinGW_32bit-Debug
+phase2/client/PokeFighterClient/PokeFighterClient.pro.user

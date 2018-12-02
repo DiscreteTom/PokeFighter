@@ -4,6 +4,8 @@
 #include <QDialog>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QMessageBox>
+#include <QTcpSocket>
 
 namespace Ui {
 class LogonDlg;
@@ -29,7 +31,13 @@ private:
 	QPushButton * btnOK;
 	QPushButton * btnCancel;
 
+	QTcpSocket * client;
+
 	void logon();
+	bool isValid(const QString & str);
+
+private slots:
+	void readServerMsg();
 };
 
 #endif // LOGONDLG_H

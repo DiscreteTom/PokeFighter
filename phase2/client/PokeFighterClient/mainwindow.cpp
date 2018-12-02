@@ -27,7 +27,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	// login layout
 	lbLoginLabel = new QLabel(tr("登录"), this);
 	leUsername = new QLineEdit(this);
+	leUsername->setPlaceholderText(tr("请输入用户名"));
 	lePassword = new QLineEdit(this);
+	lePassword->setPlaceholderText(tr("请输入密码"));
 	btnLogin = new QPushButton(tr("登录"), this);
 	btnLogon = new QPushButton(tr("注册"), this);
 	btnBack = new QPushButton(tr("返回"), this);

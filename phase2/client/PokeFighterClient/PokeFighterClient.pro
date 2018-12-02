@@ -28,10 +28,13 @@ SOURCES += main.cpp\
     logondlg.cpp
 
 HEADERS  += mainwindow.h \
-    logondlg.h
+    logondlg.h \
+    netconfig.h
 
 FORMS    += mainwindow.ui \
     logondlg.ui
 
 RESOURCES += \
     qss.qrc
+
+QT += network

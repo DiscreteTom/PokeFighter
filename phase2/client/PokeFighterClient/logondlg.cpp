@@ -85,9 +85,7 @@ void LogonDlg::logon()
 		// error occur
 		QMessageBox::warning(this, tr("错误"), tr("服务器出错"));
 		btnOK->setDisabled(false);
-		return;
 	}
-	return;
 }
 
 bool LogonDlg::isValid(const QString &str)

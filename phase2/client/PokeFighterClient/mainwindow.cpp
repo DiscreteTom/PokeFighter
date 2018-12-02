@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	// main layout
 	btnLogout = new QPushButton(tr("退出登录"), this);
+	btnShowPokemonList = new QPushButton(tr("查看精灵"), this);
 	btnDisplayAllPlayer = new QPushButton(tr("查看当前在线玩家"), this);
 
 	// logon window
@@ -61,6 +62,14 @@ MainWindow::MainWindow(QWidget *parent) :
 		changeState(LOGIN);
 		client->write("logout", BUF_LENGTH);
 		client->disconnectFromHost();
+	});
+	connect(btnShowPokemonList, &QPushButton::clicked, this, [this]{
+		changeState(POKEMON_LIST);
+		client->write("getPokemonList", BUF_LENGTH);
+	});
+	connect(btnDisplayAllPlayer, &QPushButton::clicked, this, [this]{
+		changeState(PLAYER_LIST);
+		client->write("getPlayerList", BUF_LENGTH);
 	});
 	connect(leUsername, &QLineEdit::returnPressed, btnLogin, &QPushButton::click);
 	connect(lePassword, &QLineEdit::returnPressed, btnLogin, &QPushButton::click);

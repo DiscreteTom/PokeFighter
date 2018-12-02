@@ -10,6 +10,7 @@
 #include <QGridLayout>
 #include <QTcpSocket>
 #include "logondlg.h"
+#include <QListWidget>
 
 namespace Ui {
 class MainWindow;
@@ -29,7 +30,9 @@ private:
 	enum State{
 		START,
 		LOGIN,
-		MAIN
+		MAIN,
+		POKEMON_LIST,
+		PLAYER_LIST
 	};
 
 	State state;
@@ -51,6 +54,7 @@ private:
 
 	// main layout
 	QPushButton * btnLogout;
+	QPushButton * btnShowPokemonList;
 	QPushButton * btnDisplayAllPlayer;
 
 	// logon window

@@ -39,7 +39,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	// main layout
 	btnLogout = new QPushButton(tr("退出登录"), this);
+	btnShowPokemonList = new QPushButton(tr("查看精灵"), this);
 	btnDisplayAllPlayer = new QPushButton(tr("查看当前在线玩家"), this);
+
+	// pokemon list and player list
+	list = new QListWidget(this);
+	playerID_List = new QList<int>();
 
 	// logon window
 	logonDlg = new LogonDlg(this);
@@ -54,13 +59,30 @@ MainWindow::MainWindow(QWidget *parent) :
 		}
 	});
 	connect(btnBack, &QPushButton::clicked, this, [this]{
-		changeState(START);
-		client->disconnectFromHost();
+		switch (state){
+		case LOGIN:
+			changeState(START);
+			client->disconnectFromHost();
+			break;
+		case POKEMON_LIST:
+		case PLAYER_LIST:
+			changeState(MAIN);
+			break;
+		default:break;
+		}
 	});
 	connect(btnLogout, &QPushButton::clicked, this, [this]{
 		changeState(LOGIN);
 		client->write("logout", BUF_LENGTH);
 		client->disconnectFromHost();
+	});
+	connect(btnShowPokemonList, &QPushButton::clicked, this, [this]{
+		changeState(POKEMON_LIST);
+		client->write("getPokemonList", BUF_LENGTH);
+	});
+	connect(btnDisplayAllPlayer, &QPushButton::clicked, this, [this]{
+		changeState(PLAYER_LIST);
+		client->write("getPlayerList", BUF_LENGTH);
 	});
 	connect(leUsername, &QLineEdit::returnPressed, btnLogin, &QPushButton::click);
 	connect(lePassword, &QLineEdit::returnPressed, btnLogin, &QPushButton::click);
@@ -90,7 +112,11 @@ void MainWindow::changeState(MainWindow::State aim)
 	btnLogon->hide();
 	btnBack->hide();
 	btnLogout->hide();
+	btnShowPokemonList->hide();
 	btnDisplayAllPlayer->hide();
+	list->hide();
+	list->clear();
+	playerID_List->clear();
 
 	state = aim;
 
@@ -127,9 +153,20 @@ void MainWindow::changeState(MainWindow::State aim)
 		break;
 	case MAIN:
 		btnLogout->show();
+		btnShowPokemonList->show();
 		btnDisplayAllPlayer->show();
-		layout->addWidget(btnDisplayAllPlayer, 0, 0, Qt::AlignCenter);
-		layout->addWidget(btnLogout, 1, 0, Qt::AlignCenter);
+		layout->addWidget(btnShowPokemonList, 0, 0, Qt::AlignCenter);
+		layout->addWidget(btnDisplayAllPlayer, 1, 0, Qt::AlignCenter);
+		layout->addWidget(btnLogout, 2, 0, Qt::AlignCenter);
+		btnShowPokemonList->setDefault(true);
+		break;
+	case POKEMON_LIST:
+	case PLAYER_LIST:
+		btnBack->show();
+		list->show();
+		layout->addWidget(list, 0, 0, Qt::AlignCenter);
+		layout->addWidget(btnBack, 1, 0, Qt::AlignCenter);
+		btnBack->setDefault(true);
 		break;
 	default:
 		break;
@@ -164,7 +201,9 @@ void MainWindow::login()
 void MainWindow::getServerMsg()
 {
 	auto ret = client->read(BUF_LENGTH);
-	client->disconnectFromHost();
+
+	if (state == LOGIN)
+		client->disconnectFromHost();
 
 	QString msg(ret);
 
@@ -176,10 +215,24 @@ void MainWindow::getServerMsg()
 			// login failed
 			QMessageBox::warning(this, tr("错误"), tr("用户名或密码错误"));
 		} else {
+			// success
+			username = leUsername->text();
 			client->connectToHost(QHostAddress("127.0.0.1"), port);
 			changeState(MAIN);
 		}
 		break;
+	}
+	case PLAYER_LIST:{
+		auto players = msg.split('\n');
+		//! players[players.size() - 1] == ""
+		for (int i = 0; i < players.size() - 1; ++i){
+			auto player = players[i];
+			auto detail = player.split(' ');
+			// detail[0] is id, detail[1] is username
+			if (detail[1] == username)continue;// not show player himself
+			list->addItem(detail[1]);
+			playerID_List->push_back(detail[0].toInt());
+		}
 	}
 	default:
 		break;

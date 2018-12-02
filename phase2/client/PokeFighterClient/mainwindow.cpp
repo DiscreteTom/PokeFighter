@@ -70,21 +70,22 @@ void MainWindow::changeState(MainWindow::State aim)
 	btnBack->hide();
 
 	state = aim;
+
+	// delete old layout
+	delete ui->centralWidget->layout();
+	layout = new QGridLayout(this);
+
+	// show widgets in the certain state
 	switch(state){
 	case START:
-		delete ui->centralWidget->layout();
-		layout = new QGridLayout(this);
 		lbStartTitle->show();
 		btnPlay->show();
 		btnExit->show();
 		layout->addWidget(lbStartTitle, 0, 0, Qt::AlignCenter);
 		layout->addWidget(btnPlay, 1, 0, Qt::AlignCenter);
 		layout->addWidget(btnExit, 2, 0, Qt::AlignCenter);
-		ui->centralWidget->setLayout(layout);
 		break;
 	case LOGIN:
-		delete ui->centralWidget->layout();
-		layout = new QGridLayout(this);
 		lbLoginLabel->show();
 		leUsername->show();
 		lePassword->show();
@@ -97,9 +98,9 @@ void MainWindow::changeState(MainWindow::State aim)
 		layout->addWidget(btnLogin, 3, 0, Qt::AlignCenter);
 		layout->addWidget(btnLogon, 4, 0, Qt::AlignCenter);
 		layout->addWidget(btnBack, 5, 0, Qt::AlignCenter);
-		ui->centralWidget->setLayout(layout);
 		break;
 	default:
 		break;
 	}
+	ui->centralWidget->setLayout(layout);
 }

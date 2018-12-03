@@ -357,7 +357,7 @@ void Endpoint::getPokemonList(int playerID)
 	int nColumn;
 	char *errMsg;
 	string sql;
-	sql = "SELECT name, race, lv FROM Pokemon where userid=" + to_string(playerID) + ";";
+	sql = "SELECT id, name, race, lv FROM Pokemon where userid=" + to_string(playerID) + ";";
 	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
 	{
 		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
@@ -382,11 +382,13 @@ void Endpoint::getPokemonList(int playerID)
 		string result;
 		for (int i = 0; i < nRow; ++i)
 		{
-			result += sqlResult[3 * (i + 1)];
-			result += '\n';
-			result += sqlResult[3 * (i + 1) + 1];
-			result += '\n';
-			result += sqlResult[3 * (i + 1) + 2];
+			result += sqlResult[4 * (i + 1)];// id
+			result += ' ';
+			result += sqlResult[4 * (i + 1) + 1];// name
+			result += ' ';
+			result += Pokemon::races[stoi(sqlResult[4 * (i + 1) + 2])]->raceName();// race
+			result += ' ';
+			result += sqlResult[4 * (i + 1) + 3];// lv
 			result += '\n';
 		}
 		strcpy(buf, result.c_str());

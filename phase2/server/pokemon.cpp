@@ -1,7 +1,6 @@
 #include "pokemon.h"
 
-int Pokemon::objCount = 0;
-const PokemonBase *Pokemon::races[4] = {0};
+const PokemonBase *Pokemon::races[4] = {new Race<0>(), new Race<1>(), new Race<2>(), new Race<3>()};
 
 PokemonBase::PokemonBase(PokemonType type)
 {
@@ -81,15 +80,6 @@ bool PokemonBase::dodge(int attacker, int aim) const
 
 Pokemon::Pokemon(int raceIndex, const string &name)
 {
-	++objCount;
-	if (objCount == 1)
-	{
-		races[0] = new Race<0>();
-		races[1] = new Race<1>();
-		races[2] = new Race<2>();
-		races[3] = new Race<3>();
-	}
-
 	_raceIndex = raceIndex;
 
 	if (!name.length())
@@ -117,13 +107,13 @@ Pokemon::Pokemon(int raceIndex, const string &name)
 
 	//output info
 	// dbout << "Init " << _name << " from " << races[_raceIndex]->raceName() << endl
-				// << "Type: " << raceType() << endl
-				// << "Atk: " << _atk << endl
-				// << "Def: " << _def << endl
-				// << "MaxHp: " << _maxHp << endl
-				// << "Speed: " << _speed << endl
-				// << "LV: " << _lv << endl
-				// << "Exp: " << _exp << endl;
+	// << "Type: " << raceType() << endl
+	// << "Atk: " << _atk << endl
+	// << "Def: " << _def << endl
+	// << "MaxHp: " << _maxHp << endl
+	// << "Speed: " << _speed << endl
+	// << "LV: " << _lv << endl
+	// << "Exp: " << _exp << endl;
 	//output skill
 	// dbout << "Skills:\n";
 	for (int i = 0; i < 4; ++i)
@@ -144,15 +134,6 @@ Pokemon::Pokemon(int raceIndex, const string &name)
 
 Pokemon::Pokemon(const string &name, int raceIndex, int atk, int def, int maxHp, int speed, int lv, int exp)
 {
-	++objCount;
-	if (objCount == 1)
-	{
-		races[0] = new Race<0>();
-		races[1] = new Race<1>();
-		races[2] = new Race<2>();
-		races[3] = new Race<3>();
-	}
-
 	_name = name;
 	_raceIndex = raceIndex;
 	_atk = atk;
@@ -165,14 +146,6 @@ Pokemon::Pokemon(const string &name, int raceIndex, int atk, int def, int maxHp,
 
 Pokemon::~Pokemon()
 {
-	--objCount;
-	if (objCount == 0)
-	{
-		for (int i = 0; i < 4; ++i)
-		{
-			delete races[i];
-		}
-	}
 }
 
 string Pokemon::raceType() const
@@ -218,7 +191,7 @@ void Pokemon::changeAtk(int count)
 	}
 
 	// dbout << _name << "'s Attack becomes " << _catk << endl
-				// << endl;
+	// << endl;
 }
 
 void Pokemon::changeDef(int count)
@@ -236,7 +209,7 @@ void Pokemon::changeDef(int count)
 		// dbout << _name << "'s Defence " << count << endl;
 	}
 	// dbout << _name << "'s Defence becomes " << _cdef << endl
-				// << endl;
+	// << endl;
 }
 
 void Pokemon::changeSpeed(int count)
@@ -254,7 +227,7 @@ void Pokemon::changeSpeed(int count)
 		// dbout << _name << "'s Speed " << count << endl;
 	}
 	// dbout << _name << "'s Speed becomes " << _cspeed << endl
-				// << endl;
+	// << endl;
 }
 
 bool Pokemon::changeHp(int count)
@@ -282,7 +255,7 @@ bool Pokemon::changeHp(int count)
 	else
 	{
 		// dbout << _name << "'s HP becomes " << _hp << endl
-					// << endl;
+		// << endl;
 	}
 	return false;
 }
@@ -311,7 +284,7 @@ bool Pokemon::gainExp(int count)
 
 	// dbout << _name << " gains " << count << " exp!\n";
 	// dbout << "Now " << _name << " has " << _exp << " exp\n"
-				// << endl;
+	// << endl;
 
 	bool LV_UP = false;
 	while (_lv < 15 && _exp > races[_raceIndex]->expCurve(_lv + 1))
@@ -321,7 +294,7 @@ bool Pokemon::gainExp(int count)
 		++_lv;
 		// dbout << "Level Up!\n";
 		// dbout << _name << "'s now LV" << _lv << "!\n"
-					// << endl;
+		// << endl;
 
 		//increase attributes
 		int atk, def, maxHp, speed;
@@ -437,10 +410,10 @@ bool Pokemon::attack(Pokemon &aim, bool autoFight)
 		}
 		for (int j = 0; j < space - skillName(i).length(); ++j)
 			// dbout << " ";
-		if (!i)
-		{
-			// dbout << "       ";
-		}
+			if (!i)
+			{
+				// dbout << "       ";
+			}
 		// dbout << skillDscp(i) << endl;
 	}
 	// dbout << "Please input a number: ";

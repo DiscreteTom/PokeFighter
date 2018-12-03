@@ -76,14 +76,13 @@ private:
 	int _cspeed;
 	int _cpp[3]; //power point
 
-	static const PokemonBase *races[4];
-	static int objCount;
-
 public:
 	Pokemon(int raceIndex, const string &name = "");																										 // init a new pokemon
 	Pokemon(const string &name, int raceIndex, int atk, int def, int maxHp, int speed, int lv, int exp); // ctor for database
 	Pokemon(const Pokemon &) = delete;
 	~Pokemon();
+
+	static const PokemonBase *races[4];
 
 	//getter
 	string name() const { return _name; }

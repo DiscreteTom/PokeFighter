@@ -24,6 +24,8 @@ PokemonDlg::PokemonDlg(const QString &detail, QWidget *parent) :
 		if (i != 1){
 			t->setFlags(t->flags() ^ Qt::ItemIsEditable);
 			t->setBackgroundColor(QColor("#eff0f1"));
+		} else {
+			t->setToolTip(tr("双击以更改精灵名称"));
 		}
 		table->setItem(i, 0, t);
 	}
@@ -59,6 +61,7 @@ PokemonDlg::PokemonDlg(const QString &detail, QWidget *parent) :
 	setAttribute(Qt::WA_DeleteOnClose);
 
 	// setup ui after data filling
+	setWindowFlags(windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	show();
 }
 

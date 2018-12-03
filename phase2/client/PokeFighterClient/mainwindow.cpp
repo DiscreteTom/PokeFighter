@@ -320,7 +320,7 @@ void MainWindow::getServerMsg()
 		}
 		else // msg is pokemon detail
 		{
-			auto dlg = new PokemonDlg(msg, this);
+			auto dlg = new PokemonDlg(msg, myPokemonTable, this);
 			connect(dlg, &PokemonDlg::pokemonChangeName, this, [this](const QString & pokemonID, const QString & newName){
 				QString str = "pokemonChangeName ";
 				str += pokemonID + ' ' + newName;

@@ -14,7 +14,7 @@ class PokemonDlg : public QDialog
 	Q_OBJECT
 
 public:
-	explicit PokemonDlg(const QString & detail, QWidget *parent = 0);
+	explicit PokemonDlg(const QString & detail, bool myPokemonTable = true, QWidget *parent = 0);
 	~PokemonDlg();
 
 	QTableWidget * table;

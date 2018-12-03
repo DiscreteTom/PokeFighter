@@ -68,6 +68,7 @@ private:
 	// user data
 	QString username;
 	bool myPokemonTable;
+	bool showPokemonDlg;
 
 	void changeState(State aim);
 	void login();

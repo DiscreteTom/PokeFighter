@@ -5,9 +5,8 @@
 #include <QHostAddress>
 #include "netconfig.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-	QMainWindow(parent),
-	ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
+																					ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
 
@@ -48,25 +47,30 @@ MainWindow::MainWindow(QWidget *parent) :
 	// logon window
 	logonDlg = new LogonDlg(this);
 
-	connect(btnPlay, &QPushButton::clicked, this, [this]{ changeState(LOGIN); });
-	connect(btnExit, &QPushButton::clicked, this, [this]{ qApp->quit(); });
+	connect(btnPlay, &QPushButton::clicked, this, [this] { changeState(LOGIN); });
+	connect(btnExit, &QPushButton::clicked, this, [this] { qApp->quit(); });
 	connect(btnLogin, &QPushButton::clicked, this, &MainWindow::login);
-	connect(btnLogon, &QPushButton::clicked, this, [this]{
-		if (logonDlg->exec() == QDialog::Accepted){
+	connect(btnLogon, &QPushButton::clicked, this, [this] {
+		if (logonDlg->exec() == QDialog::Accepted)
+		{
 			leUsername->setText(logonDlg->getUsername());
 			lePassword->setText(logonDlg->getPassword());
 		}
 	});
-	connect(btnBack, &QPushButton::clicked, this, [this]{
-		switch (state){
+	connect(btnBack, &QPushButton::clicked, this, [this] {
+		switch (state)
+		{
 		case LOGIN:
 			changeState(START);
 			client->disconnectFromHost();
 			break;
 		case POKEMON_TABLE:
-			if (myPokemonTable){
+			if (myPokemonTable)
+			{
 				changeState(MAIN);
-			} else {
+			}
+			else
+			{
 				changeState(PLAYER_TABLE);
 				client->write("getPlayerList", BUF_LENGTH);
 			}
@@ -74,20 +78,21 @@ MainWindow::MainWindow(QWidget *parent) :
 		case PLAYER_TABLE:
 			changeState(MAIN);
 			break;
-		default:break;
+		default:
+			break;
 		}
 	});
-	connect(btnLogout, &QPushButton::clicked, this, [this]{
+	connect(btnLogout, &QPushButton::clicked, this, [this] {
 		changeState(LOGIN);
 		client->write("logout", BUF_LENGTH);
 		client->disconnectFromHost();
 	});
-	connect(btnShowPokemonList, &QPushButton::clicked, this, [this]{
+	connect(btnShowPokemonList, &QPushButton::clicked, this, [this] {
 		changeState(POKEMON_TABLE);
 		myPokemonTable = true;
 		client->write("getPokemonList", BUF_LENGTH);
 	});
-	connect(btnDisplayAllPlayer, &QPushButton::clicked, this, [this]{
+	connect(btnDisplayAllPlayer, &QPushButton::clicked, this, [this] {
 		changeState(PLAYER_TABLE);
 		client->write("getPlayerList", BUF_LENGTH);
 	});
@@ -131,7 +136,8 @@ void MainWindow::changeState(MainWindow::State aim)
 	layout = new QGridLayout(this);
 
 	// show widgets in the certain state
-	switch(state){
+	switch (state)
+	{
 	case START:
 		lbStartTitle->show();
 		btnPlay->show();
@@ -180,7 +186,8 @@ void MainWindow::changeState(MainWindow::State aim)
 	ui->centralWidget->setLayout(layout);
 
 	// special settings, must behind ui->centralWidget->setLayout()
-	if (state == LOGIN){
+	if (state == LOGIN)
+	{
 		leUsername->setFocus();
 	}
 }
@@ -196,7 +203,8 @@ void MainWindow::login()
 
 	btnLogin->setDisabled(true);
 
-	if (client->write(msg.toStdString().c_str(), BUF_LENGTH) == -1){
+	if (client->write(msg.toStdString().c_str(), BUF_LENGTH) == -1)
+	{
 		// error
 		QMessageBox::warning(this, tr("错误"), tr("服务器错误"));
 		btnLogin->setDisabled(false);
@@ -213,14 +221,19 @@ void MainWindow::getServerMsg()
 
 	QString msg(ret);
 
-	switch (state){
-	case LOGIN:{
+	switch (state)
+	{
+	case LOGIN:
+	{
 		btnLogin->setDisabled(false);
 		int port = msg.toInt();
-		if (port == 0){
+		if (port == 0)
+		{
 			// login failed
 			QMessageBox::warning(this, tr("错误"), tr("用户名或密码错误"));
-		} else {
+		}
+		else
+		{
 			// success
 			username = leUsername->text();
 			client->connectToHost(QHostAddress("127.0.0.1"), port);
@@ -228,25 +241,28 @@ void MainWindow::getServerMsg()
 		}
 		break;
 	}
-	case PLAYER_TABLE:{
+	case PLAYER_TABLE:
+	{
 		auto players = msg.split('\n');
 
 		//! players[players.size() - 1] == ""
 
 		table->setRowCount(players.size() - 2);
-		table->setColumnCount(3);// id - username - viewPokemon
-		table->setHorizontalHeaderLabels({tr("玩家id"), tr("用户名"), tr("操作")});
+		table->setColumnCount(3); // id - username - viewPokemon
+		table->setHorizontalHeaderLabels({tr("玩家ID"), tr("用户名"), tr("操作")});
 
 		int tableRowIndex = 0;
-		for (int i = 0; i < players.size() - 1; ++i){
+		for (int i = 0; i < players.size() - 1; ++i)
+		{
 			auto player = players[i];
 			auto detail = player.split(' ');
 			// detail[0] is id, detail[1] is username
-			if (detail[1] == username)continue;// not show player himself
+			if (detail[1] == username)
+				continue; // not show player himself
 			table->setItem(tableRowIndex, 0, new QTableWidgetItem(detail[0]));
 			table->setItem(tableRowIndex, 1, new QTableWidgetItem(detail[1]));
 			auto btn = new QPushButton(tr("查看小精灵"), this);
-			connect(btn, &QPushButton::clicked, this, [this, detail]{
+			connect(btn, &QPushButton::clicked, this, [this, detail] {
 				changeState(POKEMON_TABLE);
 				myPokemonTable = false;
 				QString str = "getPokemonList ";
@@ -256,6 +272,40 @@ void MainWindow::getServerMsg()
 			table->setCellWidget(tableRowIndex, 2, btn);
 			++tableRowIndex;
 		}
+		break;
+	}
+	case POKEMON_TABLE:
+	{
+		if (!showPokemonDlg) // msg is pokemon table
+		{
+			auto pokemons = msg.split('\n');
+
+			table->setRowCount(pokemons.size() - 1);
+			table->setColumnCount(5);
+			table->setHorizontalHeaderLabels({tr("精灵ID"), tr("名字"), tr("种族"), tr("等级"), tr("操作")});
+			for (int i = 0; i < pokemons.size() - 1; ++i)
+			{
+				auto detail = pokemons[i].split(' ');
+				// detail[0] is name, detail[1] is race, detail[2] is lv
+				table->setItem(i, 0, new QTableWidgetItem(detail[0]));
+				table->setItem(i, 1, new QTableWidgetItem(detail[1]));
+				table->setItem(i, 2, new QTableWidgetItem(detail[2]));
+				table->setItem(i, 3, new QTableWidgetItem(detail[3]));
+				auto btn = new QPushButton(tr("查看详情"), this);
+				connect(btn, &QPushButton::clicked, this, [this, detail] {
+					QString str = "getPokemon ";
+					str += detail[0];
+					client->write(str.toStdString().c_str(), BUF_LENGTH);
+					showPokemonDlg = true;
+				});
+				table->setCellWidget(i, 4, btn);
+			}
+		}
+		else // msg is pokemon detail
+		{
+			// TODO: show pokemonDlg, not exec
+		}
+		break;
 	}
 	default:
 		break;

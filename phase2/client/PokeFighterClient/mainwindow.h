@@ -63,6 +63,7 @@ private:
 	// logon window
 	LogonDlg * logonDlg;
 
+	// pokemon dialog
 	QTcpSocket * client;
 
 	// user data

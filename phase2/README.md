@@ -77,6 +77,7 @@ resetPassword <oldPassword> <newPassword>
 getPlayerList
 getPokemonList [playerID]
 getPokemon <pokemonID>
+pokemonChangeName <pokemonID> <newName>
 battle <pokemonID> [-auto]
 useSkill <skillID>
 ```

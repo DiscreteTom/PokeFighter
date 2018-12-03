@@ -245,6 +245,10 @@ void Endpoint::listenFunc()
 		{
 			getPokemonByID(stoi(strs[1]));
 		}
+		else if (strs[0] == "pokemonChangeName" && strs.size() == 3)
+		{
+			pokemonChangeName(strs[1], strs[2]);
+		}
 		else
 		{
 			cout << "Endpoint[" << playerID << "]: Invalid request.\n";
@@ -459,4 +463,23 @@ void Endpoint::getPokemonByID(int pokemonID)
 	strcpy(buf, result.c_str());
 	send(connSocket, buf, BUF_LENGTH, 0);
 	sqlite3_free_table(sqlResult);
+}
+
+void Endpoint::pokemonChangeName(const string &pokemonID, const string &newName)
+{
+	string sql = "update Pokemon set name = '" + newName + "' where id=" + pokemonID + ";";
+
+	char *errMsg;
+	if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+		sqlite3_free(errMsg);
+		strcpy(buf, errMsg);
+		send(connSocket, buf, BUF_LENGTH, 0);
+	}
+	else
+	{
+		strcpy(buf, "Accept.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+	}
 }

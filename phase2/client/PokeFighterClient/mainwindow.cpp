@@ -104,6 +104,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	connect(client, &QTcpSocket::readyRead, this, &MainWindow::getServerMsg);
 
 	changeState(START);
+
+	changingPokemonName = false;
 }
 
 MainWindow::~MainWindow()
@@ -224,6 +226,16 @@ void MainWindow::getServerMsg()
 
 	QString msg(ret);
 
+	if (changingPokemonName){
+		if (msg != "Accept.\n"){
+			QMessageBox::warning(this, tr("错误"), tr("修改精灵名字失败"));
+		} else {
+			QMessageBox::information(this, tr("精灵修改名字"), tr("精灵名字已更新"));
+		}
+		changingPokemonName = false;
+		return;
+	}
+
 	switch (state)
 	{
 	case LOGIN:
@@ -308,7 +320,13 @@ void MainWindow::getServerMsg()
 		}
 		else // msg is pokemon detail
 		{
-			new PokemonDlg(msg, this);
+			auto dlg = new PokemonDlg(msg, this);
+			connect(dlg, &PokemonDlg::pokemonChangeName, this, [this](const QString & pokemonID, const QString & newName){
+				QString str = "pokemonChangeName ";
+				str += pokemonID + ' ' + newName;
+				client->write(str.toStdString().c_str(), BUF_LENGTH);
+				changingPokemonName = true;
+			});
 			showPokemonDlg = false;
 		}
 		break;

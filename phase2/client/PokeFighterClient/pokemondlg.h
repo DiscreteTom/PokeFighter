@@ -20,6 +20,9 @@ public:
 	QTableWidget * table;
 	QLabel * lbImg;
 
+signals:
+	void pokemonChangeName(const QString & pokemonID, const QString & newName);
+
 private:
 	Ui::PokemonDlg *ui;
 };

@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 			client->disconnectFromHost();
 			break;
 		case POKEMON_TABLE:
-			if (myPokemonTable)
+			if (currentPlayerID == 0)
 			{
 				changeState(MAIN);
 			}
@@ -90,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	});
 	connect(btnShowPokemonList, &QPushButton::clicked, this, [this] {
 		changeState(POKEMON_TABLE);
-		myPokemonTable = true;
+		currentPlayerID = 0;
 		client->write("getPokemonList", BUF_LENGTH);
 	});
 	connect(btnDisplayAllPlayer, &QPushButton::clicked, this, [this] {
@@ -231,6 +231,12 @@ void MainWindow::getServerMsg()
 			QMessageBox::warning(this, tr("错误"), tr("修改精灵名字失败"));
 		} else {
 			QMessageBox::information(this, tr("精灵修改名字"), tr("精灵名字已更新"));
+			QString str = "getPokemonList";
+			if (currentPlayerID != 0){
+				str += ' ';
+				str += QString::number(currentPlayerID);
+			}
+			client->write(str.toStdString().c_str(), BUF_LENGTH);
 		}
 		changingPokemonName = false;
 		return;
@@ -279,7 +285,7 @@ void MainWindow::getServerMsg()
 			auto btn = new QPushButton(tr("查看小精灵"), this);
 			connect(btn, &QPushButton::clicked, this, [this, detail] {
 				changeState(POKEMON_TABLE);
-				myPokemonTable = false;
+				currentPlayerID = detail[0].toInt();
 				QString str = "getPokemonList ";
 				str += detail[0];
 				client->write(str.toStdString().c_str(), BUF_LENGTH);
@@ -320,7 +326,7 @@ void MainWindow::getServerMsg()
 		}
 		else // msg is pokemon detail
 		{
-			auto dlg = new PokemonDlg(msg, myPokemonTable, this);
+			auto dlg = new PokemonDlg(msg, currentPlayerID == 0, this);
 			connect(dlg, &PokemonDlg::pokemonChangeName, this, [this](const QString & pokemonID, const QString & newName){
 				QString str = "pokemonChangeName ";
 				str += pokemonID + ' ' + newName;

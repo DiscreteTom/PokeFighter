@@ -190,6 +190,8 @@ void MainWindow::changeState(MainWindow::State aim)
 	if (state == LOGIN)
 	{
 		leUsername->setFocus();
+	} else if (state == MAIN){
+		btnShowPokemonList->setFocus();
 	}
 }
 
@@ -284,6 +286,8 @@ void MainWindow::getServerMsg()
 			table->setRowCount(pokemons.size() - 1);
 			table->setColumnCount(5);
 			table->setHorizontalHeaderLabels({tr("精灵ID"), tr("名字"), tr("种族"), tr("等级"), tr("操作")});
+			table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+			table->verticalHeader()->hide();
 			for (int i = 0; i < pokemons.size() - 1; ++i)
 			{
 				auto detail = pokemons[i].split(' ');

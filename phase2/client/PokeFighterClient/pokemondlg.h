@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QTableWidget>
+#include <QLabel>
 
 namespace Ui {
 class PokemonDlg;
@@ -17,6 +18,7 @@ public:
 	~PokemonDlg();
 
 	QTableWidget * table;
+	QLabel * lbImg;
 
 private:
 	Ui::PokemonDlg *ui;

@@ -44,11 +44,10 @@ PokemonDlg::PokemonDlg(const QString &detail, QWidget *parent) :
 
 	// layout
 	QVBoxLayout * layout = new QVBoxLayout(this);
-	layout->addWidget(lbImg, Qt::AlignCenter);
-	lbImg->show();
-	layout->addWidget(table, Qt::AlignCenter);
+	layout->addWidget(lbImg, 0, Qt::AlignCenter);
+	layout->addWidget(table, 0, Qt::AlignHCenter);
 	setLayout(layout);
-	setFixedSize(340, 750);// can not resize window
+	setFixedSize(340, 670);// can not resize window
 
 	// memory
 	setAttribute(Qt::WA_DeleteOnClose);

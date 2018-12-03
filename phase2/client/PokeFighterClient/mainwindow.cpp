@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include <QHostAddress>
 #include "netconfig.h"
+#include "pokemondlg.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 																					ui(new Ui::MainWindow)
@@ -303,7 +304,8 @@ void MainWindow::getServerMsg()
 		}
 		else // msg is pokemon detail
 		{
-			// TODO: show pokemonDlg, not exec
+			new PokemonDlg(msg, this);
+			showPokemonDlg = false;
 		}
 		break;
 	}

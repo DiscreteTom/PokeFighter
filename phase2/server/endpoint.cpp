@@ -217,7 +217,6 @@ void Endpoint::listenFunc()
 	while (ret != 0 && ret != SOCKET_ERROR && running) // normal
 	{
 		// parse command here
-		// TODO
 		auto strs = split(buf);
 		if (strs[0] == "logout")
 		{
@@ -242,6 +241,10 @@ void Endpoint::listenFunc()
 				getPokemonList(playerID);
 			}
 		}
+		else if (strs[0] == "getPokemon" && strs.size() == 2)
+		{
+			getPokemonByID(stoi(strs[1]));
+		}
 		else
 		{
 			cout << "Endpoint[" << playerID << "]: Invalid request.\n";
@@ -251,7 +254,8 @@ void Endpoint::listenFunc()
 		if (running)
 			ret = recv(connSocket, buf, BUF_LENGTH, 0);
 	}
-	if (!running);// this object was destroyed by dtor
+	if (!running)
+		; // this object was destroyed by dtor
 	else if (ret == SOCKET_ERROR || ret == 0)
 	{
 		cout << "Endpoint[" << playerID << "]: Client unexpected offline, start timing.\n";
@@ -382,13 +386,13 @@ void Endpoint::getPokemonList(int playerID)
 		string result;
 		for (int i = 0; i < nRow; ++i)
 		{
-			result += sqlResult[4 * (i + 1)];// id
+			result += sqlResult[4 * (i + 1)]; // id
 			result += ' ';
-			result += sqlResult[4 * (i + 1) + 1];// name
+			result += sqlResult[4 * (i + 1) + 1]; // name
 			result += ' ';
-			result += Pokemon::races[stoi(sqlResult[4 * (i + 1) + 2])]->raceName();// race
+			result += Pokemon::races[stoi(sqlResult[4 * (i + 1) + 2])]->raceName(); // race
 			result += ' ';
-			result += sqlResult[4 * (i + 1) + 3];// lv
+			result += sqlResult[4 * (i + 1) + 3]; // lv
 			result += '\n';
 		}
 		strcpy(buf, result.c_str());
@@ -415,4 +419,44 @@ void Endpoint::savePokemonToDB(const Pokemon &p)
 		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
 		sqlite3_free(errMsg);
 	}
+}
+
+void Endpoint::getPokemonByID(int pokemonID)
+{
+	char **sqlResult;
+	int nRow;
+	int nColumn;
+	char *errMsg;
+	string sql;
+	sql = "SELECT id, name, race, atk, def, maxHp, speed, lv, exp FROM Pokemon where id=" + to_string(pokemonID) + ";";
+	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+		sqlite3_free(errMsg);
+		strcpy(buf, "Reject: Server error.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+		return;
+	}
+	string result;
+	result += sqlResult[9 + 0]; // id
+	result += ' ';
+	result += sqlResult[9 + 1]; // name
+	result += ' ';
+	result += Pokemon::races[stoi(sqlResult[9 + 2])]->raceName(); // race
+	result += ' ';
+	result += sqlResult[9 + 3]; // atk
+	result += ' ';
+	result += sqlResult[9 + 4]; // def
+	result += ' ';
+	result += sqlResult[9 + 5]; // maxHp
+	result += ' ';
+	result += sqlResult[9 + 6]; // speed
+	result += ' ';
+	result += sqlResult[9 + 7]; // lv
+	result += ' ';
+	result += sqlResult[9 + 8]; // exp
+	result += '\n';
+	strcpy(buf, result.c_str());
+	send(connSocket, buf, BUF_LENGTH, 0);
+	sqlite3_free_table(sqlResult);
 }

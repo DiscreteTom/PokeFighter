@@ -25,14 +25,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    logondlg.cpp
+    logondlg.cpp \
+    pokemondlg.cpp
 
 HEADERS  += mainwindow.h \
     logondlg.h \
-    netconfig.h
+    netconfig.h \
+    pokemondlg.h
 
 FORMS    += mainwindow.ui \
-    logondlg.ui
+    logondlg.ui \
+    pokemondlg.ui
 
 RESOURCES += \
     qss.qrc

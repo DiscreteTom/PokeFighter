@@ -20,8 +20,16 @@ PokemonDlg::PokemonDlg(const QString &detail, QWidget *parent) :
 	// data
 	auto details = detail.split(' ');
 	for (int i = 0; i < 9; ++i){
-		table->setItem(i, 0, new QTableWidgetItem(details[i]));
+		auto t = new QTableWidgetItem(details[i]);
+		if (i != 1){
+			t->setFlags(t->flags() ^ Qt::ItemIsEditable);
+			t->setBackgroundColor(QColor("#eff0f1"));
+		} else {
+			t->setToolTip(tr("双击以更改精灵名称"));
+		}
+		table->setItem(i, 0, t);
 	}
+	connect(table, &QTableWidget::cellChanged, this, [this, detail]{ emit pokemonChangeName(detail[0], table->item(1, 0)->text()); });
 
 	// img
 	lbImg = new QLabel(this); // name
@@ -53,6 +61,7 @@ PokemonDlg::PokemonDlg(const QString &detail, QWidget *parent) :
 	setAttribute(Qt::WA_DeleteOnClose);
 
 	// setup ui after data filling
+	setWindowFlags(windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	show();
 }
 

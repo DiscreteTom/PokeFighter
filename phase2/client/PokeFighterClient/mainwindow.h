@@ -70,6 +70,7 @@ private:
 	QString username;
 	bool myPokemonTable;
 	bool showPokemonDlg;
+	bool changingPokemonName;
 
 	void changeState(State aim);
 	void login();

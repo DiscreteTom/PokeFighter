@@ -38,6 +38,7 @@ FORMS    += mainwindow.ui \
     pokemondlg.ui
 
 RESOURCES += \
-    qss.qrc
+    qss.qrc \
+    img.qrc
 
 QT += network

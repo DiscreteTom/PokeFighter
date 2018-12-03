@@ -10,8 +10,7 @@
 #include <QGridLayout>
 #include <QTcpSocket>
 #include "logondlg.h"
-#include <QListWidget>
-#include <QList>
+#include <QTableWidget>
 
 namespace Ui {
 class MainWindow;
@@ -32,8 +31,8 @@ private:
 		START,
 		LOGIN,
 		MAIN,
-		POKEMON_LIST,
-		PLAYER_LIST
+		POKEMON_TABLE,
+		PLAYER_TABLE
 	};
 
 	State state;
@@ -58,9 +57,8 @@ private:
 	QPushButton * btnShowPokemonList;
 	QPushButton * btnDisplayAllPlayer;
 
-	// pokemon list and player list
-	QListWidget * list;
-	QList<int> * playerID_List;
+	// pokemon table and player table
+	QTableWidget * table;
 
 	// logon window
 	LogonDlg * logonDlg;
@@ -69,6 +67,7 @@ private:
 
 	// user data
 	QString username;
+	bool myPokemonTable;
 
 	void changeState(State aim);
 	void login();

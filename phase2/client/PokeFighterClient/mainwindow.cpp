@@ -42,9 +42,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	btnShowPokemonList = new QPushButton(tr("查看精灵"), this);
 	btnDisplayAllPlayer = new QPushButton(tr("查看当前在线玩家"), this);
 
-	// pokemon list and player list
-	list = new QListWidget(this);
-	playerID_List = new QList<int>();
+	// pokemon table and player table
+	table = new QTableWidget(this);
 
 	// logon window
 	logonDlg = new LogonDlg(this);
@@ -64,8 +63,15 @@ MainWindow::MainWindow(QWidget *parent) :
 			changeState(START);
 			client->disconnectFromHost();
 			break;
-		case POKEMON_LIST:
-		case PLAYER_LIST:
+		case POKEMON_TABLE:
+			if (myPokemonTable){
+				changeState(MAIN);
+			} else {
+				changeState(PLAYER_TABLE);
+				client->write("getPlayerList", BUF_LENGTH);
+			}
+			break;
+		case PLAYER_TABLE:
 			changeState(MAIN);
 			break;
 		default:break;
@@ -77,11 +83,12 @@ MainWindow::MainWindow(QWidget *parent) :
 		client->disconnectFromHost();
 	});
 	connect(btnShowPokemonList, &QPushButton::clicked, this, [this]{
-		changeState(POKEMON_LIST);
+		changeState(POKEMON_TABLE);
+		myPokemonTable = true;
 		client->write("getPokemonList", BUF_LENGTH);
 	});
 	connect(btnDisplayAllPlayer, &QPushButton::clicked, this, [this]{
-		changeState(PLAYER_LIST);
+		changeState(PLAYER_TABLE);
 		client->write("getPlayerList", BUF_LENGTH);
 	});
 	connect(leUsername, &QLineEdit::returnPressed, btnLogin, &QPushButton::click);
@@ -114,9 +121,8 @@ void MainWindow::changeState(MainWindow::State aim)
 	btnLogout->hide();
 	btnShowPokemonList->hide();
 	btnDisplayAllPlayer->hide();
-	list->hide();
-	list->clear();
-	playerID_List->clear();
+	table->hide();
+	table->clear();
 
 	state = aim;
 
@@ -160,11 +166,11 @@ void MainWindow::changeState(MainWindow::State aim)
 		layout->addWidget(btnLogout, 2, 0, Qt::AlignCenter);
 		btnShowPokemonList->setDefault(true);
 		break;
-	case POKEMON_LIST:
-	case PLAYER_LIST:
+	case POKEMON_TABLE:
+	case PLAYER_TABLE:
 		btnBack->show();
-		list->show();
-		layout->addWidget(list, 0, 0, Qt::AlignCenter);
+		table->show();
+		layout->addWidget(table, 0, 0, Qt::AlignCenter);
 		layout->addWidget(btnBack, 1, 0, Qt::AlignCenter);
 		btnBack->setDefault(true);
 		break;
@@ -222,16 +228,33 @@ void MainWindow::getServerMsg()
 		}
 		break;
 	}
-	case PLAYER_LIST:{
+	case PLAYER_TABLE:{
 		auto players = msg.split('\n');
+
 		//! players[players.size() - 1] == ""
+
+		table->setRowCount(players.size() - 2);
+		table->setColumnCount(3);// id - username - viewPokemon
+		table->setHorizontalHeaderLabels({tr("玩家id"), tr("用户名"), tr("操作")});
+
+		int tableRowIndex = 0;
 		for (int i = 0; i < players.size() - 1; ++i){
 			auto player = players[i];
 			auto detail = player.split(' ');
 			// detail[0] is id, detail[1] is username
 			if (detail[1] == username)continue;// not show player himself
-			list->addItem(detail[1]);
-			playerID_List->push_back(detail[0].toInt());
+			table->setItem(tableRowIndex, 0, new QTableWidgetItem(detail[0]));
+			table->setItem(tableRowIndex, 1, new QTableWidgetItem(detail[1]));
+			auto btn = new QPushButton(tr("查看小精灵"), this);
+			connect(btn, &QPushButton::clicked, this, [this, detail]{
+				changeState(POKEMON_TABLE);
+				myPokemonTable = false;
+				QString str = "getPokemonList ";
+				str += detail[0];
+				client->write(str.toStdString().c_str(), BUF_LENGTH);
+			});
+			table->setCellWidget(tableRowIndex, 2, btn);
+			++tableRowIndex;
 		}
 	}
 	default:

@@ -114,6 +114,30 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
+bool MainWindow::isValidPassword(const QString &str)
+{
+	if (str.length() > 30 || str.length() < 6)
+		return false;
+	for (auto c : str){
+		if (c != '_' && !(c <= 'z' && c >= 'a') && !(c <= 'Z' && c >= 'A') && !(c >= '0' && c <= '9'))
+			return false;
+	}
+	return true;
+}
+
+bool MainWindow::isValidUsername(const QString &str)
+{
+	if (str.length() > 30 || str.length() < 6){
+		return false;
+	}
+	for (auto c : str){
+		if (c == '\t' || c == '\b' || c == '\t'){
+			return false;
+		}
+	}
+	return true;
+}
+
 void MainWindow::changeState(MainWindow::State aim)
 {
 	// hide all widget
@@ -203,6 +227,17 @@ void MainWindow::changeState(MainWindow::State aim)
 
 void MainWindow::login()
 {
+	if (!isValidUsername(leUsername->text())){
+		QMessageBox::warning(this, tr("错误"), tr("用户名不合法"));
+		leUsername->clear();
+		lePassword->clear();
+		return;
+	}
+	if (!isValidPassword(lePassword->text())){
+		QMessageBox::warning(this, tr("错误"), tr("密码不合法"));
+		lePassword->clear();
+		return;
+	}
 	client->connectToHost(QHostAddress("127.0.0.1"), 7500);
 	QString msg = "login";
 	msg += ' ';

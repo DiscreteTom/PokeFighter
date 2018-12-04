@@ -12,7 +12,8 @@
 #include "logondlg.h"
 #include <QTableWidget>
 
-namespace Ui {
+namespace Ui
+{
 class MainWindow;
 }
 
@@ -27,7 +28,8 @@ public:
 private:
 	Ui::MainWindow *ui;
 
-	enum State{
+	enum State
+	{
 		START,
 		LOGIN,
 		MAIN,
@@ -37,34 +39,34 @@ private:
 
 	State state;
 
-	QGridLayout * layout;
+	QGridLayout *layout;
 
 	// start layout
-	QLabel * lbStartTitle;
-	QPushButton * btnPlay;
-	QPushButton * btnExit;
+	QLabel *lbStartTitle;
+	QPushButton *btnPlay;
+	QPushButton *btnExit;
 
 	// login layout
-	QLabel * lbLoginLabel;
-	QLineEdit * leUsername;
-	QLineEdit * lePassword;
-	QPushButton * btnLogin;
-	QPushButton * btnLogon;
-	QPushButton * btnBack;
+	QLabel *lbLoginLabel;
+	QLineEdit *leUsername;
+	QLineEdit *lePassword;
+	QPushButton *btnLogin;
+	QPushButton *btnLogon;
+	QPushButton *btnBack;
 
 	// main layout
-	QPushButton * btnLogout;
-	QPushButton * btnShowPokemonList;
-	QPushButton * btnDisplayAllPlayer;
+	QPushButton *btnLogout;
+	QPushButton *btnShowPokemonList;
+	QPushButton *btnDisplayAllPlayer;
 
 	// pokemon table and player table
-	QTableWidget * table;
+	QTableWidget *table;
 
 	// logon window
-	LogonDlg * logonDlg;
+	LogonDlg *logonDlg;
 
 	// pokemon dialog
-	QTcpSocket * client;
+	QTcpSocket *client;
 
 	// user data
 	QString username;
@@ -74,6 +76,8 @@ private:
 
 	void changeState(State aim);
 	void login();
+	bool isValidPassword(const QString &str);
+	bool isValidUsername(const QString &str);
 
 private slots:
 	void getServerMsg();

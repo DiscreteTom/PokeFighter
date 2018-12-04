@@ -3,6 +3,7 @@
 #include <QGridLayout>
 #include <QHostAddress>
 #include "netconfig.h"
+#include "authentication.h"
 
 LogonDlg::LogonDlg(QWidget *parent) :
 	QDialog(parent),
@@ -87,31 +88,6 @@ void LogonDlg::logon()
 		btnOK->setDisabled(false);
 	}
 }
-
-bool LogonDlg::isValidPassword(const QString &str)
-{
-	if (str.length() > 30 || str.length() < 6)
-		return false;
-	for (auto c : str){
-		if (c != '_' && !(c <= 'z' && c >= 'a') && !(c <= 'Z' && c >= 'A') && !(c >= '0' && c <= '9'))
-			return false;
-	}
-	return true;
-}
-
-bool LogonDlg::isValidUsername(const QString &str)
-{
-	if (str.length() > 30 || str.length() < 6){
-		return false;
-	}
-	for (auto c : str){
-		if (c == '\t' || c == '\b' || c == '\t'){
-			return false;
-		}
-	}
-	return true;
-}
-
 
 void LogonDlg::readServerMsg()
 {

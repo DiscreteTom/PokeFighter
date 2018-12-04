@@ -11,6 +11,7 @@
 #include <QTcpSocket>
 #include "logondlg.h"
 #include <QTableWidget>
+#include <QMediaPlayer>
 
 namespace Ui
 {
@@ -74,6 +75,9 @@ private:
 
 	// pokemon dialog
 	QTcpSocket *client;
+
+	// media
+	QMediaPlayer * mediaPlayer;
 
 	// user data
 	QString username;

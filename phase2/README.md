@@ -92,3 +92,5 @@ useSkill <skillID>
 - 用户名
 - 精灵名
 - 种族名
+
+需要安装LAV filters才能播放音频。音频文件保存在exe目录下的media目录下

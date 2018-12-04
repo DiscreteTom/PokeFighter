@@ -50,12 +50,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	leNewPassword->setPlaceholderText(tr("请输入新密码"));
 	leNewPassword->setEchoMode(QLineEdit::Password);
 
-
 	// pokemon table and player table
 	table = new QTableWidget(this);
 
 	// logon window
 	logonDlg = new LogonDlg(this);
+
+	// media
+	mediaPlayer = new QMediaPlayer(this);
 
 	connect(btnPlay, &QPushButton::clicked, this, [this] { changeState(LOGIN); });
 	connect(btnExit, &QPushButton::clicked, this, [this] { qApp->quit(); });
@@ -107,15 +109,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 		changeState(PLAYER_TABLE);
 		client->write("getPlayerList", BUF_LENGTH);
 	});
-	connect(btnChangePassword, &QPushButton::clicked, this, [this]{ changeState(CHANGE_PSW); });
-	connect(btnOK, &QPushButton::clicked, this, [this]{
-		if (!isValidPassword(lePassword->text())){
+	connect(btnChangePassword, &QPushButton::clicked, this, [this] { changeState(CHANGE_PSW); });
+	connect(btnOK, &QPushButton::clicked, this, [this] {
+		if (!isValidPassword(lePassword->text()))
+		{
 			QMessageBox::warning(this, tr("错误"), tr("旧密码格式错误"));
 			lePassword->clear();
-		} else if (!isValidPassword(leNewPassword->text())){
+		}
+		else if (!isValidPassword(leNewPassword->text()))
+		{
 			QMessageBox::warning(this, tr("错误"), tr("新密码格式错误"));
 			leNewPassword->clear();
-		} else {
+		}
+		else
+		{
 			QString str = "resetPassword ";
 			str += lePassword->text();
 			str += ' ';
@@ -125,10 +132,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	});
 
 	connect(leUsername, &QLineEdit::returnPressed, btnLogin, &QPushButton::click);
-	connect(lePassword, &QLineEdit::returnPressed, this, [this]{
-		if (state == LOGIN){
+	connect(lePassword, &QLineEdit::returnPressed, this, [this] {
+		if (state == LOGIN)
+		{
 			btnLogin->click();
-		} else if (state == CHANGE_PSW){
+		}
+		else if (state == CHANGE_PSW)
+		{
 			btnOK->click();
 		}
 	});
@@ -140,6 +150,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	changeState(START);
 
 	changingPokemonName = false;
+
+	//	setFixedSize(1600, 900);
+	setFixedSize(1366, 966); // size of start.jpg
+	ui->centralWidget->setStyleSheet("background-image:url(\":/img/img/start.jpg\")");
+
+	mediaPlayer->setMedia(QUrl(":/music/media/op.mp3"));
+	mediaPlayer->setVolume(50);
+	mediaPlayer->play();
 }
 
 MainWindow::~MainWindow()
@@ -189,9 +207,9 @@ void MainWindow::changeState(MainWindow::State aim)
 		btnExit->show();
 		setTabOrder(btnPlay, btnExit);
 		setTabOrder(btnExit, btnPlay);
-		layout->addWidget(lbStartTitle, 0, 0, Qt::AlignCenter);
-		layout->addWidget(btnPlay, 1, 0, Qt::AlignCenter);
-		layout->addWidget(btnExit, 2, 0, Qt::AlignCenter);
+		layout->addWidget(lbStartTitle, 0, 0, 1, 1, Qt::AlignCenter);
+		layout->addWidget(btnPlay, 1, 0, 1, 1);
+		layout->addWidget(btnExit, 2, 0, 1, 1);
 		btnPlay->setDefault(true);
 		break;
 	case LOGIN:
@@ -208,11 +226,11 @@ void MainWindow::changeState(MainWindow::State aim)
 		setTabOrder(btnLogon, btnBack);
 		setTabOrder(btnBack, leUsername);
 		layout->addWidget(lbLoginLabel, 0, 0, Qt::AlignCenter);
-		layout->addWidget(leUsername, 1, 0, Qt::AlignCenter);
-		layout->addWidget(lePassword, 2, 0, Qt::AlignCenter);
-		layout->addWidget(btnLogin, 3, 0, Qt::AlignCenter);
-		layout->addWidget(btnLogon, 4, 0, Qt::AlignCenter);
-		layout->addWidget(btnBack, 5, 0, Qt::AlignCenter);
+		layout->addWidget(leUsername, 1, 0);
+		layout->addWidget(lePassword, 2, 0);
+		layout->addWidget(btnLogin, 3, 0);
+		layout->addWidget(btnLogon, 4, 0);
+		layout->addWidget(btnBack, 5, 0);
 		btnLogin->setDefault(true);
 		leUsername->setFocus();
 		break;
@@ -225,18 +243,18 @@ void MainWindow::changeState(MainWindow::State aim)
 		setTabOrder(btnDisplayAllPlayer, btnChangePassword);
 		setTabOrder(btnChangePassword, btnLogout);
 		setTabOrder(btnLogout, btnShowPokemonList);
-		layout->addWidget(btnShowPokemonList, 0, 0, Qt::AlignCenter);
-		layout->addWidget(btnDisplayAllPlayer, 1, 0, Qt::AlignCenter);
-		layout->addWidget(btnChangePassword, 2, 0, Qt::AlignCenter);
-		layout->addWidget(btnLogout, 3, 0, Qt::AlignCenter);
+		layout->addWidget(btnShowPokemonList, 0, 0);
+		layout->addWidget(btnDisplayAllPlayer, 1, 0);
+		layout->addWidget(btnChangePassword, 2, 0);
+		layout->addWidget(btnLogout, 3, 0);
 		btnShowPokemonList->setDefault(true);
 		break;
 	case POKEMON_TABLE:
 	case PLAYER_TABLE:
 		btnBack->show();
 		table->show();
-		layout->addWidget(table, 0, 0, Qt::AlignCenter);
-		layout->addWidget(btnBack, 1, 0, Qt::AlignCenter);
+		layout->addWidget(table, 0, 0);
+		layout->addWidget(btnBack, 1, 0);
 		btnBack->setDefault(true);
 		break;
 	case CHANGE_PSW:
@@ -265,20 +283,24 @@ void MainWindow::changeState(MainWindow::State aim)
 	if (state == LOGIN)
 	{
 		leUsername->setFocus();
-	} else if (state == MAIN){
+	}
+	else if (state == MAIN)
+	{
 		btnShowPokemonList->setFocus();
 	}
 }
 
 void MainWindow::login()
 {
-	if (!isValidUsername(leUsername->text())){
+	if (!isValidUsername(leUsername->text()))
+	{
 		QMessageBox::warning(this, tr("错误"), tr("用户名不合法"));
 		leUsername->clear();
 		lePassword->clear();
 		return;
 	}
-	if (!isValidPassword(lePassword->text())){
+	if (!isValidPassword(lePassword->text()))
+	{
 		QMessageBox::warning(this, tr("错误"), tr("密码不合法"));
 		lePassword->clear();
 		return;
@@ -310,13 +332,18 @@ void MainWindow::getServerMsg()
 
 	QString msg = QString::fromLocal8Bit(ret);
 
-	if (changingPokemonName){
-		if (msg != "Accept.\n"){
+	if (changingPokemonName)
+	{
+		if (msg != "Accept.\n")
+		{
 			QMessageBox::warning(this, tr("错误"), tr("修改精灵名字失败"));
-		} else {
+		}
+		else
+		{
 			QMessageBox::information(this, tr("精灵修改名字"), tr("精灵名字已更新"));
 			QString str = "getPokemonList";
-			if (currentPlayerID != 0){
+			if (currentPlayerID != 0)
+			{
 				str += ' ';
 				str += QString::number(currentPlayerID);
 			}
@@ -411,7 +438,7 @@ void MainWindow::getServerMsg()
 		else // msg is pokemon detail
 		{
 			auto dlg = new PokemonDlg(msg, currentPlayerID == 0, this);
-			connect(dlg, &PokemonDlg::pokemonChangeName, this, [this](const QString & pokemonID, const QString & newName){
+			connect(dlg, &PokemonDlg::pokemonChangeName, this, [this](const QString &pokemonID, const QString &newName) {
 				QString str = "pokemonChangeName ";
 				str += pokemonID + ' ' + newName;
 				client->write(str.toLocal8Bit(), BUF_LENGTH);
@@ -422,10 +449,13 @@ void MainWindow::getServerMsg()
 		break;
 	}
 	case CHANGE_PSW:
-		if (msg == "Accept.\n"){
+		if (msg == "Accept.\n")
+		{
 			QMessageBox::information(this, tr("密码重置"), tr("密码重置成功"));
 			changeState(MAIN);
-		} else {
+		}
+		else
+		{
 			QMessageBox::warning(this, tr("错误"), msg);
 		}
 		break;

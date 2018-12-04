@@ -42,6 +42,8 @@ FORMS    += mainwindow.ui \
 
 RESOURCES += \
     qss.qrc \
-    img.qrc
+    img.qrc \
+    media.qrc
 
 QT += network
+QT += multimedia

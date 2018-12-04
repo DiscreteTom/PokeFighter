@@ -450,7 +450,8 @@ int f(int n)
 template <>
 Race<0>::Race() : PokemonBase(ATK)
 {
-	_raceName = "Charmander";
+	// _raceName = "Charmander";
+	_raceName = "Ð¡»ðÁú";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{
@@ -517,7 +518,8 @@ bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 template <>
 Race<1>::Race() : PokemonBase(HP)
 {
-	_raceName = "Bulbasaur";
+	// _raceName = "Bulbasaur";
+	_raceName = "ÃîÍÜÖÖ×Ó";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{
@@ -588,7 +590,8 @@ bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 template <>
 Race<2>::Race() : PokemonBase(DEF)
 {
-	_raceName = "Squirtle";
+	// _raceName = "Squirtle";
+	_raceName = "½ÜÄá¹ê";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{
@@ -658,7 +661,8 @@ bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 template <>
 Race<3>::Race() : PokemonBase(SPE)
 {
-	_raceName = "Pidgey";
+	// _raceName = "Pidgey";
+	_raceName = "²¨²¨";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{

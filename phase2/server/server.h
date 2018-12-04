@@ -46,7 +46,8 @@ private:
 	void logon(const string &username, const string &password);
 
 	// authentication
-	bool isValid(const string &str);
+	bool isValidUsername(const string &str);
+	bool isValidPassword(const string &str);
 
 	// thread function
 	void listenFunc();

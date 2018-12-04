@@ -131,6 +131,10 @@ void MainWindow::changeState(MainWindow::State aim)
 	btnDisplayAllPlayer->hide();
 	table->hide();
 	table->clear();
+	btnPlay->setDefault(false);
+	btnBack->setDefault(false);
+	btnLogin->setDefault(false);
+	btnShowPokemonList->setDefault(false);
 
 	state = aim;
 
@@ -208,7 +212,7 @@ void MainWindow::login()
 
 	btnLogin->setDisabled(true);
 
-	if (client->write(msg.toStdString().c_str(), BUF_LENGTH) == -1)
+	if (client->write(msg.toLocal8Bit(), BUF_LENGTH) == -1)
 	{
 		// error
 		QMessageBox::warning(this, tr("错误"), tr("服务器错误"));
@@ -224,7 +228,7 @@ void MainWindow::getServerMsg()
 	if (state == LOGIN)
 		client->disconnectFromHost();
 
-	QString msg(ret);
+	QString msg = QString::fromLocal8Bit(ret);
 
 	if (changingPokemonName){
 		if (msg != "Accept.\n"){
@@ -251,7 +255,7 @@ void MainWindow::getServerMsg()
 		if (port == 0)
 		{
 			// login failed
-			QMessageBox::warning(this, tr("错误"), tr("用户名或密码错误"));
+			QMessageBox::warning(this, tr("错误"), msg);
 		}
 		else
 		{
@@ -330,7 +334,7 @@ void MainWindow::getServerMsg()
 			connect(dlg, &PokemonDlg::pokemonChangeName, this, [this](const QString & pokemonID, const QString & newName){
 				QString str = "pokemonChangeName ";
 				str += pokemonID + ' ' + newName;
-				client->write(str.toStdString().c_str(), BUF_LENGTH);
+				client->write(str.toLocal8Bit(), BUF_LENGTH);
 				changingPokemonName = true;
 			});
 			showPokemonDlg = false;

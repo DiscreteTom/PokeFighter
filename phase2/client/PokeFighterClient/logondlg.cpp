@@ -19,7 +19,7 @@ LogonDlg::LogonDlg(QWidget *parent) :
 	btnOK = new QPushButton(tr("确认"), this);
 	btnCancel = new QPushButton(tr("取消"), this);
 	leUsername->setPlaceholderText(tr("请输入用户名"));
-	leUsername->setToolTip(tr("由字母、数字、下划线组成，长度为6-30位"));
+	leUsername->setToolTip(tr("不能包含空白字符，长度为6-30位"));
 	lePassword->setPlaceholderText(tr("请输入密码"));
 	lePassword->setToolTip(tr("由字母、数字、下划线组成，长度为6-30位"));
 	leRepeat->setPlaceholderText(tr("请再次输入密码以确认"));
@@ -61,10 +61,10 @@ QString LogonDlg::getPassword() const
 
 void LogonDlg::logon()
 {
-	if (!isValid(leUsername->text())){
+	if (!isValidUsername(leUsername->text())){
 		QMessageBox::warning(this, tr("不合法的用户名"), tr("账号必需由字母、数字、下划线组成且长度介于6-30"));
 		return;
-	} else if (!isValid(lePassword->text())){
+	} else if (!isValidPassword(lePassword->text())){
 		QMessageBox::warning(this, tr("不合法的密码"), tr("密码必需由字母、数字、下划线组成且长度介于6-30"));
 		return;
 	} else if (lePassword->text() != leRepeat->text()){
@@ -81,14 +81,14 @@ void LogonDlg::logon()
 
 	btnOK->setDisabled(true);
 
-	if (client->write(msg.toStdString().c_str(), BUF_LENGTH) == -1){
+	if (client->write(msg.toLocal8Bit(), BUF_LENGTH) == -1){
 		// error occur
 		QMessageBox::warning(this, tr("错误"), tr("服务器出错"));
 		btnOK->setDisabled(false);
 	}
 }
 
-bool LogonDlg::isValid(const QString &str)
+bool LogonDlg::isValidPassword(const QString &str)
 {
 	if (str.length() > 30 || str.length() < 6)
 		return false;
@@ -98,6 +98,20 @@ bool LogonDlg::isValid(const QString &str)
 	}
 	return true;
 }
+
+bool LogonDlg::isValidUsername(const QString &str)
+{
+	if (str.length() > 30 || str.length() < 6){
+		return false;
+	}
+	for (auto c : str){
+		if (c == '\t' || c == '\b' || c == '\t'){
+			return false;
+		}
+	}
+	return true;
+}
+
 
 void LogonDlg::readServerMsg()
 {
@@ -111,7 +125,7 @@ void LogonDlg::readServerMsg()
 		accept();
 	}
 	else{
-		QMessageBox::warning(this, tr("错误"), ret);
+		QMessageBox::warning(this, tr("错误"), QString::fromLocal8Bit(ret));
 	}
 
 }

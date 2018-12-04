@@ -1,0 +1,37 @@
+*{
+	font-family: "微软雅黑"
+}
+
+
+.MainWindow{
+	background-image:url(":/img/img/start.jpg");
+}
+
+#btnPlay, #btnExit, #btnLogin, #btnLogon, #btnBack{
+	width: 200px;
+	height: 80px;
+	border: 2px solid #8f8f91;
+	border-radius: 6px;
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+																		stop: 0 #f6f7fa, stop: 1 #dadbde);
+	min-width: 80px;
+	font-size: 20px;
+}
+
+#btnPlay:pressed, #btnExit:pressed, #btnLogin:pressed, #btnLogon:pressed, #btnBack:pressed{
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+																		stop: 0 #dadbde, stop: 1 #f6f7fa);
+}
+
+#btnPlay:flat, #btnExit:flat, #btnLogin:flat, #btnLogon:flat, #btnBack:flat{
+	border: none; /* no border for a flat push button */
+}
+
+#btnPlay:default, #btnExit:default, #btnLogin:default, #btnLogon:default, #btnBack:default{
+	border-color: navy; /* make the default button prominent */
+}
+
+#lbStartTitle, #lbLoginLabel{
+	font-size: 30pt;
+	font-weight: 75;
+}

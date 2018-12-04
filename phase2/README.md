@@ -94,3 +94,5 @@ useSkill <skillID>
 - 种族名
 
 需要安装LAV filters才能播放音频。音频文件保存在exe目录下的media目录下
+
+使用QSS实现样式与内容分离。注意QSS文件一定**不要**使用UTF-8编码，建议使用ASCII编码。此处使用了GB2312

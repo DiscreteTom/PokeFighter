@@ -12,41 +12,48 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 {
 	ui->setupUi(this);
 
-	// set style sheet
-	QFile file(":/qss/main.qss");
-	file.open(QFile::ReadOnly);
-	QTextStream filetext(&file);
-	QString stylesheet = filetext.readAll();
-	this->setStyleSheet(stylesheet);
-	file.close();
-
 	setWindowTitle(tr("宠物小精灵对战程序客户端"));
 
 	// start layout
 	lbStartTitle = new QLabel(tr("宠物小精灵对战程序"), this);
+	lbStartTitle->setObjectName("lbStartTitle");
 	btnPlay = new QPushButton(tr("开始游戏"), this);
+	btnPlay->setObjectName("btnPlay");
 	btnExit = new QPushButton(tr("退出"), this);
+	btnExit->setObjectName("btnExit");
 
 	// login layout
 	lbLoginLabel = new QLabel(tr("登录"), this);
+	lbLoginLabel->setObjectName("lbLoginLabel");
 	leUsername = new QLineEdit(this);
+	leUsername->setObjectName("leUsername");
 	leUsername->setPlaceholderText(tr("请输入用户名"));
 	lePassword = new QLineEdit(this);
+	lePassword->setObjectName("lePassword");
 	lePassword->setPlaceholderText(tr("请输入密码"));
 	lePassword->setEchoMode(QLineEdit::Password);
 	btnLogin = new QPushButton(tr("登录"), this);
+	btnLogin->setObjectName("btnLogin");
 	btnLogon = new QPushButton(tr("注册"), this);
+	btnLogon->setObjectName("btnLogon");
 	btnBack = new QPushButton(tr("返回"), this);
+	btnBack->setObjectName("btnBack");
 
 	// main layout
 	btnLogout = new QPushButton(tr("退出登录"), this);
+	btnLogout->setObjectName("btnLogout");
 	btnShowPokemonList = new QPushButton(tr("查看精灵"), this);
+	btnShowPokemonList->setObjectName("btnShowPokemonList");
 	btnDisplayAllPlayer = new QPushButton(tr("查看当前在线玩家"), this);
+	btnDisplayAllPlayer->setObjectName("btnDisplayAllPlayer");
 	btnChangePassword = new QPushButton(tr("修改密码"), this);
+	btnChangePassword->setObjectName("btnChangePassword");
 
 	// change password layout
 	leNewPassword = new QLineEdit(this);
+	leNewPassword->setObjectName("leNewPassword");
 	btnOK = new QPushButton(tr("提交"), this);
+	btnOK->setObjectName("btnOK");
 	leNewPassword->setPlaceholderText(tr("请输入新密码"));
 	leNewPassword->setEchoMode(QLineEdit::Password);
 
@@ -153,9 +160,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
 	//	setFixedSize(1600, 900);
 	setFixedSize(1366, 966); // size of start.jpg
-	ui->centralWidget->setStyleSheet("background-image:url(\":/img/img/start.jpg\")");
 
-	mediaPlayer->setMedia(QUrl("media/op.mp3"));
+	mediaPlayer->setMedia(QUrl("qrc:/music/media/op.mp3"));
 	mediaPlayer->setVolume(50);
 	mediaPlayer->play();
 }
@@ -207,9 +213,9 @@ void MainWindow::changeState(MainWindow::State aim)
 		btnExit->show();
 		setTabOrder(btnPlay, btnExit);
 		setTabOrder(btnExit, btnPlay);
-		layout->addWidget(lbStartTitle, 0, 0, 1, 1, Qt::AlignCenter);
-		layout->addWidget(btnPlay, 1, 0, 1, 1);
-		layout->addWidget(btnExit, 2, 0, 1, 1);
+		layout->addWidget(lbStartTitle, 0, 0, 1, 1, Qt::AlignHCenter | Qt::AlignTop);
+		layout->addWidget(btnPlay, 1, 0, 1, 1, Qt::AlignRight);
+		layout->addWidget(btnExit, 2, 0, 1, 1, Qt::AlignRight);
 		btnPlay->setDefault(true);
 		break;
 	case LOGIN:
@@ -225,12 +231,12 @@ void MainWindow::changeState(MainWindow::State aim)
 		setTabOrder(btnLogin, btnLogon);
 		setTabOrder(btnLogon, btnBack);
 		setTabOrder(btnBack, leUsername);
-		layout->addWidget(lbLoginLabel, 0, 0, Qt::AlignCenter);
-		layout->addWidget(leUsername, 1, 0);
-		layout->addWidget(lePassword, 2, 0);
-		layout->addWidget(btnLogin, 3, 0);
-		layout->addWidget(btnLogon, 4, 0);
-		layout->addWidget(btnBack, 5, 0);
+		layout->addWidget(lbLoginLabel, 0, 0, Qt::AlignHCenter | Qt::AlignTop);
+		layout->addWidget(leUsername, 1, 0, Qt::AlignRight);
+		layout->addWidget(lePassword, 2, 0, Qt::AlignRight);
+		layout->addWidget(btnLogin, 3, 0, Qt::AlignRight);
+		layout->addWidget(btnLogon, 4, 0, Qt::AlignRight);
+		layout->addWidget(btnBack, 5, 0, Qt::AlignRight);
 		btnLogin->setDefault(true);
 		leUsername->setFocus();
 		break;
@@ -243,10 +249,10 @@ void MainWindow::changeState(MainWindow::State aim)
 		setTabOrder(btnDisplayAllPlayer, btnChangePassword);
 		setTabOrder(btnChangePassword, btnLogout);
 		setTabOrder(btnLogout, btnShowPokemonList);
-		layout->addWidget(btnShowPokemonList, 0, 0);
-		layout->addWidget(btnDisplayAllPlayer, 1, 0);
-		layout->addWidget(btnChangePassword, 2, 0);
-		layout->addWidget(btnLogout, 3, 0);
+		layout->addWidget(btnShowPokemonList, 0, 0, Qt::AlignRight);
+		layout->addWidget(btnDisplayAllPlayer, 1, 0, Qt::AlignRight);
+		layout->addWidget(btnChangePassword, 2, 0, Qt::AlignRight);
+		layout->addWidget(btnLogout, 3, 0, Qt::AlignRight);
 		btnShowPokemonList->setDefault(true);
 		break;
 	case POKEMON_TABLE:

@@ -155,7 +155,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	setFixedSize(1366, 966); // size of start.jpg
 	ui->centralWidget->setStyleSheet("background-image:url(\":/img/img/start.jpg\")");
 
-	mediaPlayer->setMedia(QUrl(":/music/media/op.mp3"));
+	mediaPlayer->setMedia(QUrl("media/op.mp3"));
 	mediaPlayer->setVolume(50);
 	mediaPlayer->play();
 }

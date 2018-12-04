@@ -68,7 +68,7 @@ private:
 
 	// user data
 	QString username;
-	bool myPokemonTable;
+	int currentPlayerID; // if 0 means current player is the player himself
 	bool showPokemonDlg;
 	bool changingPokemonName;
 

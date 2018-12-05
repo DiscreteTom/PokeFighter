@@ -11,8 +11,10 @@
 #include <QTcpSocket>
 #include "logondlg.h"
 #include <QTableWidget>
+#include <QMediaPlayer>
 
-namespace Ui {
+namespace Ui
+{
 class MainWindow;
 }
 
@@ -27,44 +29,55 @@ public:
 private:
 	Ui::MainWindow *ui;
 
-	enum State{
+	enum State
+	{
 		START,
 		LOGIN,
 		MAIN,
 		POKEMON_TABLE,
-		PLAYER_TABLE
+		PLAYER_TABLE,
+		CHANGE_PSW
 	};
 
 	State state;
 
-	QGridLayout * layout;
+	QGridLayout *layout;
 
 	// start layout
-	QLabel * lbStartTitle;
-	QPushButton * btnPlay;
-	QPushButton * btnExit;
+	QLabel *lbStartTitle;
+	QPushButton *btnPlay;
+	QPushButton *btnExit;
 
 	// login layout
-	QLabel * lbLoginLabel;
-	QLineEdit * leUsername;
-	QLineEdit * lePassword;
-	QPushButton * btnLogin;
-	QPushButton * btnLogon;
-	QPushButton * btnBack;
+	QLabel *lbLoginLabel;
+	QLineEdit *leUsername;
+	QLineEdit *lePassword;
+	QPushButton *btnLogin;
+	QPushButton *btnLogon;
+	QPushButton *btnBack;
 
 	// main layout
-	QPushButton * btnLogout;
-	QPushButton * btnShowPokemonList;
-	QPushButton * btnDisplayAllPlayer;
+	QPushButton *btnLogout;
+	QPushButton *btnShowPokemonList;
+	QPushButton *btnDisplayAllPlayer;
+	QPushButton * btnChangePassword;
+
+	// change password layout
+	QLineEdit * leNewPassword;
+	QPushButton * btnOK;
+
 
 	// pokemon table and player table
-	QTableWidget * table;
+	QTableWidget *table;
 
 	// logon window
-	LogonDlg * logonDlg;
+	LogonDlg *logonDlg;
 
 	// pokemon dialog
-	QTcpSocket * client;
+	QTcpSocket *client;
+
+	// media
+	QMediaPlayer * mediaPlayer;
 
 	// user data
 	QString username;
@@ -74,7 +87,6 @@ private:
 
 	void changeState(State aim);
 	void login();
-
 private slots:
 	void getServerMsg();
 };

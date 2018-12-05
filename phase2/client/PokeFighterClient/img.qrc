@@ -4,5 +4,6 @@
         <file>img/charmander.png</file>
         <file>img/pidgey.png</file>
         <file>img/squirtle.png</file>
+        <file>img/start.jpg</file>
     </qresource>
 </RCC>

@@ -316,7 +316,8 @@ void Endpoint::resetPassword(const string &oldPassword, const string &newPasswor
 	{
 		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
 		sqlite3_free(errMsg);
-		strcpy(buf, "Reject: Server error.\n");
+		// strcpy(buf, "Reject: Server error.\n");
+		strcpy(buf, "服务器错误");
 		send(connSocket, buf, BUF_LENGTH, 0);
 		return;
 	}
@@ -324,7 +325,8 @@ void Endpoint::resetPassword(const string &oldPassword, const string &newPasswor
 	{
 		// wrong password
 		sqlite3_free_table(sqlResult);
-		strcpy(buf, "Reject: wrong old password.\n");
+		// strcpy(buf, "Reject: wrong old password.\n");
+		strcpy(buf, "旧密码不正确");
 		send(connSocket, buf, BUF_LENGTH, 0);
 		return;
 	}
@@ -339,7 +341,8 @@ void Endpoint::resetPassword(const string &oldPassword, const string &newPasswor
 	{
 		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
 		sqlite3_free(errMsg);
-		strcpy(buf, "Reject: Server error.\n");
+		// strcpy(buf, "Reject: Server error.\n");
+		strcpy(buf, "服务器错误");
 		send(connSocket, buf, BUF_LENGTH, 0);
 		return;
 	}

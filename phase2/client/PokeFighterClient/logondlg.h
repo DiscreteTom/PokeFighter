@@ -38,8 +38,6 @@ private:
 	QTcpSocket * client;
 
 	void logon();
-	bool isValid(const QString & str);
-
 private slots:
 	void readServerMsg();
 };

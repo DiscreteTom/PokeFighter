@@ -24,7 +24,7 @@ PokemonDlg::PokemonDlg(const QString &detail, bool myPokemonTable, QWidget *pare
 
 		if (i != 1)
 		{
-			t->setFlags(t->flags() ^ Qt::ItemIsEditable);
+			t->setFlags(t->flags() ^ Qt::ItemIsEnabled);
 			t->setBackgroundColor(QColor("#eff0f1"));
 		}
 		else
@@ -46,22 +46,26 @@ PokemonDlg::PokemonDlg(const QString &detail, bool myPokemonTable, QWidget *pare
 
 	// img
 	lbImg = new QLabel(this); // name
-	if (details[2] == "Bulbasaur")
+	// if (details[2] == "Bulbasaur")
+	if (details[2] == "妙蛙种子")
 	{
 		lbImg->setPixmap(QPixmap(":/img/img/bulbasaur.png"));
 		setWindowIcon(QIcon(":/img/img/bulbasaur.png"));
 	}
-	else if (details[2] == "Charmander")
+	// else if (details[2] == "Charmander")
+	else if (details[2] == "小火龙")
 	{
 		lbImg->setPixmap(QPixmap(":/img/img/charmander.png"));
 		setWindowIcon(QIcon(":/img/img/charmander.png"));
 	}
-	else if (details[2] == "Squirtle")
+	// else if (details[2] == "Squirtle")
+	else if (details[2] == "杰尼龟")
 	{
 		lbImg->setPixmap(QPixmap(":/img/img/squirtle.png"));
 		setWindowIcon(QIcon(":/img/img/squirtle.png"));
 	}
-	else if (details[2] == "Pidgey")
+	// else if (details[2] == "Pidgey")
+	else if (details[2] == "波波")
 	{
 		lbImg->setPixmap(QPixmap(":/img/img/pidgey.png"));
 		setWindowIcon(QIcon(":/img/img/pidgey.png"));

@@ -1,0 +1,48 @@
+*{
+	font-family: "Î¢ÈíÑÅºÚ"
+}
+
+
+.MainWindow{
+	background-image:url(":/img/img/start.jpg");
+}
+
+#btnPlay, #btnExit, #btnLogin, #btnLogon, #btnBack, #btnLogout, #btnShowPokemonList, #btnDisplayAllPlayer, #btnChangePassword, #btnOK{
+	width: 200px;
+	height: 80px;
+	border: 2px solid #8f8f91;
+	border-radius: 6px;
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+																		stop: 0 #f6f7fa, stop: 1 #dadbde);
+	min-width: 80px;
+	font-size: 20px;
+}
+
+#btnPlay:pressed, #btnExit:pressed, #btnLogin:pressed, #btnLogon:pressed, #btnBack:pressed , #btnLogout:pressed, #btnShowPokemonList:pressed, #btnDisplayAllPlayer:pressed, #btnChangePassword:pressed, #btnOK:pressed{
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+																		stop: 0 #dadbde, stop: 1 #f6f7fa);
+}
+
+#btnPlay:flat, #btnExit:flat, #btnLogin:flat, #btnLogon:flat, #btnBack:flat, #btnLogout:flat, #btnShowPokemonList:flat, #btnDisplayAllPlayer:flat, #btnChangePassword:flat, #btnOK:flat{
+	border: none; /* no border for a flat push button */
+}
+
+#btnPlay:default, #btnExit:default, #btnLogin:default, #btnLogon:default, #btnBack:default, #btnLogout:default, #btnShowPokemonList:default, #btnDisplayAllPlayer:default, #btnChangePassword:default, #btnOK:default{
+	border-color: navy; /* make the default button prominent */
+}
+
+#lbStartTitle, #lbLoginLabel{
+	font-size: 30pt;
+	font-weight: 75;
+}
+
+#leUsername, #lePassword, #leNewPassword {
+	width: 300px;
+	height: 50px;
+	font-size: 18pt;
+	border: 2px solid gray;
+	border-radius: 10px;
+	padding: 0 8px;
+	background: white;
+	selection-background-color: darkgray;
+}

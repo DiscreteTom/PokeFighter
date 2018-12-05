@@ -6,6 +6,7 @@
 #include <conio.h>
 #include <thread>
 #include <iostream>
+#include <map>
 
 using namespace std;
 
@@ -242,12 +243,12 @@ void Hub::terminateFunc()
 
 void Hub::login(const string &username, const string &password)
 {
-	if (!isValid(username))
+	if (!isValidUsername(username))
 	{
 		cout << "Hub: Got an invalid username: " << username << endl;
 		strcpy(buf, "Reject: Invalid username.\n");
 	}
-	else if (!isValid(password))
+	else if (!isValidPassword(password))
 	{
 		cout << "Hub: Got an invalid password: " << password << endl;
 		strcpy(buf, "Reject: Invalid password.\n");
@@ -262,7 +263,8 @@ void Hub::login(const string &username, const string &password)
 		if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
 		{
 			cout << "Hub: Sqlite3 error: " << errMsg << endl;
-			strcpy(buf, "Reject: Hub database error.\n");
+			// strcpy(buf, "Reject: Hub database error.\n");
+			strcpy(buf, "服务器数据库错误");
 			sqlite3_free(errMsg);
 		}
 		else // sqlite select succeed
@@ -271,7 +273,8 @@ void Hub::login(const string &username, const string &password)
 			{
 				// username and password mismatch
 				cout << "Hub: Login: username '" << username << "' and password '" << password << "' mismatch.\n";
-				strcpy(buf, "Reject: Username and password dismatch.\n");
+				// strcpy(buf, "Reject: Username and password dismatch.\n");
+				strcpy(buf, "用户名或密码错误");
 			}
 			else
 			{
@@ -287,7 +290,8 @@ void Hub::login(const string &username, const string &password)
 						userExist = true;
 						if (endpoint->isOnline())
 						{
-							strcpy(buf, "Reject: Account is already online.\n");
+							// strcpy(buf, "Reject: Account is already online.\n");
+							strcpy(buf, "用户已在其他设备登录");
 						}
 						else
 						{
@@ -306,7 +310,8 @@ void Hub::login(const string &username, const string &password)
 					if (endpointPort == 0) // start ERROR, remove and delete this new endpoint
 					{
 						delete p;
-						strcpy(buf, "Reject: Hub endpoint error.\n");
+						// strcpy(buf, "Reject: Hub endpoint error.\n");
+						strcpy(buf, "服务器错误");
 					}
 					else // start normally, add this endpoint to endpoints
 					{
@@ -325,15 +330,17 @@ void Hub::login(const string &username, const string &password)
 }
 void Hub::logon(const string &username, const string &password)
 {
-	if (!isValid(username))
+	if (!isValidUsername(username))
 	{
 		cout << "Hub: Got an invalid username: " << username << endl;
-		strcpy(buf, "Reject: Invalid username.\n");
+		// strcpy(buf, "Reject: Invalid username.\n");
+		strcpy(buf, "不合法的用户名");
 	}
-	else if (!isValid(password))
+	else if (!isValidPassword(password))
 	{
 		cout << "Hub: Got an invalid password: " << password << endl;
-		strcpy(buf, "Reject: Invalid password.\n");
+		// strcpy(buf, "Reject: Invalid password.\n");
+		strcpy(buf, "不合法的密码");
 	}
 	else
 	{
@@ -345,7 +352,8 @@ void Hub::logon(const string &username, const string &password)
 		if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
 		{
 			cout << "Hub: Sqlite3 error: " << errMsg << endl;
-			strcpy(buf, "Reject: Hub database error.\n");
+			// strcpy(buf, "Reject: Hub database error.\n");
+			strcpy(buf, "服务器数据库错误");
 			sqlite3_free(errMsg);
 		}
 		else
@@ -359,7 +367,8 @@ void Hub::logon(const string &username, const string &password)
 				{
 					cout << "Hub: Sqlite3 error: " << errMsg << endl;
 					sqlite3_free(errMsg);
-					strcpy(buf, "Reject: Hub database error.\n");
+					strcpy(buf, "服务器数据库错误");
+					// strcpy(buf, "Reject: Hub database error.\n");
 				}
 				else
 				{
@@ -371,7 +380,8 @@ void Hub::logon(const string &username, const string &password)
 			{
 				// username already exist
 				cout << "Hub: Logon: username '" << username << "' already exist.\n";
-				strcpy(buf, "Reject: Duplicate username.\n");
+				//strcpy(buf, "Reject: Duplicate username.\n");
+				strcpy(buf, "用户名已存在");
 			}
 			sqlite3_free_table(sqlResult);
 		}
@@ -379,7 +389,20 @@ void Hub::logon(const string &username, const string &password)
 	send(connSocket, buf, BUF_LENGTH, 0);
 }
 
-bool Hub::isValid(const string &str)
+bool Hub::isValidUsername(const string &str)
+{
+	for (auto c : str)
+	{
+		if (c == '\b' || c == '\n' || c == '\t')
+		{
+			// contains \b \n \t
+			return false;
+		}
+	}
+	return true;
+}
+
+bool Hub::isValidPassword(const string &str)
 {
 	for (auto c : str)
 	{
@@ -412,16 +435,53 @@ void Hub::mornitor(Endpoint *const endpoint)
 	mtx.unlock();
 }
 
+/**
+ * format:
+ * <userID> <userName> <online:0|1>
+ */
 string Hub::getAllUser()
 {
+	struct temp{
+		string name;
+		bool online;
+	};
+	char **sqlResult;
+	int nRow;
+	int nColumn;
+	char *errMsg;
+	string sql = "SELECT id, name FROM User;";
+	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+	{
+		cout << "Hub: Sqlite3 error: " << errMsg << endl;
+		// strcpy(buf, "Reject: Hub database error.\n");
+		// strcpy(buf, "服务器数据库错误");
+		sqlite3_free(errMsg);
+	}
+
+	map<int, temp> playerMap;
+	for (int i = 0; i < nRow; ++i){
+		temp t = {sqlResult[2 * (i + 1) + 1], false};
+		playerMap.insert(make_pair(stoi(sqlResult[2 * (i + 1)]), t));
+	}
+
+	sqlite3_free_table(sqlResult);
+
+
 	string result;
 	mtx.lock();
 	for (auto endpoint : endpoints)
 	{
-		result += to_string(endpoint->getPlayerID());
-		result += ' ';
-		result += endpoint->getPlayerName() + '\n';
+		playerMap[endpoint->getPlayerID()].online = true;
 	}
 	mtx.unlock();
+
+	for (auto & player : playerMap){
+		if (player.second.online){
+			result = to_string(player.first) + ' ' + player.second.name + " 1\n" + result;
+		} else {
+			result += to_string(player.first) + ' ' + player.second.name + " 0\n";
+		}
+	}
+
 	return result;
 }

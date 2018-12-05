@@ -26,19 +26,24 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
         mainwindow.cpp \
     logondlg.cpp \
-    pokemondlg.cpp
+    pokemondlg.cpp \
+    authentication.cpp
 
 HEADERS  += mainwindow.h \
     logondlg.h \
     netconfig.h \
-    pokemondlg.h
+    pokemondlg.h \
+    authentication.h
 
 FORMS    += mainwindow.ui \
     logondlg.ui \
-    pokemondlg.ui
+    pokemondlg.ui \
+    changepassworddlg.ui
 
 RESOURCES += \
     qss.qrc \
-    img.qrc
+    img.qrc \
+    media.qrc
 
 QT += network
+QT += multimedia

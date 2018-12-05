@@ -476,13 +476,11 @@ string Hub::getAllUser()
 	mtx.unlock();
 
 	for (auto & player : playerMap){
-		result += to_string(player.first);
-		result += ' ';
-		result += player.second.name;
-		result += ' ';
-		if (player.second.online)result += '1';
-		else result += '0';
-		result += '\n';
+		if (player.second.online){
+			result = to_string(player.first) + ' ' + player.second.name + " 1\n" + result;
+		} else {
+			result += to_string(player.first) + ' ' + player.second.name + " 0\n";
+		}
 	}
 
 	return result;

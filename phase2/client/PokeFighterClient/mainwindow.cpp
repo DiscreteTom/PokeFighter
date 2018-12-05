@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	btnLogout->setObjectName("btnLogout");
 	btnShowPokemonList = new QPushButton(tr("查看精灵"), this);
 	btnShowPokemonList->setObjectName("btnShowPokemonList");
-	btnDisplayAllPlayer = new QPushButton(tr("查看当前在线玩家"), this);
+	btnDisplayAllPlayer = new QPushButton(tr("查看所有玩家"), this);
 	btnDisplayAllPlayer->setObjectName("btnDisplayAllPlayer");
 	btnChangePassword = new QPushButton(tr("修改密码"), this);
 	btnChangePassword->setObjectName("btnChangePassword");
@@ -381,13 +381,18 @@ void MainWindow::getServerMsg()
 	}
 	case PLAYER_TABLE:
 	{
+		/**
+		 * msg format:
+		 * <playerID> <playername> <online:0|1>
+		 */
 		auto players = msg.split('\n');
 
 		//! players[players.size() - 1] == ""
 
 		table->setRowCount(players.size() - 2);
-		table->setColumnCount(3); // id - username - viewPokemon
-		table->setHorizontalHeaderLabels({tr("玩家ID"), tr("用户名"), tr("操作")});
+		table->setColumnCount(4); // id - username - online - viewPokemon
+		table->setHorizontalHeaderLabels({tr("玩家ID"), tr("用户名"), tr("在线情况"), tr("操作")});
+		table->verticalHeader()->hide();
 
 		int tableRowIndex = 0;
 		for (int i = 0; i < players.size() - 1; ++i)
@@ -397,8 +402,21 @@ void MainWindow::getServerMsg()
 			// detail[0] is id, detail[1] is username
 			if (detail[1] == username)
 				continue; // not show player himself
-			table->setItem(tableRowIndex, 0, new QTableWidgetItem(detail[0]));
-			table->setItem(tableRowIndex, 1, new QTableWidgetItem(detail[1]));
+			auto t = new QTableWidgetItem(detail[0]);
+			t->setFlags(t->flags() ^ Qt::ItemIsEnabled);
+			if (detail[2] == '0')
+				t->setBackgroundColor(QColor("#eff0f1"));
+			table->setItem(tableRowIndex, 0, t);
+			t = new QTableWidgetItem(detail[1]);
+			t->setFlags(t->flags() ^ Qt::ItemIsEnabled);
+			if (detail[2] == '0')
+				t->setBackgroundColor(QColor("#eff0f1"));
+			table->setItem(tableRowIndex, 1, t);
+			t = new QTableWidgetItem(detail[2] == '1' ? tr("在线") : tr("离线"));
+			t->setFlags(t->flags() ^ Qt::ItemIsEnabled);
+			if (detail[2] == '0')
+				t->setBackgroundColor(QColor("#eff0f1"));
+			table->setItem(tableRowIndex, 2, t);
 			auto btn = new QPushButton(tr("查看小精灵"), this);
 			connect(btn, &QPushButton::clicked, this, [this, detail] {
 				changeState(POKEMON_TABLE);
@@ -407,7 +425,7 @@ void MainWindow::getServerMsg()
 				str += detail[0];
 				client->write(str.toStdString().c_str(), BUF_LENGTH);
 			});
-			table->setCellWidget(tableRowIndex, 2, btn);
+			table->setCellWidget(tableRowIndex, 3, btn);
 			++tableRowIndex;
 		}
 		break;

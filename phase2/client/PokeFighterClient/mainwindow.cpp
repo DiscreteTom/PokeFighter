@@ -198,6 +198,8 @@ void MainWindow::changeState(MainWindow::State aim)
 	btnShowPokemonList->setDefault(false);
 	btnOK->setDefault(false);
 
+	disconnect(table, &QTableWidget::cellChanged, 0, 0);
+
 	state = aim;
 
 	// delete old layout
@@ -347,14 +349,8 @@ void MainWindow::getServerMsg()
 		else
 		{
 			QMessageBox::information(this, tr("精灵修改名字"), tr("精灵名字已更新"));
-			QString str = "getPokemonList";
-			if (currentPlayerID != 0)
-			{
-				str += ' ';
-				str += QString::number(currentPlayerID);
-			}
-			client->write(str.toStdString().c_str(), BUF_LENGTH);
 		}
+
 		changingPokemonName = false;
 		return;
 	}
@@ -451,7 +447,7 @@ void MainWindow::getServerMsg()
 				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
 				table->setItem(i, 0, t);
 				t = new QTableWidgetItem(detail[1]);
-				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
+				t->setToolTip(tr("双击以更改精灵名称"));
 				table->setItem(i, 1, t);
 				t = new QTableWidgetItem(detail[2]);
 				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
@@ -468,15 +464,27 @@ void MainWindow::getServerMsg()
 				});
 				table->setCellWidget(i, 4, btn);
 			}
+
+			connect(table, &QTableWidget::cellChanged, this, [this](int row, int column) {
+				if (state == POKEMON_TABLE && column == 1)
+				{
+					// pokemon name changed
+					QString str = "pokemonChangeName ";
+					str += table->item(row, 0)->text() + ' ' + table->item(row, 1)->text();
+					client->write(str.toLocal8Bit(), BUF_LENGTH);
+					changingPokemonName = true;
+				}
+			}); // must be connected after data input
 		}
 		else // msg is pokemon detail
 		{
 			auto dlg = new PokemonDlg(msg, currentPlayerID == 0, this);
 			connect(dlg, &PokemonDlg::pokemonChangeName, this, [this](const QString &pokemonID, const QString &newName) {
-				QString str = "pokemonChangeName ";
-				str += pokemonID + ' ' + newName;
-				client->write(str.toLocal8Bit(), BUF_LENGTH);
-				changingPokemonName = true;
+				for (int i = 0; i < table->rowCount(); ++i){
+					if (table->item(i, 0)->text() == pokemonID){
+						table->item(i, 1)->setText(newName);// will call table::cellChanged
+					}
+				}
 			});
 			showPokemonDlg = false;
 		}

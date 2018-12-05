@@ -8,8 +8,7 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 
 	// set style sheet
-	// QFile file(":/qss/main.qss");
-	QFile file("qss/main.qss");
+	QFile file(":/qss/qss/main.qss");
 	file.open(QFile::ReadOnly);
 	QTextStream filetext(&file);
 	QString stylesheet = filetext.readAll();

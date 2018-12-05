@@ -447,10 +447,18 @@ void MainWindow::getServerMsg()
 			{
 				auto detail = pokemons[i].split(' ');
 				// detail[0] is name, detail[1] is race, detail[2] is lv
-				table->setItem(i, 0, new QTableWidgetItem(detail[0]));
-				table->setItem(i, 1, new QTableWidgetItem(detail[1]));
-				table->setItem(i, 2, new QTableWidgetItem(detail[2]));
-				table->setItem(i, 3, new QTableWidgetItem(detail[3]));
+				auto t = new QTableWidgetItem(detail[0]);
+				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
+				table->setItem(i, 0, t);
+				t = new QTableWidgetItem(detail[1]);
+				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
+				table->setItem(i, 1, t);
+				t = new QTableWidgetItem(detail[2]);
+				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
+				table->setItem(i, 2, t);
+				t = new QTableWidgetItem(detail[3]);
+				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
+				table->setItem(i, 3, t);
 				auto btn = new QPushButton(tr("查看详情"), this);
 				connect(btn, &QPushButton::clicked, this, [this, detail] {
 					QString str = "getPokemon ";

@@ -393,6 +393,8 @@ void MainWindow::getServerMsg()
 		table->setColumnCount(4); // id - username - online - viewPokemon
 		table->setHorizontalHeaderLabels({tr("玩家ID"), tr("用户名"), tr("在线情况"), tr("操作")});
 		table->verticalHeader()->hide();
+		table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+		table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
 
 		int tableRowIndex = 0;
 		for (int i = 0; i < players.size() - 1; ++i)
@@ -439,7 +441,7 @@ void MainWindow::getServerMsg()
 			table->setRowCount(pokemons.size() - 1);
 			table->setColumnCount(5);
 			table->setHorizontalHeaderLabels({tr("精灵ID"), tr("名字"), tr("种族"), tr("等级"), tr("操作")});
-			table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+			table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
 			table->verticalHeader()->hide();
 			for (int i = 0; i < pokemons.size() - 1; ++i)
 			{

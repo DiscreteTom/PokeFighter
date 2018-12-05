@@ -24,7 +24,7 @@ PokemonDlg::PokemonDlg(const QString &detail, bool myPokemonTable, QWidget *pare
 
 		if (i != 1)
 		{
-			t->setFlags(t->flags() ^ Qt::ItemIsEditable);
+			t->setFlags(t->flags() ^ Qt::ItemIsEnabled);
 			t->setBackgroundColor(QColor("#eff0f1"));
 		}
 		else

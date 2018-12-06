@@ -56,7 +56,9 @@ void Hub::start()
 	string sql = "create table User(";
 	sql += "id integer primary key,";
 	sql += "name text unique not null,";
-	sql += "password text not null";
+	sql += "password text not null,";
+	sql += "win int not null,";
+	sql += "total int not null";
 	sql += ");";
 	if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
 	{
@@ -360,7 +362,7 @@ void Hub::logon(const string &username, const string &password)
 			if (nRow == 0)
 			{
 				// username NOT exist, add this user
-				string sql = "INSERT INTO User(name, password) VALUES('" + username + "', '" + password + "');";
+				string sql = "INSERT INTO User(name, password, win, total) VALUES('" + username + "', '" + password + "', 0, 0);";
 				char *errMsg;
 				if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
 				{

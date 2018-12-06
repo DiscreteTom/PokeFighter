@@ -40,14 +40,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	btnBack->setObjectName("btnBack");
 
 	// main layout
-	btnLogout = new QPushButton(tr("退出登录"), this);
-	btnLogout->setObjectName("btnLogout");
 	btnShowPokemonList = new QPushButton(tr("查看精灵"), this);
 	btnShowPokemonList->setObjectName("btnShowPokemonList");
+	btnLvUpBattle = new QPushButton(tr("升级比赛"), this);
+	btnLvUpBattle->setObjectName("btnLvUpBattle");
+	btnDuelBattle = new QPushButton(tr("决斗比赛"), this);
+	btnDuelBattle->setObjectName("btnDuelBattle");
 	btnDisplayAllPlayer = new QPushButton(tr("查看所有玩家"), this);
 	btnDisplayAllPlayer->setObjectName("btnDisplayAllPlayer");
 	btnChangePassword = new QPushButton(tr("修改密码"), this);
 	btnChangePassword->setObjectName("btnChangePassword");
+	btnLogout = new QPushButton(tr("退出登录"), this);
+	btnLogout->setObjectName("btnLogout");
 
 	// change password layout
 	leNewPassword = new QLineEdit(this);
@@ -112,6 +116,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 		currentPlayerID = 0;
 		client->write("getPokemonList", BUF_LENGTH);
 	});
+	connect(btnLvUpBattle, &QPushButton::clicked, this, [this]{ changeState(LV_UP_BATTLE); });
+	connect(btnDuelBattle, &QPushButton::clicked, this, [this]{ changeState(DUEL_BATTLE); });
 	connect(btnDisplayAllPlayer, &QPushButton::clicked, this, [this] {
 		changeState(PLAYER_TABLE);
 		client->write("getPlayerList", BUF_LENGTH);
@@ -186,6 +192,8 @@ void MainWindow::changeState(MainWindow::State aim)
 	btnBack->hide();
 	btnLogout->hide();
 	btnShowPokemonList->hide();
+	btnLvUpBattle->hide();
+	btnDuelBattle->hide();
 	btnChangePassword->hide();
 	btnDisplayAllPlayer->hide();
 	btnOK->hide();
@@ -244,17 +252,23 @@ void MainWindow::changeState(MainWindow::State aim)
 		break;
 	case MAIN:
 		btnShowPokemonList->show();
+		btnLvUpBattle->show();
+		btnDuelBattle->show();
 		btnDisplayAllPlayer->show();
 		btnChangePassword->show();
 		btnLogout->show();
-		setTabOrder(btnShowPokemonList, btnDisplayAllPlayer);
+		setTabOrder(btnShowPokemonList, btnLvUpBattle);
+		setTabOrder(btnLvUpBattle, btnDuelBattle);
+		setTabOrder(btnDuelBattle, btnDisplayAllPlayer);
 		setTabOrder(btnDisplayAllPlayer, btnChangePassword);
 		setTabOrder(btnChangePassword, btnLogout);
 		setTabOrder(btnLogout, btnShowPokemonList);
 		layout->addWidget(btnShowPokemonList, 0, 0, Qt::AlignRight);
-		layout->addWidget(btnDisplayAllPlayer, 1, 0, Qt::AlignRight);
-		layout->addWidget(btnChangePassword, 2, 0, Qt::AlignRight);
-		layout->addWidget(btnLogout, 3, 0, Qt::AlignRight);
+		layout->addWidget(btnLvUpBattle, 1, 0, Qt::AlignRight);
+		layout->addWidget(btnDuelBattle, 2, 0, Qt::AlignRight);
+		layout->addWidget(btnDisplayAllPlayer, 3, 0, Qt::AlignRight);
+		layout->addWidget(btnChangePassword, 4, 0, Qt::AlignRight);
+		layout->addWidget(btnLogout, 5, 0, Qt::AlignRight);
 		btnShowPokemonList->setDefault(true);
 		break;
 	case POKEMON_TABLE:

@@ -36,7 +36,9 @@ private:
 		MAIN,
 		POKEMON_TABLE,
 		PLAYER_TABLE,
-		CHANGE_PSW
+		CHANGE_PSW,
+		LV_UP_BATTLE,
+		DUEL_BATTLE
 	};
 
 	State state;
@@ -57,10 +59,12 @@ private:
 	QPushButton *btnBack;
 
 	// main layout
-	QPushButton *btnLogout;
 	QPushButton *btnShowPokemonList;
+	QPushButton * btnLvUpBattle;
+	QPushButton * btnDuelBattle;
 	QPushButton *btnDisplayAllPlayer;
 	QPushButton * btnChangePassword;
+	QPushButton *btnLogout;
 
 	// change password layout
 	QLineEdit * leNewPassword;

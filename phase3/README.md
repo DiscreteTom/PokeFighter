@@ -85,6 +85,7 @@ getPokemon <pokemonID>
 pokemonChangeName <pokemonID> <newName>
 battle <type: "LV_UP" | "DUEL"> <pokemonID> <enemyRaceID> <enemyLV> [-auto]
 useSkill <skillID>
+getDuelStatistic
 ```
 
 编码相关：

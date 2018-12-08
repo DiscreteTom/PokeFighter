@@ -249,6 +249,10 @@ void Endpoint::listenFunc()
 		{
 			pokemonChangeName(strs[1], strs[2]);
 		}
+		else if (strs[0] == "getDuelStatistic")
+		{
+			getDuelStatistic();
+		}
 		else
 		{
 			cout << "Endpoint[" << playerID << "]: Invalid request.\n";
@@ -485,4 +489,28 @@ void Endpoint::pokemonChangeName(const string &pokemonID, const string &newName)
 		strcpy(buf, "Accept.\n");
 		send(connSocket, buf, BUF_LENGTH, 0);
 	}
+}
+
+void Endpoint::getDuelStatistic()
+{
+	char **sqlResult;
+	int nRow;
+	int nColumn;
+	char *errMsg;
+	string sql;
+	sql = "SELECT win, total FROM User where id=" + to_string(playerID) + ";";
+	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+		sqlite3_free(errMsg);
+		strcpy(buf, "Reject: Server error.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+		return;
+	}
+	string result = sqlResult[2];
+	result += ' ';
+	result += sqlResult[3];
+	strcpy(buf, result.c_str());
+	send(connSocket, buf, BUF_LENGTH, 0);
+	sqlite3_free_table(sqlResult);
 }

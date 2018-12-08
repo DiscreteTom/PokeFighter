@@ -57,6 +57,7 @@ class Endpoint
 	void pokemonChangeName(const string & pokemonID, const string &newName);
 	void battle(int pokemonID, bool autoFight = false);
 	void useSkill(int skillID);
+	void getDuelStatistic();
 
 	// other functions
 	void savePokemonToDB(const Pokemon &p);

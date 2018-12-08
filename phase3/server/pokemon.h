@@ -84,6 +84,8 @@ public:
 
 	static const PokemonBase *races[4];
 
+	static Pokemon * getEnemy(int raceIndex, int lv);
+
 	//getter
 	string name() const { return _name; }
 	int atk() const { return _atk; }

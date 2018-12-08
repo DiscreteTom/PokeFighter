@@ -5,7 +5,7 @@ const PokemonBase *Pokemon::races[4] = {new Race<0>(), new Race<1>(), new Race<2
 Pokemon * Pokemon::getEnemy(int raceIndex, int lv){
 	if (raceIndex < 0 || raceIndex > 3) return 0;
 	if (lv < 1 || lv > 15) return 0;
-	Pokemon * result = new Pokemon(raceID);
+	Pokemon * result = new Pokemon(raceIndex);
 	while (result->lv() < lv){
 		result->gainExp(10);
 	}
@@ -461,7 +461,7 @@ template <>
 Race<0>::Race() : PokemonBase(ATK)
 {
 	// _raceName = "Charmander";
-	_raceName = "Ð¡ï¿½ï¿½ï¿½ï¿½";
+	_raceName = "Ð¡»ðÁú";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{
@@ -529,7 +529,7 @@ template <>
 Race<1>::Race() : PokemonBase(HP)
 {
 	// _raceName = "Bulbasaur";
-	_raceName = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
+	_raceName = "ÃîÍÜÖÖ×Ó";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{
@@ -601,7 +601,7 @@ template <>
 Race<2>::Race() : PokemonBase(DEF)
 {
 	// _raceName = "Squirtle";
-	_raceName = "ï¿½ï¿½ï¿½ï¿½ï¿½";
+	_raceName = "½ÜÄá¹ê";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{
@@ -672,7 +672,7 @@ template <>
 Race<3>::Race() : PokemonBase(SPE)
 {
 	// _raceName = "Pidgey";
-	_raceName = "ï¿½ï¿½ï¿½ï¿½";
+	_raceName = "²¨²¨";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{

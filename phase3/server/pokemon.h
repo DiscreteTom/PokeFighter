@@ -79,7 +79,7 @@ private:
 public:
 	Pokemon(int raceIndex, const string &name = "");																										 // init a new pokemon
 	Pokemon(const string &name, int raceIndex, int atk, int def, int maxHp, int speed, int lv, int exp); // ctor for database
-	Pokemon(const Pokemon &) = delete;
+	// Pokemon(const Pokemon &) = delete;
 	~Pokemon();
 
 	static const PokemonBase *races[4];

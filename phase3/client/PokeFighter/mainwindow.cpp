@@ -69,6 +69,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	lbWinRate = new QLabel(this);
 	lbWinRate->setObjectName("lbWinRate");
 
+	// choose enemy layout
+	lbChooseEnemy = new QLabel(tr("选择你的对手："), this);
+	lbEnemyLV = new QLabel(tr("对手等级："), this);
+	sbEnemyLV = new QSpinBox(this);
+	btnEnemyRace0 = new QPushButton(tr("小火龙"), this);
+	btnEnemyRace1 = new QPushButton(tr("妙蛙种子"), this);
+	btnEnemyRace2 = new QPushButton(tr("杰尼龟"), this);
+	btnEnemyRace3 = new QPushButton(tr("波波"), this);
+	sbEnemyLV->setMaximum(15);
+	sbEnemyLV->setMinimum(1);
+
 	// pokemon table and player table
 	table = new QTableWidget(this);
 
@@ -111,6 +122,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 		case POKEMON_TABLE | LV_UP_BATTLE:
 		case POKEMON_TABLE | DUEL_BATTLE:
 			changeState(MAIN);
+			break;
+		case CHOOSE_ENEMY | LV_UP_BATTLE:
+		case CHOOSE_ENEMY | DUEL_BATTLE:
+			changeState((state ^ CHOOSE_ENEMY) | POKEMON_TABLE);
+			client->write("getPokemonList", BUF_LENGTH);
 			break;
 		default:
 			break;
@@ -220,6 +236,13 @@ void MainWindow::changeState(int aim)
 	lbWin->hide();
 	lbTotal->hide();
 	lbWinRate->hide();
+	lbChooseEnemy->hide();
+	lbEnemyLV->hide();
+	sbEnemyLV->hide();
+	btnEnemyRace0->hide();
+	btnEnemyRace1->hide();
+	btnEnemyRace2->hide();
+	btnEnemyRace3->hide();
 	table->hide();
 	table->clear();
 	btnPlay->setDefault(false);
@@ -330,6 +353,31 @@ void MainWindow::changeState(int aim)
 		layout->addWidget(btnOK, 2, 0, 1, 1, Qt::AlignCenter);
 		layout->addWidget(btnBack, 3, 0, 1, 1, Qt::AlignCenter);
 		btnOK->setDefault(true);
+		break;
+	case CHOOSE_ENEMY | DUEL_BATTLE:
+	case CHOOSE_ENEMY | LV_UP_BATTLE:
+		lbChooseEnemy->show();
+		lbEnemyLV->show();
+		sbEnemyLV->show();
+		btnEnemyRace0->show();
+		btnEnemyRace1->show();
+		btnEnemyRace2->show();
+		btnEnemyRace3->show();
+		btnBack->show();
+		if (state == (CHOOSE_ENEMY | DUEL_BATTLE)){
+			sbEnemyLV->setValue(15);
+			sbEnemyLV->setDisabled(true);
+		} else {
+			sbEnemyLV->setDisabled(false);
+		}
+		layout->addWidget(lbChooseEnemy, 0, 0, 1, 2);
+		layout->addWidget(lbEnemyLV, 0, 2, 1, 1);
+		layout->addWidget(sbEnemyLV, 0, 3, 1, 1);
+		layout->addWidget(btnEnemyRace0, 1, 0, 1, 2);
+		layout->addWidget(btnEnemyRace1, 1, 2, 1, 2);
+		layout->addWidget(btnEnemyRace2, 2, 0, 1, 2);
+		layout->addWidget(btnEnemyRace3, 2, 2, 1, 2);
+		layout->addWidget(btnBack, 3, 0, 1, 4);
 		break;
 	default:
 		break;
@@ -557,7 +605,6 @@ void MainWindow::getServerMsg()
 					if (!gettingDuelStatistic){
 						gettingDuelStatistic = true;
 						client->write("getDuelStatistic", BUF_LENGTH);
-					} else {
 					}
 				}
 

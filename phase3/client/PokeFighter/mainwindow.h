@@ -12,6 +12,7 @@
 #include "logondlg.h"
 #include <QTableWidget>
 #include <QMediaPlayer>
+#include <QSpinBox>
 
 namespace Ui
 {
@@ -75,6 +76,15 @@ private:
 	QLabel * lbWin;
 	QLabel * lbTotal;
 	QLabel * lbWinRate;
+
+	// choose enemy layout
+	QLabel * lbChooseEnemy;
+	QLabel * lbEnemyLV;
+	QSpinBox * sbEnemyLV;
+	QPushButton * btnEnemyRace0;
+	QPushButton * btnEnemyRace1;
+	QPushButton * btnEnemyRace2;
+	QPushButton * btnEnemyRace3;
 
 	// pokemon table and player table
 	QTableWidget *table;

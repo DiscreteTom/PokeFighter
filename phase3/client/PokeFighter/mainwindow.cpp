@@ -393,15 +393,15 @@ void MainWindow::getServerMsg()
 	{
 		/**
 		 * msg format:
-		 * <playerID> <playername> <online:0|1>
+		 * <playerID> <playername> <online:0|1> <win> <total>
 		 */
 		auto players = msg.split('\n');
 
 		//! players[players.size() - 1] == ""
 
 		table->setRowCount(players.size() - 2);
-		table->setColumnCount(4); // id - username - online - viewPokemon
-		table->setHorizontalHeaderLabels({tr("玩家ID"), tr("用户名"), tr("在线情况"), tr("操作")});
+		table->setColumnCount(7); // id - username - online - win - total - win rate - viewPokemon
+		table->setHorizontalHeaderLabels({tr("玩家ID"), tr("用户名"), tr("在线情况"), tr("决斗次数"), tr("决斗获胜次数"), tr("胜率"), tr("操作")});
 		table->verticalHeader()->hide();
 		table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 		table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
@@ -429,6 +429,21 @@ void MainWindow::getServerMsg()
 			if (detail[2] == '0')
 				t->setBackgroundColor(QColor("#eff0f1"));
 			table->setItem(tableRowIndex, 2, t);
+			t = new QTableWidgetItem(detail[3]);
+			t->setFlags(t->flags() ^ Qt::ItemIsEnabled);
+			if (detail[2] == '0')
+				t->setBackgroundColor(QColor("#eff0f1"));
+			table->setItem(tableRowIndex, 3, t);
+			t = new QTableWidgetItem(detail[4]);
+			t->setFlags(t->flags() ^ Qt::ItemIsEnabled);
+			if (detail[2] == '0')
+				t->setBackgroundColor(QColor("#eff0f1"));
+			table->setItem(tableRowIndex, 4, t);
+			t = new QTableWidgetItem(detail[4] == "0" ? "-" : QString::number(detail[3].toDouble() / detail[4].toDouble()));
+			t->setFlags(t->flags() ^ Qt::ItemIsEnabled);
+			if (detail[2] == '0')
+				t->setBackgroundColor(QColor("#eff0f1"));
+			table->setItem(tableRowIndex, 5, t);
 			auto btn = new QPushButton(tr("查看小精灵"), this);
 			connect(btn, &QPushButton::clicked, this, [this, detail] {
 				changeState(POKEMON_TABLE);
@@ -437,7 +452,7 @@ void MainWindow::getServerMsg()
 				str += detail[0];
 				client->write(str.toStdString().c_str(), BUF_LENGTH);
 			});
-			table->setCellWidget(tableRowIndex, 3, btn);
+			table->setCellWidget(tableRowIndex, 6, btn);
 			++tableRowIndex;
 		}
 		break;

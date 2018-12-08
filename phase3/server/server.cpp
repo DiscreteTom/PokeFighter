@@ -6,6 +6,7 @@
 #include <conio.h>
 #include <thread>
 #include <iostream>
+#include <map>
 
 using namespace std;
 
@@ -436,16 +437,55 @@ void Hub::mornitor(Endpoint *const endpoint)
 	mtx.unlock();
 }
 
+/**
+ * format:
+ * <userID> <userName> <online:0|1> <win> <total>
+ */
 string Hub::getAllUser()
 {
+	struct temp{
+		string name;
+		bool online;
+		string win;
+		string total;
+	};
+	char **sqlResult;
+	int nRow;
+	int nColumn;
+	char *errMsg;
+	string sql = "SELECT id, name, win, total FROM User;";
+	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+	{
+		cout << "Hub: Sqlite3 error: " << errMsg << endl;
+		// strcpy(buf, "Reject: Hub database error.\n");
+		// strcpy(buf, "服务器数据库错误");
+		sqlite3_free(errMsg);
+	}
+
+	map<int, temp> playerMap;
+	for (int i = 0; i < nRow; ++i){
+		temp t = {sqlResult[4 * (i + 1) + 1], false, sqlResult[4 * (i + 1) + 2], sqlResult[4 * (i + 1) + 3]};
+		playerMap.insert(make_pair(stoi(sqlResult[4 * (i + 1)]), t));
+	}
+
+	sqlite3_free_table(sqlResult);
+
+
 	string result;
 	mtx.lock();
 	for (auto endpoint : endpoints)
 	{
-		result += to_string(endpoint->getPlayerID());
-		result += ' ';
-		result += endpoint->getPlayerName() + '\n';
+		playerMap[endpoint->getPlayerID()].online = true;
 	}
 	mtx.unlock();
+
+	for (auto & player : playerMap){
+		if (player.second.online){
+			result = to_string(player.first) + ' ' + player.second.name + " 1 " + player.second.win + " " + player.second.total + "\n" + result;
+		} else {
+			result += to_string(player.first) + ' ' + player.second.name + " 0 " + player.second.win + " " + player.second.total + "\n";
+		}
+	}
+
 	return result;
 }

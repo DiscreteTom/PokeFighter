@@ -61,6 +61,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	leNewPassword->setPlaceholderText(tr("请输入新密码"));
 	leNewPassword->setEchoMode(QLineEdit::Password);
 
+	// duel battle statistic layout
+	lbWin = new QLabel(this);
+	lbWin->setObjectName("lbWin");
+	lbTotal = new QLabel(this);
+	lbTotal->setObjectName("lbTotal");
+	lbWinRate = new QLabel(this);
+	lbWinRate->setObjectName("lbWinRate");
+
 	// pokemon table and player table
 	table = new QTableWidget(this);
 
@@ -100,6 +108,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 			break;
 		case PLAYER_TABLE:
 		case CHANGE_PSW:
+		case POKEMON_TABLE | LV_UP_BATTLE:
+		case POKEMON_TABLE | DUEL_BATTLE:
 			changeState(MAIN);
 			break;
 		default:
@@ -116,8 +126,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 		currentPlayerID = 0;
 		client->write("getPokemonList", BUF_LENGTH);
 	});
-	connect(btnLvUpBattle, &QPushButton::clicked, this, [this]{ changeState(LV_UP_BATTLE); });
-	connect(btnDuelBattle, &QPushButton::clicked, this, [this]{ changeState(DUEL_BATTLE); });
+	connect(btnLvUpBattle, &QPushButton::clicked, this, [this]{
+		currentPlayerID = 0;
+		client->write("getPokemonList", BUF_LENGTH);
+		changeState(POKEMON_TABLE | LV_UP_BATTLE);
+	});
+	connect(btnDuelBattle, &QPushButton::clicked, this, [this]{
+		currentPlayerID = 0;
+		client->write("getPokemonList", BUF_LENGTH);
+		changeState(POKEMON_TABLE | DUEL_BATTLE);
+	});
 	connect(btnDisplayAllPlayer, &QPushButton::clicked, this, [this] {
 		changeState(PLAYER_TABLE);
 		client->write("getPlayerList", BUF_LENGTH);
@@ -163,6 +181,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	changeState(START);
 
 	changingPokemonName = false;
+	gettingDuelStatistic = false;
 
 	//	setFixedSize(1600, 900);
 	setFixedSize(1366, 966); // size of start.jpg
@@ -178,7 +197,7 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
-void MainWindow::changeState(MainWindow::State aim)
+void MainWindow::changeState(int aim)
 {
 	// hide all widget
 	lbStartTitle->hide();
@@ -198,6 +217,9 @@ void MainWindow::changeState(MainWindow::State aim)
 	btnDisplayAllPlayer->hide();
 	btnOK->hide();
 	leNewPassword->hide();
+	lbWin->hide();
+	lbTotal->hide();
+	lbWinRate->hide();
 	table->hide();
 	table->clear();
 	btnPlay->setDefault(false);
@@ -273,10 +295,23 @@ void MainWindow::changeState(MainWindow::State aim)
 		break;
 	case POKEMON_TABLE:
 	case PLAYER_TABLE:
+	case POKEMON_TABLE | LV_UP_BATTLE:
+	case POKEMON_TABLE | DUEL_BATTLE:
 		btnBack->show();
 		table->show();
-		layout->addWidget(table, 0, 0);
-		layout->addWidget(btnBack, 1, 0);
+		if (state == (POKEMON_TABLE | DUEL_BATTLE)){
+			lbWin->show();
+			lbTotal->show();
+			lbWinRate->show();
+			layout->addWidget(lbWin, 0, 0, 1, 1, Qt::AlignHCenter);
+			layout->addWidget(lbTotal, 0, 1, 1, 1, Qt::AlignHCenter);
+			layout->addWidget(lbWinRate, 0, 2, 1, 1, Qt::AlignHCenter);
+			layout->addWidget(table, 1, 0, 1, 3);
+			layout->addWidget(btnBack, 2, 0, 1, 3);
+		} else {
+			layout->addWidget(table, 0, 0);
+			layout->addWidget(btnBack, 1, 0);
+		}
 		btnBack->setDefault(true);
 		break;
 	case CHANGE_PSW:
@@ -458,14 +493,30 @@ void MainWindow::getServerMsg()
 		break;
 	}
 	case POKEMON_TABLE:
+	case POKEMON_TABLE | LV_UP_BATTLE:
+	case POKEMON_TABLE | DUEL_BATTLE:
 	{
+		if (gettingDuelStatistic){
+						gettingDuelStatistic = false;
+						auto detail = msg.split(' ');
+						lbWin->setText(tr("获胜次数：") + detail[0]);
+						lbTotal->setText(tr("决斗次数：") + detail[1]);
+						lbWinRate->setText(tr("胜率：") + (detail[1] == '0' ? "-" : QString::number(detail[0].toDouble() / detail[1].toDouble())));
+						break;
+		}
 		if (!showPokemonDlg) // msg is pokemon table
 		{
 			auto pokemons = msg.split('\n');
 
 			table->setRowCount(pokemons.size() - 1);
-			table->setColumnCount(5);
-			table->setHorizontalHeaderLabels({tr("精灵ID"), tr("名字"), tr("种族"), tr("等级"), tr("操作")});
+			if (state == POKEMON_TABLE){
+				table->setColumnCount(5);
+				table->setHorizontalHeaderLabels({tr("精灵ID"), tr("名字"), tr("种族"), tr("等级"), tr("操作")});
+			} else {
+				// battle table
+				table->setColumnCount(6);
+				table->setHorizontalHeaderLabels({tr("精灵ID"), tr("名字"), tr("种族"), tr("等级"), tr("查看"), tr("选中")});
+			}
 			table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
 			table->verticalHeader()->hide();
 			for (int i = 0; i < pokemons.size() - 1; ++i)
@@ -492,10 +543,26 @@ void MainWindow::getServerMsg()
 					showPokemonDlg = true;
 				});
 				table->setCellWidget(i, 4, btn);
+				if (state != POKEMON_TABLE){
+					// battle table
+					auto btn = new QPushButton(tr("就决定是你了！"), this);
+					connect(btn, &QPushButton::clicked, this, [this, detail] {
+						battlePokemonID = detail[0];
+						changeState((state ^ POKEMON_TABLE) | CHOOSE_ENEMY);
+					});
+					table->setCellWidget(i, 5, btn);
+				}
 			}
+			if (state == (DUEL_BATTLE | POKEMON_TABLE)){
+					if (!gettingDuelStatistic){
+						gettingDuelStatistic = true;
+						client->write("getDuelStatistic", BUF_LENGTH);
+					} else {
+					}
+				}
 
 			connect(table, &QTableWidget::cellChanged, this, [this](int row, int column) {
-				if (state == POKEMON_TABLE && column == 1)
+				if ((state & POKEMON_TABLE) == POKEMON_TABLE && column == 1)
 				{
 					// pokemon name changed
 					QString str = "pokemonChangeName ";

@@ -29,19 +29,20 @@ public:
 private:
 	Ui::MainWindow *ui;
 
-	enum State
+	enum State // use bitmask
 	{
-		START,
-		LOGIN,
-		MAIN,
-		POKEMON_TABLE,
-		PLAYER_TABLE,
-		CHANGE_PSW,
-		LV_UP_BATTLE,
-		DUEL_BATTLE
+		START = 1,
+		LOGIN = 2,
+		MAIN = 4,
+		POKEMON_TABLE = 8,
+		PLAYER_TABLE = 16,
+		CHANGE_PSW = 32,
+		LV_UP_BATTLE = 64,
+		DUEL_BATTLE = 128,
+		CHOOSE_ENEMY = 256
 	};
 
-	State state;
+	int state;
 
 	QGridLayout *layout;
 
@@ -70,6 +71,10 @@ private:
 	QLineEdit * leNewPassword;
 	QPushButton * btnOK;
 
+	// duel battle statistic layout
+	QLabel * lbWin;
+	QLabel * lbTotal;
+	QLabel * lbWinRate;
 
 	// pokemon table and player table
 	QTableWidget *table;
@@ -88,8 +93,10 @@ private:
 	int currentPlayerID; // if 0 means current player is the player himself
 	bool showPokemonDlg;
 	bool changingPokemonName;
+	QString battlePokemonID;
+	bool gettingDuelStatistic;
 
-	void changeState(State aim);
+	void changeState(int aim);
 	void login();
 private slots:
 	void getServerMsg();

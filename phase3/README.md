@@ -83,7 +83,7 @@ getPlayerList
 getPokemonList [playerID]
 getPokemon <pokemonID>
 pokemonChangeName <pokemonID> <newName>
-battle <type: "LV_UP" | "DUEL"> <pokemonID> <enemyRaceID> <enemyLV> [-auto]
+battle <type: "LV_UP" | "DUEL"> <pokemonID> <enemyRaceID> <enemyLV>
 useSkill <skillID>
 getDuelStatistic
 ```
@@ -99,3 +99,15 @@ getDuelStatistic
 需要安装LAV filters才能播放音频。音频文件保存在exe目录下的media目录下
 
 使用QSS实现样式与内容分离。注意QSS文件一定**不要**使用UTF-8编码，建议使用ASCII编码。此处使用了GB2312
+
+发送到客户端的战斗信息格式：
+
+```shell
+<playerRound: 0 | 1> <skillName> <defenderHP> <defenderAtk: 0 | 1 | 2> <defenderDef: 0 | 1 | 2> <defenderSpeed: 0 | 1 | 2> <defenderPP1> <defenderPP2> <defenderPP3> <attackerHP> <attackerAtk: 0 | 1 | 2> <attackerDef: 0 | 1 | 2> <attackerSpeed: 0 | 1 | 2> <attackerPP1> <attackerPP2> <attackerPP3>
+```
+
+其中playerRound为1表示玩家的回合，为0表示对手的回合。属性为0表示下降，为1表示不变，为2表示上升。
+
+客户端需要监视精灵血量，当血量为0时战斗终止。
+
+自动战斗由客户端实现，随机使用技能。

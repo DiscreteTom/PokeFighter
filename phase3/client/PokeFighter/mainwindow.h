@@ -13,6 +13,7 @@
 #include <QTableWidget>
 #include <QMediaPlayer>
 #include <QSpinBox>
+#include <QProgressBar>
 
 namespace Ui
 {
@@ -85,6 +86,19 @@ private:
 	QPushButton * btnEnemyRace1;
 	QPushButton * btnEnemyRace2;
 	QPushButton * btnEnemyRace3;
+
+	// battle layout
+	QLabel * lbP1; // img
+	QLabel * lbP2; // img
+	QPushButton * btnSkill_1;
+	QPushButton * btnSkill_2;
+	QPushButton * btnSkill_3;
+	QPushButton * btnSkill_4;
+	QProgressBar * pbP1HP;
+	QProgressBar * pbP2HP;
+	QProgressBar * pbP1AtkInterval;
+	QProgressBar * pbP2AtkInterval;
+
 
 	// pokemon table and player table
 	QTableWidget *table;

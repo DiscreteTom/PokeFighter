@@ -80,6 +80,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	sbEnemyLV->setMaximum(15);
 	sbEnemyLV->setMinimum(1);
 
+	// battle layout
+	lbP1 = new QLabel(tr("精灵1"), this);
+	lbP2 = new QLabel(tr("精灵2"), this);
+	btnSkill_1 = new QPushButton(this);
+	btnSkill_2 = new QPushButton(this);
+	btnSkill_3 = new QPushButton(this);
+	btnSkill_4 = new QPushButton(this);
+	pbP1HP = new QProgressBar(this);
+	pbP2HP = new QProgressBar(this);
+	pbP1AtkInterval = new QProgressBar(this);
+	pbP2AtkInterval = new QProgressBar(this);
+
 	// pokemon table and player table
 	table = new QTableWidget(this);
 
@@ -127,6 +139,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 		case CHOOSE_ENEMY | DUEL_BATTLE:
 			changeState((state ^ CHOOSE_ENEMY) | POKEMON_TABLE);
 			client->write("getPokemonList", BUF_LENGTH);
+			break;
+		case LV_UP_BATTLE:
+		case DUEL_BATTLE:
+			changeState(state | CHOOSE_ENEMY);
 			break;
 		default:
 			break;
@@ -176,6 +192,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 			str += leNewPassword->text();
 			client->write(str.toStdString().c_str(), BUF_LENGTH);
 		}
+	});
+	connect(btnEnemyRace0, &QPushButton::clicked, [this]{
+		changeState(state ^ CHOOSE_ENEMY);
+	});
+	connect(btnEnemyRace1, &QPushButton::clicked, [this]{
+		changeState(state ^ CHOOSE_ENEMY);
+	});
+	connect(btnEnemyRace2, &QPushButton::clicked, [this]{
+		changeState(state ^ CHOOSE_ENEMY);
+	});
+	connect(btnEnemyRace3, &QPushButton::clicked, [this]{
+		changeState(state ^ CHOOSE_ENEMY);
 	});
 
 	connect(leUsername, &QLineEdit::returnPressed, btnLogin, &QPushButton::click);
@@ -243,6 +271,16 @@ void MainWindow::changeState(int aim)
 	btnEnemyRace1->hide();
 	btnEnemyRace2->hide();
 	btnEnemyRace3->hide();
+	lbP1->hide();
+	lbP2->hide();
+	btnSkill_1->hide();
+	btnSkill_2->hide();
+	btnSkill_3->hide();
+	btnSkill_4->hide();
+	pbP1HP->hide();
+	pbP2HP->hide();
+	pbP1AtkInterval->hide();
+	pbP2AtkInterval->hide();
 	table->hide();
 	table->clear();
 	btnPlay->setDefault(false);
@@ -378,6 +416,29 @@ void MainWindow::changeState(int aim)
 		layout->addWidget(btnEnemyRace2, 2, 0, 1, 2);
 		layout->addWidget(btnEnemyRace3, 2, 2, 1, 2);
 		layout->addWidget(btnBack, 3, 0, 1, 4);
+		break;
+	case LV_UP_BATTLE:
+	case DUEL_BATTLE:
+		lbP1->show();
+		lbP2->show();
+		btnSkill_1->show();
+		btnSkill_2->show();
+		btnSkill_3->show();
+		btnSkill_4->show();
+		pbP1HP->show();
+		pbP1AtkInterval->show();
+		pbP2HP->show();
+		pbP2AtkInterval->show();
+		layout->addWidget(pbP1HP, 0, 0, 1, 2);
+		layout->addWidget(pbP1AtkInterval, 1, 0, 1, 2);
+		layout->addWidget(pbP2HP, 0, 2, 1, 2);
+		layout->addWidget(pbP2AtkInterval, 1, 2, 1, 2);
+		layout->addWidget(lbP1, 2, 0, 1, 2);
+		layout->addWidget(lbP2, 2, 2, 1, 2);
+		layout->addWidget(btnSkill_1, 3, 0, 1, 1);
+		layout->addWidget(btnSkill_2, 3, 1, 1, 1);
+		layout->addWidget(btnSkill_3, 3, 2, 1, 1);
+		layout->addWidget(btnSkill_4, 3, 3, 1, 1);
 		break;
 	default:
 		break;

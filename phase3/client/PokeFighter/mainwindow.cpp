@@ -102,6 +102,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	lbP1SkillName = new QLabel(this);
 	lbP2SkillName = new QLabel(this);
 
+	// choose bet layout
+	lbBet[1] = new QLabel(this);
+	lbBet[2] = new QLabel(this);
+	lbBet[0] = new QLabel(this);
+	btnBet[1] = new QPushButton(this);
+	btnBet[2] = new QPushButton(this);
+	btnBet[0] = new QPushButton(this);
+
 	// pokemon table and player table
 	table = new QTableWidget(this);
 
@@ -305,6 +313,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	changingPokemonName = false;
 	gettingDuelStatistic = false;
 	battleStart = false;
+	chooseBetIndex = 0;
 
 	//	setFixedSize(1600, 900);
 	setFixedSize(1366, 966); // size of start.jpg
@@ -364,6 +373,12 @@ void MainWindow::changeState(int aim)
 	//	pbP2AtkInterval->hide();
 	lbP1SkillName->hide();
 	lbP2SkillName->hide();
+	lbBet[1]->hide();
+	lbBet[2]->hide();
+	lbBet[0]->hide();
+	btnBet[1]->hide();
+	btnBet[2]->hide();
+	btnBet[0]->hide();
 	table->hide();
 	table->clear();
 	btnPlay->setDefault(false);
@@ -533,6 +548,21 @@ void MainWindow::changeState(int aim)
 		layout->addWidget(btnSkill_2, 3, 1, 1, 1);
 		layout->addWidget(btnSkill_3, 3, 2, 1, 1);
 		layout->addWidget(btnSkill_4, 3, 3, 1, 1);
+		break;
+	case CHOOSE_BET:
+		setStyleSheet("");
+		lbBet[1]->show();
+		lbBet[2]->show();
+		lbBet[0]->show();
+		btnBet[1]->show();
+		btnBet[2]->show();
+		btnBet[0]->show();
+		layout->addWidget(lbBet[0], 0, 0, 1, 1, Qt::AlignHCenter);
+		layout->addWidget(lbBet[1], 0, 1, 1, 1, Qt::AlignHCenter);
+		layout->addWidget(lbBet[2], 0, 2, 1, 1, Qt::AlignHCenter);
+		layout->addWidget(btnBet[0], 1, 0, 1, 1);
+		layout->addWidget(btnBet[1], 1, 1, 1, 1);
+		layout->addWidget(btnBet[2], 1, 2, 1, 1);
 		break;
 	default:
 		break;
@@ -948,7 +978,8 @@ void MainWindow::getServerMsg()
 				// hp decreased
 				lbP2SkillName->setText(QString::number(detail[3].toInt() - pbP2HP->value()));
 				getDecreased(lbP2);
-				while (pbP2HP->value() > detail[3].toInt()){
+				while (pbP2HP->value() > detail[3].toInt())
+				{
 					mySleep(10);
 					pbP2HP->setValue(pbP2HP->value() - 1);
 				}
@@ -959,7 +990,8 @@ void MainWindow::getServerMsg()
 				// hp increased
 				lbP2SkillName->setText(QString::number(detail[3].toInt() - pbP2HP->value()));
 				getImproved(lbP2);
-				while (pbP2HP->value() < detail[3].toInt()){
+				while (pbP2HP->value() < detail[3].toInt())
+				{
 					mySleep(10);
 					pbP2HP->setValue(pbP2HP->value() + 1);
 				}
@@ -1006,7 +1038,8 @@ void MainWindow::getServerMsg()
 				// hp decreased
 				lbP1SkillName->setText(QString::number(detail[10].toInt() - pbP1HP->value()));
 				getDecreased(lbP1);
-				while (pbP1HP->value() > detail[10].toInt()){
+				while (pbP1HP->value() > detail[10].toInt())
+				{
 					mySleep(10);
 					pbP1HP->setValue(pbP1HP->value() - 1);
 				}
@@ -1017,7 +1050,8 @@ void MainWindow::getServerMsg()
 				// hp increased
 				lbP1SkillName->setText(QString::number(detail[10].toInt() - pbP1HP->value()));
 				getImproved(lbP1);
-				while (pbP1HP->value() < detail[10].toInt()){
+				while (pbP1HP->value() < detail[10].toInt())
+				{
 					mySleep(10);
 					pbP1HP->setValue(pbP1HP->value() + 1);
 				}
@@ -1086,7 +1120,8 @@ void MainWindow::getServerMsg()
 				// hp decreased
 				lbP1SkillName->setText(QString::number(detail[3].toInt() - pbP1HP->value()));
 				getDecreased(lbP1);
-				while (pbP1HP->value() > detail[3].toInt()){
+				while (pbP1HP->value() > detail[3].toInt())
+				{
 					mySleep(10);
 					pbP1HP->setValue(pbP1HP->value() - 1);
 				}
@@ -1097,7 +1132,8 @@ void MainWindow::getServerMsg()
 				// hp increased
 				lbP1SkillName->setText(QString::number(detail[3].toInt() - pbP1HP->value()));
 				getImproved(lbP1);
-				while (pbP1HP->value() < detail[3].toInt()){
+				while (pbP1HP->value() < detail[3].toInt())
+				{
 					mySleep(10);
 					pbP1HP->setValue(pbP1HP->value() + 1);
 				}
@@ -1144,7 +1180,8 @@ void MainWindow::getServerMsg()
 				// hp decreased
 				lbP2SkillName->setText(QString::number(detail[10].toInt() - pbP2HP->value()));
 				getDecreased(lbP2);
-				while (pbP2HP->value() > detail[10].toInt()){
+				while (pbP2HP->value() > detail[10].toInt())
+				{
 					mySleep(10);
 					pbP2HP->setValue(pbP2HP->value() - 1);
 				}
@@ -1155,7 +1192,8 @@ void MainWindow::getServerMsg()
 				// hp increased
 				lbP2SkillName->setText(QString::number(detail[10].toInt() - pbP2HP->value()));
 				getImproved(lbP2);
-				while (pbP2HP->value() < detail[10].toInt()){
+				while (pbP2HP->value() < detail[10].toInt())
+				{
 					mySleep(10);
 					pbP2HP->setValue(pbP2HP->value() + 1);
 				}
@@ -1209,18 +1247,47 @@ void MainWindow::getServerMsg()
 		// judge result
 		if (pbP2HP->value() == 0)
 		{
+			if (state == LV_UP_BATTLE)
 			QMessageBox::information(this, tr("恭喜"), tr("你赢得了战斗"));
+			else
+				QMessageBox::information(this, tr("恭喜"), tr("你赢得了决斗，获得了敌对精灵"));
 			changeState(MAIN);
 			break;
 		}
 		else if (pbP1HP->value() == 0)
 		{
 			QMessageBox::information(this, tr("抱歉"), tr("您战败了"));
+			if (state == DUEL_BATTLE){
+				changeState(CHOOSE_BET);
+				chooseBetIndex = 0;
+				client->write("chooseBet", BUF_LENGTH);
+				break;
+			}
 			changeState(MAIN);
 			break;
 		}
 		client->write("done", BUF_LENGTH);
 
+		break;
+	}
+	case CHOOSE_BET:{
+		++chooseBetIndex;
+		auto dlg = new PokemonDlg(msg, false, this);
+		if (chooseBetIndex == 1)
+		dlg->move(dlg->x() - dlg->width(), dlg->y());
+		else if (chooseBetIndex == 3)
+			dlg->move(dlg->x() + dlg->width(), dlg->y());
+		lbBet[chooseBetIndex - 1]->setPixmap(QPixmap(*dlg->getPixmap()));
+		btnBet[chooseBetIndex - 1]->setText(tr("我选择") + dlg->getName());
+		auto id = dlg->getID();
+		connect(btnBet[chooseBetIndex], &QPushButton::clicked, [this, id]{
+			QString str = "discard ";
+			str += id;
+			client->write(str.toLocal8Bit(), BUF_LENGTH);
+			changeState(MAIN);
+		});
+		if (chooseBetIndex < 4)
+			client->write("done", BUF_LENGTH);
 		break;
 	}
 	default:

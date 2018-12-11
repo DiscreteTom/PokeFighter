@@ -60,6 +60,8 @@ class Endpoint
 	void useSkill(int skillID);
 	void getDuelStatistic();
 	void battle(const string &pokemonID, int enemyRaceID, int enemyLV);
+	void chooseBet();
+	void discard(const string &pokemonID);
 
 	// other functions
 	void savePokemonToDB(const Pokemon &p, int id = -1);

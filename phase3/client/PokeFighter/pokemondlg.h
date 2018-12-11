@@ -20,6 +20,10 @@ public:
 	QTableWidget * table;
 	QLabel * lbImg;
 
+	QString getID(){return table->item(0, 0)->text();}
+	const QPixmap *getPixmap() {return lbImg->pixmap();}
+	QString getName() {return table->item(1, 0)->text();}
+
 signals:
 	void pokemonChangeName(const QString & pokemonID, const QString & newName);
 

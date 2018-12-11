@@ -41,7 +41,8 @@ private:
 		CHANGE_PSW = 32,
 		LV_UP_BATTLE = 64,
 		DUEL_BATTLE = 128,
-		CHOOSE_ENEMY = 256
+		CHOOSE_ENEMY = 256,
+		CHOOSE_BET = 512
 	};
 
 	int state;
@@ -101,6 +102,10 @@ private:
 	QLabel *lbP1SkillName;
 	QLabel *lbP2SkillName;
 
+	// choose bet layout
+	QLabel *lbBet[3];
+	QPushButton *btnBet[3];
+
 	// pokemon table and player table
 	QTableWidget *table;
 
@@ -122,6 +127,7 @@ private:
 	bool gettingDuelStatistic;
 	bool battleStart;
 	int currentPokemonLV;
+	int chooseBetIndex;
 
 	void changeState(int aim);
 	void login();

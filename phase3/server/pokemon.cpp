@@ -361,7 +361,7 @@ bool Pokemon::attack(Pokemon &aim, string &msg)
 	int skillIndex = 0;
 	//judge usable skill by LV and PP
 	bool usable[3];
-	int usableCount = 1;				//can use simple attack by default
+	int usableCount = 1;				//can use 普通攻击 by default
 	for (int i = 0; i < 3; ++i) //get all usable skill
 	{
 		if (_lv >= (i + 1) * 5 && _cpp[i])
@@ -476,14 +476,14 @@ Race<0>::Race() : PokemonBase(ATK)
 	{
 		_expCurve[i] = _expCurve[i - 1] + 5 * i;
 	}
-	_skillName[0] = "kick";
-	_skillName[1] = "spark";
-	_skillName[2] = "rage";
-	_skillName[3] = "fireball";
-	_skillDscp[0] = "simple attack";
-	_skillDscp[1] = "ignore opponent's half defence";
-	_skillDscp[2] = "increase attack";
-	_skillDscp[3] = "cause huge damage";
+	_skillName[0] = "撞击";
+	_skillName[1] = "火花";
+	_skillName[2] = "怒气";
+	_skillName[3] = "火球";
+	_skillDscp[0] = "普通攻击";
+	_skillDscp[1] = "忽略敌人一半防御的攻击";
+	_skillDscp[2] = "增加攻击力";
+	_skillDscp[3] = "伤害很高的大招";
 	_pp[0] = 10;
 	_pp[1] = 3;
 	_pp[2] = 5;
@@ -556,7 +556,7 @@ bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 	}
 	default:
 	{
-		//simple attack
+		//普通攻击
 		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
@@ -590,14 +590,14 @@ Race<1>::Race() : PokemonBase(HP)
 	{
 		_expCurve[i] = _expCurve[i - 1] + 5 * i;
 	}
-	_skillName[0] = "kick";
-	_skillName[1] = "photosynthesis";
-	_skillName[2] = "life drain";
-	_skillName[3] = "razor leaf";
-	_skillDscp[0] = "simple attack";
-	_skillDscp[1] = "restore HP";
-	_skillDscp[2] = "cause damage and restore HP, ignore defence";
-	_skillDscp[3] = "cause huge damage";
+	_skillName[0] = "撞击";
+	_skillName[1] = "光合作用";
+	_skillName[2] = "吸血";
+	_skillName[3] = "飞叶快刀";
+	_skillDscp[0] = "普通攻击";
+	_skillDscp[1] = "恢复生命值";
+	_skillDscp[2] = "无视防御，造成伤害并恢复自身生命值";
+	_skillDscp[3] = "伤害很高的大招";
 	_pp[0] = 5;
 	_pp[1] = 10;
 	_pp[2] = 5;
@@ -673,7 +673,7 @@ bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 	}
 	default:
 	{
-		//simple attack
+		//普通攻击
 		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
@@ -707,14 +707,14 @@ Race<2>::Race() : PokemonBase(DEF)
 	{
 		_expCurve[i] = _expCurve[i - 1] + 5 * i;
 	}
-	_skillName[0] = "kick";
-	_skillName[1] = "iron defence";
-	_skillName[2] = "water pulse";
-	_skillName[3] = "hydro pump";
-	_skillDscp[0] = "simple attack";
-	_skillDscp[1] = "improve defence";
-	_skillDscp[2] = "improve attack then cause damage";
-	_skillDscp[3] = "cause huge damage";
+	_skillName[0] = "撞击";
+	_skillName[1] = "铁壁";
+	_skillName[2] = "水之波动";
+	_skillName[3] = "水炮";
+	_skillDscp[0] = "普通攻击";
+	_skillDscp[1] = "增加防御";
+	_skillDscp[2] = "造成伤害并增加攻击";
+	_skillDscp[3] = "伤害很高的大招";
 	_pp[0] = 10;
 	_pp[1] = 10;
 	_pp[2] = 3;
@@ -759,7 +759,7 @@ bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		{
 			msg += to_string(aim.cpp(i)) + ' ';
 		}
-		msg += to_string(attacker.hp()) + " 1 1 1 ";
+		msg += to_string(attacker.hp()) + " 2 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
 			msg += to_string(aim.cpp(i)) + ' ';
@@ -791,7 +791,7 @@ bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 	}
 	default:
 	{
-		//simple attack
+		//普通攻击
 		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
@@ -825,14 +825,14 @@ Race<3>::Race() : PokemonBase(SPE)
 	{
 		_expCurve[i] = _expCurve[i - 1] + 5 * i;
 	}
-	_skillName[0] = "kick";
-	_skillName[1] = "agility";
-	_skillName[2] = "wing attack";
-	_skillName[3] = "take down";
-	_skillDscp[0] = "simple attack";
-	_skillDscp[1] = "improve speed";
-	_skillDscp[2] = "cause damage based on current speed";
-	_skillDscp[3] = "cause huge damage based on current speed";
+	_skillName[0] = "撞击";
+	_skillName[1] = "高速移动";
+	_skillName[2] = "拍打";
+	_skillName[3] = "猛冲";
+	_skillDscp[0] = "普通攻击";
+	_skillDscp[1] = "提升自身速度";
+	_skillDscp[2] = "自身速度越高伤害越高";
+	_skillDscp[3] = "伤害很高的大招。自身速度越高伤害越高";
 	_pp[0] = 5;
 	_pp[1] = 10;
 	_pp[2] = 5;
@@ -908,7 +908,7 @@ bool Race<3>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 	}
 	default:
 	{
-		//simple attack
+		//普通攻击
 		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 

@@ -63,44 +63,43 @@ private:
 
 	// main layout
 	QPushButton *btnShowPokemonList;
-	QPushButton * btnLvUpBattle;
-	QPushButton * btnDuelBattle;
+	QPushButton *btnLvUpBattle;
+	QPushButton *btnDuelBattle;
 	QPushButton *btnDisplayAllPlayer;
-	QPushButton * btnChangePassword;
+	QPushButton *btnChangePassword;
 	QPushButton *btnLogout;
 
 	// change password layout
-	QLineEdit * leNewPassword;
-	QPushButton * btnOK;
+	QLineEdit *leNewPassword;
+	QPushButton *btnOK;
 
 	// duel battle statistic layout
-	QLabel * lbWin;
-	QLabel * lbTotal;
-	QLabel * lbWinRate;
+	QLabel *lbWin;
+	QLabel *lbTotal;
+	QLabel *lbWinRate;
 
 	// choose enemy layout
-	QLabel * lbChooseEnemy;
-	QLabel * lbEnemyLV;
-	QSpinBox * sbEnemyLV;
-	QPushButton * btnEnemyRace0;
-	QPushButton * btnEnemyRace1;
-	QPushButton * btnEnemyRace2;
-	QPushButton * btnEnemyRace3;
+	QLabel *lbChooseEnemy;
+	QLabel *lbEnemyLV;
+	QSpinBox *sbEnemyLV;
+	QPushButton *btnEnemyRace0;
+	QPushButton *btnEnemyRace1;
+	QPushButton *btnEnemyRace2;
+	QPushButton *btnEnemyRace3;
 
 	// battle layout
-	QLabel * lbP1; // img
-	QLabel * lbP2; // img
-	QPushButton * btnSkill_1;
-	QPushButton * btnSkill_2;
-	QPushButton * btnSkill_3;
-	QPushButton * btnSkill_4;
-	QProgressBar * pbP1HP;
-	QProgressBar * pbP2HP;
-//	QProgressBar * pbP1AtkInterval;
-//	QProgressBar * pbP2AtkInterval;
-	QLabel * lbP1SkillName;
-	QLabel * lbP2SkillName;
-
+	QLabel *lbP1; // img
+	QLabel *lbP2; // img
+	QPushButton *btnSkill_1;
+	QPushButton *btnSkill_2;
+	QPushButton *btnSkill_3;
+	QPushButton *btnSkill_4;
+	QProgressBar *pbP1HP;
+	QProgressBar *pbP2HP;
+	//	QProgressBar * pbP1AtkInterval;
+	//	QProgressBar * pbP2AtkInterval;
+	QLabel *lbP1SkillName;
+	QLabel *lbP2SkillName;
 
 	// pokemon table and player table
 	QTableWidget *table;
@@ -112,7 +111,7 @@ private:
 	QTcpSocket *client;
 
 	// media
-	QMediaPlayer * mediaPlayer;
+	QMediaPlayer *mediaPlayer;
 
 	// user data
 	QString username;
@@ -125,8 +124,9 @@ private:
 
 	void changeState(int aim);
 	void login();
-	void getImproved(QLabel * lb);
+	void getImproved(QLabel *lb);
 	void getDecreased(QLabel *lb);
+	void mySleep(int n);
 private slots:
 	void getServerMsg();
 };

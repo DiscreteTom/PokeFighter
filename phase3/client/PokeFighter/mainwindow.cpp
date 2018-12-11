@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QThread>
+#include <QTime>
 #include <QHostAddress>
 #include "netconfig.h"
 #include "pokemondlg.h"
@@ -496,6 +497,8 @@ void MainWindow::changeState(int aim)
 		btnSkill_2->show();
 		btnSkill_3->show();
 		btnSkill_4->show();
+		lbP1SkillName->show();
+		lbP2SkillName->show();
 		pbP1HP->show();
 		//		pbP1AtkInterval->show();
 		pbP2HP->show();
@@ -565,38 +568,46 @@ void MainWindow::login()
 void MainWindow::getImproved(QLabel *lb)
 {
 	lb->move(lb->x(), lb->y() + 50);
-	QThread::msleep(50);
+	mySleep(50);
 	lb->move(lb->x(), lb->y() + 50);
-	QThread::msleep(50);
+	mySleep(50);
 	lb->move(lb->x(), lb->y() + 50);
-	QThread::msleep(50);
+	mySleep(50);
 	lb->move(lb->x(), lb->y() + 50);
-	QThread::msleep(50);
+	mySleep(50);
 	lb->move(lb->x(), lb->y() + 50);
-	QThread::msleep(50);
+	mySleep(50);
 	lb->move(lb->x(), lb->y() - 50);
-	QThread::msleep(50);
+	mySleep(50);
 	lb->move(lb->x(), lb->y() - 50);
-	QThread::msleep(50);
+	mySleep(50);
 	lb->move(lb->x(), lb->y() - 50);
-	QThread::msleep(50);
+	mySleep(50);
 	lb->move(lb->x(), lb->y() - 50);
-	QThread::msleep(50);
+	mySleep(50);
 	lb->move(lb->x(), lb->y() - 50);
-	QThread::msleep(50);
+	mySleep(50);
 }
 
 void MainWindow::getDecreased(QLabel *lb)
 {
 	// P1 lose HP
 	lb->hide();
-	QThread::msleep(200);
+	mySleep(200);
 	lb->show();
-	QThread::msleep(200);
+	mySleep(200);
 	lb->hide();
-	QThread::msleep(200);
+	mySleep(200);
 	lb->show();
-	QThread::msleep(200);
+	mySleep(200);
+}
+
+void MainWindow::mySleep(int n)
+{
+	QTime t;
+	t.start();
+	while (t.elapsed() < n)
+		QCoreApplication::processEvents();
 }
 
 void MainWindow::getServerMsg()
@@ -900,12 +911,12 @@ void MainWindow::getServerMsg()
 		if (detail[0] == '1')
 		{
 			lbP1SkillName->setText(detail[1]);
-			QThread::msleep(500);
+			mySleep(500);
 			if (detail[2] == '1')
 			{
 				// dodge!
 				lbP2SkillName->setText(tr("闪避！"));
-				QThread::msleep(500);
+				mySleep(500);
 				lbP2SkillName->clear();
 				break;
 			}
@@ -1023,12 +1034,12 @@ void MainWindow::getServerMsg()
 		{
 			// detail[0] == '0', p2's turn
 			lbP2SkillName->setText(detail[1]);
-			QThread::msleep(500);
+			mySleep(500);
 			if (detail[2] == '1')
 			{
 				// dodge!
 				lbP1SkillName->setText(tr("闪避！"));
-				QThread::msleep(500);
+				mySleep(500);
 				lbP1SkillName->clear();
 				break;
 			}
@@ -1148,11 +1159,13 @@ void MainWindow::getServerMsg()
 		{
 			QMessageBox::information(this, tr("恭喜"), tr("你赢得了战斗"));
 			changeState(MAIN);
+			break;
 		}
 		else if (pbP1HP->value() == 0)
 		{
 			QMessageBox::information(this, tr("抱歉"), tr("您战败了"));
 			changeState(MAIN);
+			break;
 		}
 		client->write("done", BUF_LENGTH);
 

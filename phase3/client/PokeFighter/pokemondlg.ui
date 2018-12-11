@@ -1,12 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ChangePasswordDlg</class>
- <widget class="QDialog" name="ChangePasswordDlg">
+ <class>PokemonDlg</class>
+ <widget class="QDialog" name="PokemonDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">

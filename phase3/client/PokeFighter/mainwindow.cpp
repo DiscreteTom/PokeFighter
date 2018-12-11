@@ -75,9 +75,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	lbEnemyLV = new QLabel(tr("对手等级："), this);
 	sbEnemyLV = new QSpinBox(this);
 	btnEnemyRace0 = new QPushButton(tr("小火龙"), this);
+	btnEnemyRace0->setIcon(QPixmap(":/img/img/charmander.png"));
 	btnEnemyRace1 = new QPushButton(tr("妙蛙种子"), this);
+	btnEnemyRace1->setIcon(QPixmap(":/img/img/bulbasaur.png"));
 	btnEnemyRace2 = new QPushButton(tr("杰尼龟"), this);
+	btnEnemyRace2->setIcon(QPixmap(":/img/img/squirtle.png"));
 	btnEnemyRace3 = new QPushButton(tr("波波"), this);
+	btnEnemyRace3->setIcon(QPixmap(":/img/img/pidgey.png"));
 	sbEnemyLV->setMaximum(15);
 	sbEnemyLV->setMinimum(1);
 
@@ -212,7 +216,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 		msg += "1 ";
 		msg += QString::number(sbEnemyLV->value());
 		client->write(msg.toLocal8Bit(), BUF_LENGTH);
-				changeState(state ^ CHOOSE_ENEMY);
+		changeState(state ^ CHOOSE_ENEMY);
 	});
 	connect(btnEnemyRace2, &QPushButton::clicked, [this] {
 		battleStart = true;
@@ -221,7 +225,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 		msg += "2 ";
 		msg += QString::number(sbEnemyLV->value());
 		client->write(msg.toLocal8Bit(), BUF_LENGTH);
-				changeState(state ^ CHOOSE_ENEMY);
+		changeState(state ^ CHOOSE_ENEMY);
 	});
 	connect(btnEnemyRace3, &QPushButton::clicked, [this] {
 		battleStart = true;
@@ -230,7 +234,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 		msg += "3 ";
 		msg += QString::number(sbEnemyLV->value());
 		client->write(msg.toLocal8Bit(), BUF_LENGTH);
-				changeState(state ^ CHOOSE_ENEMY);
+		changeState(state ^ CHOOSE_ENEMY);
 	});
 	connect(btnSkill_1, &QPushButton::clicked, [this] {
 		client->write("0", BUF_LENGTH);
@@ -299,6 +303,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::changeState(int aim)
 {
+	setStyleSheet(tr("background-image:url(\":/img/img/start.jpg\");"));
+
 	// hide all widget
 	lbStartTitle->hide();
 	btnPlay->hide();
@@ -483,6 +489,7 @@ void MainWindow::changeState(int aim)
 		break;
 	case LV_UP_BATTLE:
 	case DUEL_BATTLE:
+		setStyleSheet("");
 		lbP1->show();
 		lbP2->show();
 		btnSkill_1->show();
@@ -822,6 +829,10 @@ void MainWindow::getServerMsg()
 	{
 		if (battleStart)
 		{
+			btnSkill_1->setDisabled(true);
+			btnSkill_2->setDisabled(true);
+			btnSkill_3->setDisabled(true);
+			btnSkill_4->setDisabled(true);
 			// get battle config message
 			auto ps = msg.split('\n');
 			auto detail = ps[0].split(' ');
@@ -844,16 +855,16 @@ void MainWindow::getServerMsg()
 			pbP1HP->setMaximum(detail[1].toInt());
 			pbP1HP->setValue(detail[1].toInt());
 			btnSkill_1->setText(detail[2]);
-			btnSkill_2->setText(detail[3]);
-			btnSkill_3->setText(detail[4]);
-			btnSkill_4->setText(detail[5]);
-			btnSkill_1->setToolTip(detail[6]);
-			btnSkill_2->setToolTip(detail[7]);
-			btnSkill_3->setToolTip(detail[8]);
+			btnSkill_2->setText(detail[4]);
+			btnSkill_3->setText(detail[6]);
+			btnSkill_4->setText(detail[8]);
+			btnSkill_1->setToolTip(detail[3]);
+			btnSkill_2->setToolTip(detail[5]);
+			btnSkill_3->setToolTip(detail[7]);
 			btnSkill_4->setToolTip(detail[9]);
-			btnSkill_2->setText(btnSkill_2->text() + detail[10]);
-			btnSkill_3->setText(btnSkill_3->text() + detail[11]);
-			btnSkill_4->setText(btnSkill_4->text() + detail[12]);
+			btnSkill_2->setText(btnSkill_2->text() + ' ' + detail[10]);
+			btnSkill_3->setText(btnSkill_3->text() + ' ' + detail[11]);
+			btnSkill_4->setText(btnSkill_4->text() + ' ' + detail[12]);
 			detail = ps[1].split(' ');
 			if (detail[0] == "妙蛙种子")
 			{
@@ -874,6 +885,7 @@ void MainWindow::getServerMsg()
 			pbP2HP->setMaximum(detail[1].toInt());
 			pbP2HP->setValue(detail[1].toInt());
 			battleStart = false;
+			client->write("done", BUF_LENGTH);
 			break;
 		}
 		if (msg == "turn")
@@ -948,62 +960,67 @@ void MainWindow::getServerMsg()
 				getImproved(lbP2);
 				lbP2SkillName->clear();
 			}
-			if (pbP1HP->value() > detail[11].toInt()){
+			if (pbP1HP->value() > detail[10].toInt())
+			{
 				// hp decreased
-				lbP1SkillName->setText(QString::number(detail[11].toInt() - pbP1HP->value()));
+				lbP1SkillName->setText(QString::number(detail[10].toInt() - pbP1HP->value()));
 				getDecreased(lbP1);
 				lbP1SkillName->clear();
-			} else if (pbP1HP->value() < detail[11].toInt()){
+			}
+			else if (pbP1HP->value() < detail[10].toInt())
+			{
 				// hp increased
-				lbP1SkillName->setText(QString::number(detail[11].toInt() - pbP1HP->value()));
+				lbP1SkillName->setText(QString::number(detail[10].toInt() - pbP1HP->value()));
 				getImproved(lbP1);
 				lbP1SkillName->clear();
 			}
-						pbP1HP->setValue(detail[11].toInt());
-			if (detail[12] == '0')
+			pbP1HP->setValue(detail[10].toInt());
+			if (detail[11] == '0')
 			{
 				lbP1SkillName->setText(tr("攻击下降"));
 				getDecreased(lbP1);
 				lbP1SkillName->clear();
 			}
-			else if (detail[12] == '2')
+			else if (detail[11] == '2')
 			{
 				lbP1SkillName->setText(tr("攻击上升"));
 				getImproved(lbP1);
 				lbP1SkillName->clear();
 			}
-			if (detail[13] == '0')
+			if (detail[12] == '0')
 			{
 				lbP1SkillName->setText(tr("防御下降"));
 				getDecreased(lbP1);
 				lbP1SkillName->clear();
 			}
-			else if (detail[13] == '2')
+			else if (detail[12] == '2')
 			{
 				lbP1SkillName->setText(tr("防御上升"));
 				getImproved(lbP1);
 				lbP1SkillName->clear();
 			}
-			if (detail[14] == '0')
+			if (detail[13] == '0')
 			{
 				lbP1SkillName->setText(tr("速度下降"));
 				getDecreased(lbP1);
 				lbP1SkillName->clear();
 			}
-			else if (detail[14] == '2')
+			else if (detail[13] == '2')
 			{
 				lbP1SkillName->setText(tr("速度上升"));
 				getImproved(lbP1);
 				lbP1SkillName->clear();
 			}
 			auto skillName = btnSkill_2->text().split(' ')[0];
-			btnSkill_2->setText(skillName + ' ' + detail[15]);
+			btnSkill_2->setText(skillName + ' ' + detail[14]);
 			skillName = btnSkill_3->text().split(' ')[0];
-			btnSkill_3->setText(skillName + ' ' + detail[16]);
+			btnSkill_3->setText(skillName + ' ' + detail[15]);
 			skillName = btnSkill_4->text().split(' ')[0];
-			btnSkill_4->setText(skillName + ' ' + detail[17]);
+			btnSkill_4->setText(skillName + ' ' + detail[16]);
 			lbP1SkillName->clear();
-		} else {
+		}
+		else
+		{
 			// detail[0] == '0', p2's turn
 			lbP2SkillName->setText(detail[1]);
 			QThread::msleep(500);
@@ -1066,49 +1083,52 @@ void MainWindow::getServerMsg()
 				getImproved(lbP1);
 				lbP1SkillName->clear();
 			}
-			if (pbP2HP->value() > detail[11].toInt()){
+			if (pbP2HP->value() > detail[10].toInt())
+			{
 				// hp decreased
-				lbP2SkillName->setText(QString::number(detail[11].toInt() - pbP2HP->value()));
+				lbP2SkillName->setText(QString::number(detail[10].toInt() - pbP2HP->value()));
 				getDecreased(lbP2);
 				lbP2SkillName->clear();
-			} else if (pbP2HP->value() < detail[11].toInt()){
+			}
+			else if (pbP2HP->value() < detail[10].toInt())
+			{
 				// hp increased
-				lbP2SkillName->setText(QString::number(detail[11].toInt() - pbP2HP->value()));
+				lbP2SkillName->setText(QString::number(detail[10].toInt() - pbP2HP->value()));
 				getImproved(lbP2);
 				lbP2SkillName->clear();
 			}
-						pbP2HP->setValue(detail[11].toInt());
-			if (detail[12] == '0')
+			pbP2HP->setValue(detail[10].toInt());
+			if (detail[11] == '0')
 			{
 				lbP2SkillName->setText(tr("攻击下降"));
 				getDecreased(lbP2);
 				lbP2SkillName->clear();
 			}
-			else if (detail[12] == '2')
+			else if (detail[11] == '2')
 			{
 				lbP2SkillName->setText(tr("攻击上升"));
 				getImproved(lbP2);
 				lbP2SkillName->clear();
 			}
-			if (detail[13] == '0')
+			if (detail[12] == '0')
 			{
 				lbP2SkillName->setText(tr("防御下降"));
 				getDecreased(lbP2);
 				lbP2SkillName->clear();
 			}
-			else if (detail[13] == '2')
+			else if (detail[12] == '2')
 			{
 				lbP2SkillName->setText(tr("防御上升"));
 				getImproved(lbP2);
 				lbP2SkillName->clear();
 			}
-			if (detail[14] == '0')
+			if (detail[13] == '0')
 			{
 				lbP2SkillName->setText(tr("速度下降"));
 				getDecreased(lbP2);
 				lbP2SkillName->clear();
 			}
-			else if (detail[14] == '2')
+			else if (detail[13] == '2')
 			{
 				lbP2SkillName->setText(tr("速度上升"));
 				getImproved(lbP2);
@@ -1124,13 +1144,17 @@ void MainWindow::getServerMsg()
 		}
 
 		// judge result
-		if (pbP2HP->value() == 0){
+		if (pbP2HP->value() == 0)
+		{
 			QMessageBox::information(this, tr("恭喜"), tr("你赢得了战斗"));
 			changeState(MAIN);
-		} else if (pbP1HP->value() == 0){
+		}
+		else if (pbP1HP->value() == 0)
+		{
 			QMessageBox::information(this, tr("抱歉"), tr("您战败了"));
 			changeState(MAIN);
 		}
+		client->write("done", BUF_LENGTH);
 
 		break;
 	}

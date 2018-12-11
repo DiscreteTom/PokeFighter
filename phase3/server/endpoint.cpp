@@ -266,7 +266,7 @@ void Endpoint::listenFunc()
 		{
 			cout << "Endpoint[" << playerID << "]: Invalid request.\n";
 			strcpy(buf, "Reject: Invalid request.\n");
-			send(connSocket, buf, BUF_LENGTH, 0);
+			// send(connSocket, buf, BUF_LENGTH, 0);
 		}
 		if (running)
 			ret = recv(connSocket, buf, BUF_LENGTH, 0);
@@ -618,7 +618,7 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 			}
 
 			// get a new pokemon
-			savePokemonToDB(p2);
+			savePokemonToDB(*p2);
 		}
 
 		if (p1.lv() > p2->lv() + 5)

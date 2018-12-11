@@ -254,15 +254,19 @@ void Endpoint::listenFunc()
 		{
 			getDuelStatistic();
 		}
-		else if (strs[0] == "battle" && strs.size() == 4)
+		else if (strs[0] == "battle" && strs.size() == 5)
 		{
-			battle(strs[1], stoi(strs[2]), stoi(strs[3]));
+			if (strs[1] == "DUEL")
+				isDuel = true;
+			else
+				isDuel = false;
+			battle(strs[2], stoi(strs[3]), stoi(strs[4]));
 		}
 		else
 		{
 			cout << "Endpoint[" << playerID << "]: Invalid request.\n";
 			strcpy(buf, "Reject: Invalid request.\n");
-			send(connSocket, buf, BUF_LENGTH, 0);
+			// send(connSocket, buf, BUF_LENGTH, 0);
 		}
 		if (running)
 			ret = recv(connSocket, buf, BUF_LENGTH, 0);
@@ -572,7 +576,8 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 	}
 	result += to_string(p1.pp(0)) + ' ';
 	result += to_string(p1.pp(1)) + ' ';
-	result += to_string(p1.pp(2)) + '\n';
+	result += to_string(p1.pp(2)) + ' ';
+	result += to_string(p1.lv()) + '\n';
 
 	Pokemon *p2 = Pokemon::getEnemy(enemyRaceID, enemyLV);
 
@@ -583,8 +588,40 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 	send(connSocket, buf, BUF_LENGTH, 0);
 
 	BattleController battle = BattleController(p1, *p2, connSocket);
+
+	char **sqlResult2;
+	int nRow2;
+	int nColumn2;
+	char *errMsg2;
+	string sql2 = "select win, total from User where id=" + to_string(playerID) + ";";
+	if (sqlite3_get_table(db, sql2.c_str(), &sqlResult2, &nRow2, &nColumn2, &errMsg2) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg2 << endl;
+		sqlite3_free(errMsg2);
+		strcpy(buf, "Reject: Server error.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+		return;
+	}
+
 	if (battle.start())
 	{
+		// win
+
+		if (isDuel)
+		{
+			// change win rate
+			string sql3 = "update User set win=" + to_string(stoi(sqlResult2[2]) + 1) + ", total=" + to_string(stoi(sqlResult2[3]) + 1) + " where id=" + to_string(playerID) + ";";
+			char *errMsg3;
+			if (sqlite3_exec(db, sql3.c_str(), nonUseCallback, NULL, &errMsg3) != SQLITE_OK)
+			{
+				cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg3 << endl;
+				sqlite3_free(errMsg3);
+			}
+
+			// get a new pokemon
+			savePokemonToDB(*p2);
+		}
+
 		if (p1.lv() > p2->lv() + 5)
 		{
 			// no exp
@@ -598,6 +635,19 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 			p1.gainExp((p2->lv() - p1.lv()) * 5 + f(5));
 		}
 	}
+	else
+	{
+		//lose
+
+		string sql3 = "update User set total=" + to_string(stoi(sqlResult2[3]) + 1) + " where id=" + to_string(playerID) + ";";
+		char *errMsg3;
+		if (sqlite3_exec(db, sql3.c_str(), nonUseCallback, NULL, &errMsg3) != SQLITE_OK)
+		{
+			cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg3 << endl;
+			sqlite3_free(errMsg3);
+		}
+	}
+	sqlite3_free_table(sqlResult2);
 
 	savePokemonToDB(p1, currentPokemonID);
 	delete p2;

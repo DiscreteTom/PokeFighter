@@ -83,7 +83,7 @@ getPlayerList
 getPokemonList [playerID]
 getPokemon <pokemonID>
 pokemonChangeName <pokemonID> <newName>
-battle <pokemonID> <enemyRaceID> <enemyLV>
+battle <type: LV_UP | DUEL> <pokemonID> <enemyRaceID> <enemyLV>
 useSkill <skillID>
 getDuelStatistic
 ```

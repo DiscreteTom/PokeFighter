@@ -96,8 +96,8 @@ private:
 	QPushButton * btnSkill_4;
 	QProgressBar * pbP1HP;
 	QProgressBar * pbP2HP;
-	QProgressBar * pbP1AtkInterval;
-	QProgressBar * pbP2AtkInterval;
+//	QProgressBar * pbP1AtkInterval;
+//	QProgressBar * pbP2AtkInterval;
 
 
 	// pokemon table and player table
@@ -119,6 +119,7 @@ private:
 	bool changingPokemonName;
 	QString battlePokemonID;
 	bool gettingDuelStatistic;
+	bool battleStart;
 
 	void changeState(int aim);
 	void login();

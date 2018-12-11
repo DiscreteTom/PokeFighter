@@ -89,8 +89,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	btnSkill_4 = new QPushButton(this);
 	pbP1HP = new QProgressBar(this);
 	pbP2HP = new QProgressBar(this);
-	pbP1AtkInterval = new QProgressBar(this);
-	pbP2AtkInterval = new QProgressBar(this);
+	//	pbP1AtkInterval = new QProgressBar(this);
+	//	pbP2AtkInterval = new QProgressBar(this);
 
 	// pokemon table and player table
 	table = new QTableWidget(this);
@@ -158,12 +158,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 		currentPlayerID = 0;
 		client->write("getPokemonList", BUF_LENGTH);
 	});
-	connect(btnLvUpBattle, &QPushButton::clicked, this, [this]{
+	connect(btnLvUpBattle, &QPushButton::clicked, this, [this] {
 		currentPlayerID = 0;
 		client->write("getPokemonList", BUF_LENGTH);
 		changeState(POKEMON_TABLE | LV_UP_BATTLE);
 	});
-	connect(btnDuelBattle, &QPushButton::clicked, this, [this]{
+	connect(btnDuelBattle, &QPushButton::clicked, this, [this] {
 		currentPlayerID = 0;
 		client->write("getPokemonList", BUF_LENGTH);
 		changeState(POKEMON_TABLE | DUEL_BATTLE);
@@ -193,17 +193,69 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 			client->write(str.toStdString().c_str(), BUF_LENGTH);
 		}
 	});
-	connect(btnEnemyRace0, &QPushButton::clicked, [this]{
+	connect(btnEnemyRace0, &QPushButton::clicked, [this] {
+		battleStart = true;
+		QString msg = "battle ";
+		msg += battlePokemonID + ' ';
+		msg += "0 ";
+		msg += QString::number(sbEnemyLV->value());
+		client->write(msg.toLocal8Bit(), BUF_LENGTH);
 		changeState(state ^ CHOOSE_ENEMY);
 	});
-	connect(btnEnemyRace1, &QPushButton::clicked, [this]{
-		changeState(state ^ CHOOSE_ENEMY);
+	connect(btnEnemyRace1, &QPushButton::clicked, [this] {
+		battleStart = true;
+		QString msg = "battle ";
+		msg += battlePokemonID + ' ';
+		msg += "1 ";
+		msg += QString::number(sbEnemyLV->value());
+		client->write(msg.toLocal8Bit(), BUF_LENGTH)
+				changeState(state ^ CHOOSE_ENEMY);
 	});
-	connect(btnEnemyRace2, &QPushButton::clicked, [this]{
-		changeState(state ^ CHOOSE_ENEMY);
+	connect(btnEnemyRace2, &QPushButton::clicked, [this] {
+		battleStart = true;
+		QString msg = "battle ";
+		msg += battlePokemonID + ' ';
+		msg += "2 ";
+		msg += QString::number(sbEnemyLV->value());
+		client->write(msg.toLocal8Bit(), BUF_LENGTH)
+				changeState(state ^ CHOOSE_ENEMY);
 	});
-	connect(btnEnemyRace3, &QPushButton::clicked, [this]{
-		changeState(state ^ CHOOSE_ENEMY);
+	connect(btnEnemyRace3, &QPushButton::clicked, [this] {
+		battleStart = true;
+		QString msg = "battle ";
+		msg += battlePokemonID + ' ';
+		msg += "3 ";
+		msg += QString::number(sbEnemyLV->value());
+		client->write(msg.toLocal8Bit(), BUF_LENGTH)
+				changeState(state ^ CHOOSE_ENEMY);
+	});
+	connect(btnSkill_1, &QPushButton::clicked, [this] {
+		client->write("0", BUF_LENGTH);
+		btnSkill_1->setDisabled(true);
+		btnSkill_2->setDisabled(true);
+		btnSkill_3->setDisabled(true);
+		btnSkill_4->setDisabled(true);
+	});
+	connect(btnSkill_2, &QPushButton::clicked, [this] {
+		client->write("1", BUF_LENGTH);
+		btnSkill_1->setDisabled(true);
+		btnSkill_2->setDisabled(true);
+		btnSkill_3->setDisabled(true);
+		btnSkill_4->setDisabled(true);
+	});
+	connect(btnSkill_3, &QPushButton::clicked, [this] {
+		client->write("2", BUF_LENGTH);
+		btnSkill_1->setDisabled(true);
+		btnSkill_2->setDisabled(true);
+		btnSkill_3->setDisabled(true);
+		btnSkill_4->setDisabled(true);
+	});
+	connect(btnSkill_4, &QPushButton::clicked, [this] {
+		client->write("3", BUF_LENGTH);
+		btnSkill_1->setDisabled(true);
+		btnSkill_2->setDisabled(true);
+		btnSkill_3->setDisabled(true);
+		btnSkill_4->setDisabled(true);
 	});
 
 	connect(leUsername, &QLineEdit::returnPressed, btnLogin, &QPushButton::click);
@@ -226,6 +278,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
 	changingPokemonName = false;
 	gettingDuelStatistic = false;
+	battleStart = false;
 
 	//	setFixedSize(1600, 900);
 	setFixedSize(1366, 966); // size of start.jpg
@@ -279,8 +332,8 @@ void MainWindow::changeState(int aim)
 	btnSkill_4->hide();
 	pbP1HP->hide();
 	pbP2HP->hide();
-	pbP1AtkInterval->hide();
-	pbP2AtkInterval->hide();
+	//	pbP1AtkInterval->hide();
+	//	pbP2AtkInterval->hide();
 	table->hide();
 	table->clear();
 	btnPlay->setDefault(false);
@@ -360,7 +413,8 @@ void MainWindow::changeState(int aim)
 	case POKEMON_TABLE | DUEL_BATTLE:
 		btnBack->show();
 		table->show();
-		if (state == (POKEMON_TABLE | DUEL_BATTLE)){
+		if (state == (POKEMON_TABLE | DUEL_BATTLE))
+		{
 			lbWin->show();
 			lbTotal->show();
 			lbWinRate->show();
@@ -369,7 +423,9 @@ void MainWindow::changeState(int aim)
 			layout->addWidget(lbWinRate, 0, 2, 1, 1, Qt::AlignHCenter);
 			layout->addWidget(table, 1, 0, 1, 3);
 			layout->addWidget(btnBack, 2, 0, 1, 3);
-		} else {
+		}
+		else
+		{
 			layout->addWidget(table, 0, 0);
 			layout->addWidget(btnBack, 1, 0);
 		}
@@ -402,10 +458,13 @@ void MainWindow::changeState(int aim)
 		btnEnemyRace2->show();
 		btnEnemyRace3->show();
 		btnBack->show();
-		if (state == (CHOOSE_ENEMY | DUEL_BATTLE)){
+		if (state == (CHOOSE_ENEMY | DUEL_BATTLE))
+		{
 			sbEnemyLV->setValue(15);
 			sbEnemyLV->setDisabled(true);
-		} else {
+		}
+		else
+		{
 			sbEnemyLV->setDisabled(false);
 		}
 		layout->addWidget(lbChooseEnemy, 0, 0, 1, 2);
@@ -426,13 +485,13 @@ void MainWindow::changeState(int aim)
 		btnSkill_3->show();
 		btnSkill_4->show();
 		pbP1HP->show();
-		pbP1AtkInterval->show();
+		//		pbP1AtkInterval->show();
 		pbP2HP->show();
-		pbP2AtkInterval->show();
+		//		pbP2AtkInterval->show();
 		layout->addWidget(pbP1HP, 0, 0, 1, 2);
-		layout->addWidget(pbP1AtkInterval, 1, 0, 1, 2);
+		//		layout->addWidget(pbP1AtkInterval, 1, 0, 1, 2);
 		layout->addWidget(pbP2HP, 0, 2, 1, 2);
-		layout->addWidget(pbP2AtkInterval, 1, 2, 1, 2);
+		//		layout->addWidget(pbP2AtkInterval, 1, 2, 1, 2);
 		layout->addWidget(lbP1, 2, 0, 1, 2);
 		layout->addWidget(lbP2, 2, 2, 1, 2);
 		layout->addWidget(btnSkill_1, 3, 0, 1, 1);
@@ -605,23 +664,27 @@ void MainWindow::getServerMsg()
 	case POKEMON_TABLE | LV_UP_BATTLE:
 	case POKEMON_TABLE | DUEL_BATTLE:
 	{
-		if (gettingDuelStatistic){
-						gettingDuelStatistic = false;
-						auto detail = msg.split(' ');
-						lbWin->setText(tr("获胜次数：") + detail[0]);
-						lbTotal->setText(tr("决斗次数：") + detail[1]);
-						lbWinRate->setText(tr("胜率：") + (detail[1] == '0' ? "-" : QString::number(detail[0].toDouble() / detail[1].toDouble())));
-						break;
+		if (gettingDuelStatistic)
+		{
+			gettingDuelStatistic = false;
+			auto detail = msg.split(' ');
+			lbWin->setText(tr("获胜次数：") + detail[0]);
+			lbTotal->setText(tr("决斗次数：") + detail[1]);
+			lbWinRate->setText(tr("胜率：") + (detail[1] == '0' ? "-" : QString::number(detail[0].toDouble() / detail[1].toDouble())));
+			break;
 		}
 		if (!showPokemonDlg) // msg is pokemon table
 		{
 			auto pokemons = msg.split('\n');
 
 			table->setRowCount(pokemons.size() - 1);
-			if (state == POKEMON_TABLE){
+			if (state == POKEMON_TABLE)
+			{
 				table->setColumnCount(5);
 				table->setHorizontalHeaderLabels({tr("精灵ID"), tr("名字"), tr("种族"), tr("等级"), tr("操作")});
-			} else {
+			}
+			else
+			{
 				// battle table
 				table->setColumnCount(6);
 				table->setHorizontalHeaderLabels({tr("精灵ID"), tr("名字"), tr("种族"), tr("等级"), tr("查看"), tr("选中")});
@@ -652,7 +715,8 @@ void MainWindow::getServerMsg()
 					showPokemonDlg = true;
 				});
 				table->setCellWidget(i, 4, btn);
-				if (state != POKEMON_TABLE){
+				if (state != POKEMON_TABLE)
+				{
 					// battle table
 					auto btn = new QPushButton(tr("就决定是你了！"), this);
 					connect(btn, &QPushButton::clicked, this, [this, detail] {
@@ -662,12 +726,14 @@ void MainWindow::getServerMsg()
 					table->setCellWidget(i, 5, btn);
 				}
 			}
-			if (state == (DUEL_BATTLE | POKEMON_TABLE)){
-					if (!gettingDuelStatistic){
-						gettingDuelStatistic = true;
-						client->write("getDuelStatistic", BUF_LENGTH);
-					}
+			if (state == (DUEL_BATTLE | POKEMON_TABLE))
+			{
+				if (!gettingDuelStatistic)
+				{
+					gettingDuelStatistic = true;
+					client->write("getDuelStatistic", BUF_LENGTH);
 				}
+			}
 
 			connect(table, &QTableWidget::cellChanged, this, [this](int row, int column) {
 				if ((state & POKEMON_TABLE) == POKEMON_TABLE && column == 1)
@@ -684,9 +750,11 @@ void MainWindow::getServerMsg()
 		{
 			auto dlg = new PokemonDlg(msg, currentPlayerID == 0, this);
 			connect(dlg, &PokemonDlg::pokemonChangeName, this, [this](const QString &pokemonID, const QString &newName) {
-				for (int i = 0; i < table->rowCount(); ++i){
-					if (table->item(i, 0)->text() == pokemonID){
-						table->item(i, 1)->setText(newName);// will call table::cellChanged
+				for (int i = 0; i < table->rowCount(); ++i)
+				{
+					if (table->item(i, 0)->text() == pokemonID)
+					{
+						table->item(i, 1)->setText(newName); // will call table::cellChanged
 					}
 				}
 			});
@@ -705,6 +773,73 @@ void MainWindow::getServerMsg()
 			QMessageBox::warning(this, tr("错误"), msg);
 		}
 		break;
+	case DUEL_BATTLE:
+	case LV_UP_BATTLE:
+	{
+		if (battleStart)
+		{
+			// get battle config message
+			auto ps = msg.split('\n');
+			auto detail = ps[0].split(' ');
+			if (detail[0] == "妙蛙种子")
+			{
+				lbP1->setPixmap(QPixmap(":/img/img/bulbasaur.png"));
+			}
+			else if (detail[0] == "小火龙")
+			{
+				lbP1->setPixmap(QPixmap(":/img/img/charmander.png"));
+			}
+			else if (detail[0] == "杰尼龟")
+			{
+				lbP1->setPixmap(QPixmap(":/img/img/squirtle.png"));
+			}
+			else if (detail[0] == "波波")
+			{
+				lbP1->setPixmap(QPixmap(":/img/img/pidgey.png"));
+			}
+			pbP1HP->setMaximum(detail[1].toInt());
+			pbP1HP->setValue(detail[1].toInt());
+			btnSkill_1->setText(detail[2]);
+			btnSkill_2->setText(detail[3]);
+			btnSkill_3->setText(detail[4]);
+			btnSkill_4->setText(detail[5]);
+			btnSkill_1->setToolTip(detail[6]);
+			btnSkill_2->setToolTip(detail[7]);
+			btnSkill_3->setToolTip(detail[8]);
+			btnSkill_4->setToolTip(detail[9]);
+			btnSkill_2->setText(btnSkill_2->text() + detail[10]);
+			btnSkill_3->setText(btnSkill_3->text() + detail[11]);
+			btnSkill_4->setText(btnSkill_4->text() + detail[12]);
+			detail = ps[1].split(' ');
+			if (detail[0] == "妙蛙种子")
+			{
+				lbP2->setPixmap(QPixmap(":/img/img/bulbasaur.png"));
+			}
+			else if (detail[0] == "小火龙")
+			{
+				lbP2->setPixmap(QPixmap(":/img/img/charmander.png"));
+			}
+			else if (detail[0] == "杰尼龟")
+			{
+				lbP2->setPixmap(QPixmap(":/img/img/squirtle.png"));
+			}
+			else if (detail[0] == "波波")
+			{
+				lbP2->setPixmap(QPixmap(":/img/img/pidgey.png"));
+			}
+			pbP2HP->setMaximum(detail[1].toInt());
+			pbP2HP->setValue(detail[1].toInt());
+			battleStart = false;
+			break;
+		}
+		btnSkill_1->setDisabled(false);
+		btnSkill_2->setDisabled(false);
+		btnSkill_3->setDisabled(false);
+		btnSkill_4->setDisabled(false);
+		auto detail = msg.split(' ');
+
+		break;
+	}
 	default:
 		break;
 	}

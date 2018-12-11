@@ -540,12 +540,26 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 
 	string result = "";
 	result += p1.raceName() + ' ';
-	result += p1.maxHp() + '\n';
+	result += p1.maxHp() + ' ';
+	for (int i = 0; i < 4; ++i){
+		result += p1.skillName(i) + ' ';
+		result += p1.skillDscp(i) + ' ';
+	}
+	result += to_string(p1.pp(0)) + ' ';
+	result += to_string(p1.pp(1)) + ' ';
+	result += to_string(p1.pp(2)) + '\n';
 
 	Pokemon p2 = *Pokemon::getEnemy(enemyRaceID, enemyLV);
 
 	result += p2.raceName() + ' ';
-	result += p2.maxHp();
+	result += p2.maxHp() + ' ';
+	for (int i = 0; i < 4; ++i){
+		result += p2.skillName(i) + ' ';
+		result += p2.skillDscp(i) + ' ';
+	}
+	result += to_string(p2.pp(0)) + ' ';
+	result += to_string(p2.pp(1)) + ' ';
+	result += to_string(p2.pp(2)) + '\n';
 
 	strcpy(buf, result.c_str());
 	send(connSocket, buf, BUF_LENGTH, 0);

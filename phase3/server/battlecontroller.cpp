@@ -19,7 +19,7 @@ bool BattleController::start()
 
 	while (1)
 	{
-		recv(connSocket, buf, BUF_LENGTH, 0);
+		recv(connSocket, buf, BUF_LENGTH, 0);// get done
 		while (timer1 < p1.cspeed() && timer2 < p2.cspeed())
 		{
 			++timer1;
@@ -40,6 +40,7 @@ bool BattleController::start()
 					break;
 				strcpy(buf, msg.c_str());
 				send(connSocket, buf, BUF_LENGTH, 0);
+				recv(connSocket, buf, BUF_LENGTH, 0);// get done
 				msg = "0 ";
 				if (p2.attack(p1, msg)) // enemy auto fight
 					break;
@@ -53,6 +54,7 @@ bool BattleController::start()
 					break;
 				strcpy(buf, msg.c_str());
 				send(connSocket, buf, BUF_LENGTH, 0);
+				recv(connSocket, buf, BUF_LENGTH, 0); // get done
 				send(connSocket, "turn", BUF_LENGTH, 0);
 				recv(connSocket, buf, BUF_LENGTH, 0);
 				sscanf(buf, "%d", &index);

@@ -253,6 +253,10 @@ void Endpoint::listenFunc()
 		{
 			getDuelStatistic();
 		}
+		else if (strs[0] == "battle" && strs.size() == 4)
+		{
+			battle(strs[1], stoi(strs[2]), stoi(strs[3]));
+		}
 		else
 		{
 			cout << "Endpoint[" << playerID << "]: Invalid request.\n";
@@ -513,4 +517,50 @@ void Endpoint::getDuelStatistic()
 	strcpy(buf, result.c_str());
 	send(connSocket, buf, BUF_LENGTH, 0);
 	sqlite3_free_table(sqlResult);
+}
+
+void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
+{
+	char **sqlResult;
+	int nRow;
+	int nColumn;
+	char *errMsg;
+	string sql;
+	sql = "SELECT id, name, race, atk, def, maxHp, speed, lv, exp FROM Pokemon where id=" + pokemonID + ";";
+	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+		sqlite3_free(errMsg);
+		strcpy(buf, "Reject: Server error.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+		return;
+	}
+	// construct player pokemon
+	Pokemon p1 = Pokemon(sqlResult[10], stoi(sqlResult[11]), stoi(sqlResult[12]), stoi(sqlResult[13]), stoi(sqlResult[14]), stoi(sqlResult[15]), stoi(sqlResult[16]), stoi(sqlResult[17]));
+
+	string result = "";
+	result += p1.raceName() + ' ';
+	result += p1.maxHp() + '\n';
+
+	Pokemon p2 = *Pokemon::getEnemy(enemyRaceID, enemyLV);
+
+	result += p2.raceName() + ' ';
+	result += p2.maxHp();
+
+	strcpy(buf, result.c_str());
+	send(connSocket, buf, BUF_LENGTH, 0);
+
+	BattleController battle = BattleController(p1, p2, connSocket);
+	if (battle.start()){
+		if (p1.lv() > p2.lv() + 5){
+			// no exp
+		} else if (p1.lv() >= p2.lv()){
+			p1.gainExp(p1.lv() - p2.lv() + 3 + f(2));
+		} else {
+			p1.gainExp((p2.lv() - p1.lv()) * 5);
+		}
+	}
+
+	savePokemonToDB(p1);
+	delete &p2;
 }

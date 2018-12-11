@@ -52,9 +52,9 @@ public:
 	int expCurve(int level) const; // 2 <= level <= 15
 
 	//virtual methods
-	virtual bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const = 0; //yes, this is a CONST method
+	virtual bool attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillIndex = 0) const = 0; //yes, this is a CONST method
 
-	bool dodge(int attacker, int aim) const;
+	bool dodge(int attacker, int aim, string &msg) const;
 };
 
 class Pokemon

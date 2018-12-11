@@ -211,7 +211,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 		msg += battlePokemonID + ' ';
 		msg += "1 ";
 		msg += QString::number(sbEnemyLV->value());
-		client->write(msg.toLocal8Bit(), BUF_LENGTH)
+		client->write(msg.toLocal8Bit(), BUF_LENGTH);
 				changeState(state ^ CHOOSE_ENEMY);
 	});
 	connect(btnEnemyRace2, &QPushButton::clicked, [this] {
@@ -220,7 +220,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 		msg += battlePokemonID + ' ';
 		msg += "2 ";
 		msg += QString::number(sbEnemyLV->value());
-		client->write(msg.toLocal8Bit(), BUF_LENGTH)
+		client->write(msg.toLocal8Bit(), BUF_LENGTH);
 				changeState(state ^ CHOOSE_ENEMY);
 	});
 	connect(btnEnemyRace3, &QPushButton::clicked, [this] {
@@ -229,7 +229,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 		msg += battlePokemonID + ' ';
 		msg += "3 ";
 		msg += QString::number(sbEnemyLV->value());
-		client->write(msg.toLocal8Bit(), BUF_LENGTH)
+		client->write(msg.toLocal8Bit(), BUF_LENGTH);
 				changeState(state ^ CHOOSE_ENEMY);
 	});
 	connect(btnSkill_1, &QPushButton::clicked, [this] {
@@ -950,7 +950,7 @@ void MainWindow::getServerMsg()
 			}
 			if (pbP1HP->value() > detail[11].toInt()){
 				// hp decreased
-				lbP1SkillName.setText(QString::number(detail[11].toInt() - pbP1HP->value()));
+				lbP1SkillName->setText(QString::number(detail[11].toInt() - pbP1HP->value()));
 				getDecreased(lbP1);
 				lbP1SkillName->clear();
 			} else if (pbP1HP->value() < detail[11].toInt()){
@@ -1068,7 +1068,7 @@ void MainWindow::getServerMsg()
 			}
 			if (pbP2HP->value() > detail[11].toInt()){
 				// hp decreased
-				lbP2SkillName.setText(QString::number(detail[11].toInt() - pbP2HP->value()));
+				lbP2SkillName->setText(QString::number(detail[11].toInt() - pbP2HP->value()));
 				getDecreased(lbP2);
 				lbP2SkillName->clear();
 			} else if (pbP2HP->value() < detail[11].toInt()){

@@ -1,6 +1,8 @@
+#define _CRT_SECURE_NO_WARNINGS // to disable sscanf
+
 #include "battlecontroller.h"
 
-BattleController::BattleController(Pokemon &playerPokemon, Pokemon &enemyPokemon, SOCKET &connSocket) : p1(pokemon1), p2(pokemon2), connSocket(connSocket)
+BattleController::BattleController(Pokemon &playerPokemon, Pokemon &enemyPokemon, SOCKET &connSocket) : p1(playerPokemon), p2(enemyPokemon), connSocket(connSocket)
 {
 }
 
@@ -23,23 +25,24 @@ bool BattleController::start()
 			++timer2;
 		}
 
+		int index;
+
 		if (timer1 >= p1.cspeed() && timer2 >= p2.cspeed())
 		{
 			if (p1.cspeed() >= p2.cspeed())
 			{
 				send(connSocket, "turn", BUF_LENGTH, 0);
 				recv(connSocket, buf, BUF_LENGTH, 0);
-				int index;
-				sscanf(buf, "%d", index);
+				sscanf(buf, "%d", &index);
 				msg = "1 ";
 				if (p1.attack(p2, index, msg)) // player manual fight
 					break;
-				strcpy(buf, msg.c_str);
+				strcpy(buf, msg.c_str());
 				send(connSocket, buf, BUF_LENGTH, 0);
 				msg = "0 ";
 				if (p2.attack(p1, msg)) // enemy auto fight
 					break;
-				strcpy(buf, msg.c_str);
+				strcpy(buf, msg.c_str());
 				send(connSocket, buf, BUF_LENGTH, 0);
 			}
 			else
@@ -47,16 +50,15 @@ bool BattleController::start()
 				msg = "0 ";
 				if (p2.attack(p1, msg))
 					break;
-				strcpy(buf, msg.c_str);
+				strcpy(buf, msg.c_str());
 				send(connSocket, buf, BUF_LENGTH, 0);
 				send(connSocket, "turn", BUF_LENGTH, 0);
 				recv(connSocket, buf, BUF_LENGTH, 0);
-				int index;
-				sscanf(buf, "%d", index);
+				sscanf(buf, "%d", &index);
 				msg = "1 ";
 				if (p1.attack(p2, index, msg))
 					break;
-				strcpy(buf, msg.c_str);
+				strcpy(buf, msg.c_str());
 				send(connSocket, buf, BUF_LENGTH, 0);
 			}
 			timer1 = timer2 = 0;
@@ -67,7 +69,7 @@ bool BattleController::start()
 			msg = "0 ";
 			if (p2.attack(p1, msg))
 				break;
-			strcpy(buf, msg.c_str);
+			strcpy(buf, msg.c_str());
 			send(connSocket, buf, BUF_LENGTH, 0);
 			timer1 = 0;
 		}
@@ -75,18 +77,17 @@ bool BattleController::start()
 		{
 			send(connSocket, "turn", BUF_LENGTH, 0);
 			recv(connSocket, buf, BUF_LENGTH, 0);
-			int index;
-			sscanf(buf, "%d", index);
+			sscanf(buf, "%d", &index);
 			msg = "1 ";
 			if (p1.attack(p2, index, msg))
 				break;
-			strcpy(buf, msg.c_str);
+			strcpy(buf, msg.c_str());
 			send(connSocket, buf, BUF_LENGTH, 0);
 			timer2 = 0;
 		}
 	}
 
-	strcpy(buf, msg.c_str);
+	strcpy(buf, msg.c_str());
 	send(connSocket, buf, BUF_LENGTH, 0);
 
 	if (p1.hp())

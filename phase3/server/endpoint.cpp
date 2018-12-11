@@ -5,6 +5,7 @@
 // #include <mstcpip.h> // for socket keep_alive
 #include "mystringfunc.h"
 #include "server.h"
+#include "battlecontroller.h"
 
 using namespace std;
 

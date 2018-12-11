@@ -87,10 +87,10 @@ bool PokemonBase::dodge(int attacker, int aim, string &msg) const
 	if ((attacker + f(40)) / 80 - aim / 150 < 0)
 	{
 		// dbout << "Miss!\n";
-		msg += '1 ';
+		msg += "1 ";
 		return true;
 	}
-	msg += '0 ';
+	msg += "0 ";
 	return false;
 }
 
@@ -392,7 +392,7 @@ bool Pokemon::attack(Pokemon &aim, string &msg)
 	}
 	if (skillIndex > 0)
 		--_cpp[skillIndex - 1]; //consume pp
-	return races[_raceIndex]->attack(*this, aim, skillIndex);
+	return races[_raceIndex]->attack(*this, aim, msg, skillIndex);
 }
 
 // manual attack

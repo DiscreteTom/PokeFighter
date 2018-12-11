@@ -2,11 +2,15 @@
 
 const PokemonBase *Pokemon::races[4] = {new Race<0>(), new Race<1>(), new Race<2>(), new Race<3>()};
 
-Pokemon * Pokemon::getEnemy(int raceIndex, int lv){
-	if (raceIndex < 0 || raceIndex > 3) return 0;
-	if (lv < 1 || lv > 15) return 0;
-	Pokemon * result = new Pokemon(raceIndex);
-	while (result->lv() < lv){
+Pokemon *Pokemon::getEnemy(int raceIndex, int lv)
+{
+	if (raceIndex < 0 || raceIndex > 3)
+		return 0;
+	if (lv < 1 || lv > 15)
+		return 0;
+	Pokemon *result = new Pokemon(raceIndex);
+	while (result->lv() < lv)
+	{
 		result->gainExp(10);
 	}
 	return result;
@@ -349,47 +353,49 @@ bool Pokemon::gainExp(int count)
 	return false; //default
 }
 
-bool Pokemon::attack(Pokemon &aim, bool autoFight)
+// auto attack
+bool Pokemon::attack(Pokemon &aim)
 {
 	int skillIndex = 0;
-	if (autoFight)
+	//judge usable skill by LV and PP
+	bool usable[3];
+	int usableCount = 1;				//can use simple attack by default
+	for (int i = 0; i < 3; ++i) //get all usable skill
 	{
-		//judge usable skill by LV and PP
-		bool usable[3];
-		int usableCount = 1;				//can use simple attack by default
-		for (int i = 0; i < 3; ++i) //get all usable skill
+		if (_lv >= (i + 1) * 5 && _cpp[i])
 		{
-			if (_lv >= (i + 1) * 5 && _cpp[i])
-			{
-				usable[i] = true;
-				++usableCount;
-			}
+			usable[i] = true;
+			++usableCount;
 		}
-		//get a random skill
-		int use = rand() % usableCount;
-		//find the skill
-		if (!use)
-			skillIndex = 0;
-		else
+	}
+	//get a random skill
+	int use = rand() % usableCount;
+	//find the skill
+	if (!use)
+		skillIndex = 0;
+	else
+	{
+		for (int i = 0; i < 3; ++i)
 		{
-			for (int i = 0; i < 3; ++i)
+			if (usable[i])
 			{
-				if (usable[i])
+				--use;
+				if (!use)
 				{
-					--use;
-					if (!use)
-					{
-						skillIndex = i + 1;
-						break;
-					}
+					skillIndex = i + 1;
+					break;
 				}
 			}
 		}
-		if (skillIndex > 0)
-			--_cpp[skillIndex - 1]; //consume pp
-		return races[_raceIndex]->attack(*this, aim, skillIndex);
 	}
+	if (skillIndex > 0)
+		--_cpp[skillIndex - 1]; //consume pp
+	return races[_raceIndex]->attack(*this, aim, skillIndex);
+}
 
+// manual attack
+bool Pokemon::attack(Pokemon &aim, int skillIndex)
+{
 	//manual fight, get skillIndex
 	// dbout << _name << ", your turn!\n";
 	// dbout << "Choose a skill to attack!\n";
@@ -427,11 +433,12 @@ bool Pokemon::attack(Pokemon &aim, bool autoFight)
 		// dbout << skillDscp(i) << endl;
 	}
 	// dbout << "Please input a number: ";
-	dbin >> skillIndex;
-	dbin.clear();
-	dbin.sync();
-	dbin.ignore();
+	// dbin >> skillIndex;
+	// dbin.clear();
+	// dbin.sync();
+	// dbin.ignore();
 	// dbout << endl;
+
 	//attack
 	--skillIndex;
 	if (skillIndex < 0 || skillIndex > 3)

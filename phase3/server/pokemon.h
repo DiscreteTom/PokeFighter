@@ -104,7 +104,8 @@ public:
 
 	//about battle
 	void restoreAll();
-	bool attack(Pokemon &aim, bool autoFight = true);
+	bool attack(Pokemon &aim); // auto attack
+	bool attack(Pokemon &aim, int skillIndex); // manual attack
 	bool takeDamage(int n);
 	bool gainExp(int count); //return true if level-up
 	//getter

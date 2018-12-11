@@ -39,6 +39,7 @@ class Endpoint
 	// about player
 	int playerID;
 	string playerUsername;
+	bool isDuel;
 
 	// about thread
 	mutex mtx;

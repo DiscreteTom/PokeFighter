@@ -204,6 +204,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	connect(btnEnemyRace0, &QPushButton::clicked, [this] {
 		battleStart = true;
 		QString msg = "battle ";
+		if ((state & LV_UP_BATTLE) == LV_UP_BATTLE)
+			msg += "LV_UP ";
+		else
+			msg += "DUEL ";
 		msg += battlePokemonID + ' ';
 		msg += "0 ";
 		msg += QString::number(sbEnemyLV->value());
@@ -213,6 +217,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	connect(btnEnemyRace1, &QPushButton::clicked, [this] {
 		battleStart = true;
 		QString msg = "battle ";
+		if ((state & LV_UP_BATTLE) == LV_UP_BATTLE)
+			msg += "LV_UP ";
+		else
+			msg += "DUEL ";
 		msg += battlePokemonID + ' ';
 		msg += "1 ";
 		msg += QString::number(sbEnemyLV->value());
@@ -222,6 +230,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	connect(btnEnemyRace2, &QPushButton::clicked, [this] {
 		battleStart = true;
 		QString msg = "battle ";
+		if ((state & LV_UP_BATTLE) == LV_UP_BATTLE)
+			msg += "LV_UP ";
+		else
+			msg += "DUEL ";
 		msg += battlePokemonID + ' ';
 		msg += "2 ";
 		msg += QString::number(sbEnemyLV->value());
@@ -231,6 +243,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	connect(btnEnemyRace3, &QPushButton::clicked, [this] {
 		battleStart = true;
 		QString msg = "battle ";
+		if ((state & LV_UP_BATTLE) == LV_UP_BATTLE)
+			msg += "LV_UP ";
+		else
+			msg += "DUEL ";
 		msg += battlePokemonID + ' ';
 		msg += "3 ";
 		msg += QString::number(sbEnemyLV->value());

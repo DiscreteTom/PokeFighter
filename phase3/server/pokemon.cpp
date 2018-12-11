@@ -442,7 +442,6 @@ bool Pokemon::attack(Pokemon &aim, int skillIndex, string &msg)
 	// dbout << endl;
 
 	//attack
-	--skillIndex;
 	if (skillIndex < 0 || skillIndex > 3)
 		skillIndex = 0;
 	if (skillIndex * 5 <= _lv && _cpp[skillIndex - 1]) //check again by LV and PP

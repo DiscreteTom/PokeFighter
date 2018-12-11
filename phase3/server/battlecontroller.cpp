@@ -30,28 +30,43 @@ bool BattleController::start()
 				recv(connSocket, buf, BUF_LENGTH, 0);
 				int index;
 				sscanf(buf, "%d", index);
-				if (p1.attack(p2, index)) // player manual fight
+				msg = "1 ";
+				if (p1.attack(p2, index, msg)) // player manual fight
 					break;
-				if (p2.attack(p1)) // enemy auto fight
+				strcpy(buf, msg.c_str);
+				send(connSocket, buf, BUF_LENGTH, 0);
+				msg = "0 ";
+				if (p2.attack(p1, msg)) // enemy auto fight
 					break;
+				strcpy(buf, msg.c_str);
+				send(connSocket, buf, BUF_LENGTH, 0);
 			}
 			else
 			{
-				if (p2.attack(p1))
+				msg = "0 ";
+				if (p2.attack(p1, msg))
 					break;
+				strcpy(buf, msg.c_str);
+				send(connSocket, buf, BUF_LENGTH, 0);
 				recv(connSocket, buf, BUF_LENGTH, 0);
 				int index;
 				sscanf(buf, "%d", index);
-				if (p1.attack(p2, index))
+				msg = "1 ";
+				if (p1.attack(p2, index, msg))
 					break;
+				strcpy(buf, msg.c_str);
+				send(connSocket, buf, BUF_LENGTH, 0);
 			}
 			timer1 = timer2 = 0;
 		}
 		else if (timer1 >= p1.cspeed())
 		{
 			//p2 attack
-			if (p2.attack(p1))
+			msg = "0 ";
+			if (p2.attack(p1, msg))
 				break;
+			strcpy(buf, msg.c_str);
+			send(connSocket, buf, BUF_LENGTH, 0);
 			timer1 = 0;
 		}
 		else
@@ -59,11 +74,17 @@ bool BattleController::start()
 			recv(connSocket, buf, BUF_LENGTH, 0);
 			int index;
 			sscanf(buf, "%d", index);
-			if (p1.attack(p2, index))
+			msg = "1 ";
+			if (p1.attack(p2, index, msg))
 				break;
+			strcpy(buf, msg.c_str);
+			send(connSocket, buf, BUF_LENGTH, 0);
 			timer2 = 0;
 		}
 	}
+
+	strcpy(buf, msg.c_str);
+	send(connSocket, buf, BUF_LENGTH, 0);
 
 	if (p1.hp())
 	{

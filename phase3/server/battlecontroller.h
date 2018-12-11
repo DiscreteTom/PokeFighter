@@ -2,6 +2,7 @@
 
 #include "pokemon.h"
 #include "netconfig.h"
+#include <string>
 
 // about socket
 #include <WinSock2.h>
@@ -17,6 +18,7 @@ private:
 	int timer2;
 	char buf[BUF_LENGTH];
 	SOCKET &connSocket;
+	string msg;
 
 public:
 	BattleController(Pokemon &playerPokemon, Pokemon &enemyPokemon, SOCKET &connSocket);

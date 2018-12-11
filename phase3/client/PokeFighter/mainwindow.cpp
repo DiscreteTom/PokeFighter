@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QFile>
 #include <QTextStream>
+#include <QThread>
 #include <QHostAddress>
 #include "netconfig.h"
 #include "pokemondlg.h"
@@ -91,6 +92,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	pbP2HP = new QProgressBar(this);
 	//	pbP1AtkInterval = new QProgressBar(this);
 	//	pbP2AtkInterval = new QProgressBar(this);
+	lbP1SkillName = new QLabel(this);
+	lbP2SkillName = new QLabel(this);
 
 	// pokemon table and player table
 	table = new QTableWidget(this);
@@ -334,6 +337,8 @@ void MainWindow::changeState(int aim)
 	pbP2HP->hide();
 	//	pbP1AtkInterval->hide();
 	//	pbP2AtkInterval->hide();
+	lbP1SkillName->hide();
+	lbP2SkillName->hide();
 	table->hide();
 	table->clear();
 	btnPlay->setDefault(false);
@@ -490,8 +495,10 @@ void MainWindow::changeState(int aim)
 		//		pbP2AtkInterval->show();
 		layout->addWidget(pbP1HP, 0, 0, 1, 2);
 		//		layout->addWidget(pbP1AtkInterval, 1, 0, 1, 2);
+		layout->addWidget(lbP1SkillName, 1, 0, 1, 2);
 		layout->addWidget(pbP2HP, 0, 2, 1, 2);
 		//		layout->addWidget(pbP2AtkInterval, 1, 2, 1, 2);
+		layout->addWidget(lbP2SkillName, 1, 2, 1, 2);
 		layout->addWidget(lbP1, 2, 0, 1, 2);
 		layout->addWidget(lbP2, 2, 2, 1, 2);
 		layout->addWidget(btnSkill_1, 3, 0, 1, 1);
@@ -546,6 +553,43 @@ void MainWindow::login()
 		btnLogin->setDisabled(false);
 	}
 	lePassword->clear();
+}
+
+void MainWindow::getImproved(QLabel *lb)
+{
+	lb->move(lb->x(), lb->y() + 50);
+	QThread::msleep(50);
+	lb->move(lb->x(), lb->y() + 50);
+	QThread::msleep(50);
+	lb->move(lb->x(), lb->y() + 50);
+	QThread::msleep(50);
+	lb->move(lb->x(), lb->y() + 50);
+	QThread::msleep(50);
+	lb->move(lb->x(), lb->y() + 50);
+	QThread::msleep(50);
+	lb->move(lb->x(), lb->y() - 50);
+	QThread::msleep(50);
+	lb->move(lb->x(), lb->y() - 50);
+	QThread::msleep(50);
+	lb->move(lb->x(), lb->y() - 50);
+	QThread::msleep(50);
+	lb->move(lb->x(), lb->y() - 50);
+	QThread::msleep(50);
+	lb->move(lb->x(), lb->y() - 50);
+	QThread::msleep(50);
+}
+
+void MainWindow::getDecreased(QLabel *lb)
+{
+	// P1 lose HP
+	lb->hide();
+	QThread::msleep(200);
+	lb->show();
+	QThread::msleep(200);
+	lb->hide();
+	QThread::msleep(200);
+	lb->show();
+	QThread::msleep(200);
 }
 
 void MainWindow::getServerMsg()
@@ -832,11 +876,261 @@ void MainWindow::getServerMsg()
 			battleStart = false;
 			break;
 		}
-		btnSkill_1->setDisabled(false);
-		btnSkill_2->setDisabled(false);
-		btnSkill_3->setDisabled(false);
-		btnSkill_4->setDisabled(false);
+		if (msg == "turn")
+		{
+			btnSkill_1->setDisabled(false);
+			btnSkill_2->setDisabled(false);
+			btnSkill_3->setDisabled(false);
+			btnSkill_4->setDisabled(false);
+			break;
+		}
 		auto detail = msg.split(' ');
+		if (detail[0] == '1')
+		{
+			lbP1SkillName->setText(detail[1]);
+			QThread::msleep(500);
+			if (detail[2] == '1')
+			{
+				// dodge!
+				lbP2SkillName->setText(tr("闪避！"));
+				QThread::msleep(500);
+				lbP2SkillName->clear();
+				break;
+			}
+			// not dodge
+			if (pbP2HP->value() > detail[3].toInt())
+			{
+				lbP2SkillName->setText(QString::number(detail[3].toInt() - pbP2HP->value()));
+				getDecreased(lbP2);
+				lbP2SkillName->clear();
+			}
+			else if (pbP2HP->value() < detail[3].toInt())
+			{
+				// hp increased
+				lbP2SkillName->setText(QString::number(detail[3].toInt() - pbP2HP->value()));
+				getImproved(lbP2);
+				lbP2SkillName->clear();
+			}
+			pbP2HP->setValue(detail[3].toInt());
+			if (detail[4] == '0')
+			{
+				lbP2SkillName->setText(tr("攻击下降"));
+				getDecreased(lbP2);
+				lbP2SkillName->clear();
+			}
+			else if (detail[4] == '2')
+			{
+				lbP2SkillName->setText(tr("攻击上升"));
+				getImproved(lbP2);
+				lbP2SkillName->clear();
+			}
+			if (detail[5] == '0')
+			{
+				lbP2SkillName->setText(tr("防御下降"));
+				getDecreased(lbP2);
+				lbP2SkillName->clear();
+			}
+			else if (detail[5] == '2')
+			{
+				lbP2SkillName->setText(tr("防御上升"));
+				getImproved(lbP2);
+				lbP2SkillName->clear();
+			}
+			if (detail[6] == '0')
+			{
+				lbP2SkillName->setText(tr("速度下降"));
+				getDecreased(lbP2);
+				lbP2SkillName->clear();
+			}
+			else if (detail[6] == '2')
+			{
+				lbP2SkillName->setText(tr("速度上升"));
+				getImproved(lbP2);
+				lbP2SkillName->clear();
+			}
+			if (pbP1HP->value() > detail[11].toInt()){
+				// hp decreased
+				lbP1SkillName.setText(QString::number(detail[11].toInt() - pbP1HP->value()));
+				getDecreased(lbP1);
+				lbP1SkillName->clear();
+			} else if (pbP1HP->value() < detail[11].toInt()){
+				// hp increased
+				lbP1SkillName->setText(QString::number(detail[11].toInt() - pbP1HP->value()));
+				getImproved(lbP1);
+				lbP1SkillName->clear();
+			}
+						pbP1HP->setValue(detail[11].toInt());
+			if (detail[12] == '0')
+			{
+				lbP1SkillName->setText(tr("攻击下降"));
+				getDecreased(lbP1);
+				lbP1SkillName->clear();
+			}
+			else if (detail[12] == '2')
+			{
+				lbP1SkillName->setText(tr("攻击上升"));
+				getImproved(lbP1);
+				lbP1SkillName->clear();
+			}
+			if (detail[13] == '0')
+			{
+				lbP1SkillName->setText(tr("防御下降"));
+				getDecreased(lbP1);
+				lbP1SkillName->clear();
+			}
+			else if (detail[13] == '2')
+			{
+				lbP1SkillName->setText(tr("防御上升"));
+				getImproved(lbP1);
+				lbP1SkillName->clear();
+			}
+			if (detail[14] == '0')
+			{
+				lbP1SkillName->setText(tr("速度下降"));
+				getDecreased(lbP1);
+				lbP1SkillName->clear();
+			}
+			else if (detail[14] == '2')
+			{
+				lbP1SkillName->setText(tr("速度上升"));
+				getImproved(lbP1);
+				lbP1SkillName->clear();
+			}
+			auto skillName = btnSkill_2->text().split(' ')[0];
+			btnSkill_2->setText(skillName + ' ' + detail[15]);
+			skillName = btnSkill_3->text().split(' ')[0];
+			btnSkill_3->setText(skillName + ' ' + detail[16]);
+			skillName = btnSkill_4->text().split(' ')[0];
+			btnSkill_4->setText(skillName + ' ' + detail[17]);
+			lbP1SkillName->clear();
+		} else {
+			// detail[0] == '0', p2's turn
+			lbP2SkillName->setText(detail[1]);
+			QThread::msleep(500);
+			if (detail[2] == '1')
+			{
+				// dodge!
+				lbP1SkillName->setText(tr("闪避！"));
+				QThread::msleep(500);
+				lbP1SkillName->clear();
+				break;
+			}
+			// not dodge
+			if (pbP1HP->value() > detail[3].toInt())
+			{
+				lbP1SkillName->setText(QString::number(detail[3].toInt() - pbP1HP->value()));
+				getDecreased(lbP1);
+				lbP1SkillName->clear();
+			}
+			else if (pbP1HP->value() < detail[3].toInt())
+			{
+				// hp increased
+				lbP1SkillName->setText(QString::number(detail[3].toInt() - pbP1HP->value()));
+				getImproved(lbP1);
+				lbP1SkillName->clear();
+			}
+			pbP1HP->setValue(detail[3].toInt());
+			if (detail[4] == '0')
+			{
+				lbP1SkillName->setText(tr("攻击下降"));
+				getDecreased(lbP1);
+				lbP1SkillName->clear();
+			}
+			else if (detail[4] == '2')
+			{
+				lbP1SkillName->setText(tr("攻击上升"));
+				getImproved(lbP1);
+				lbP1SkillName->clear();
+			}
+			if (detail[5] == '0')
+			{
+				lbP1SkillName->setText(tr("防御下降"));
+				getDecreased(lbP1);
+				lbP1SkillName->clear();
+			}
+			else if (detail[5] == '2')
+			{
+				lbP1SkillName->setText(tr("防御上升"));
+				getImproved(lbP1);
+				lbP1SkillName->clear();
+			}
+			if (detail[6] == '0')
+			{
+				lbP1SkillName->setText(tr("速度下降"));
+				getDecreased(lbP1);
+				lbP1SkillName->clear();
+			}
+			else if (detail[6] == '2')
+			{
+				lbP1SkillName->setText(tr("速度上升"));
+				getImproved(lbP1);
+				lbP1SkillName->clear();
+			}
+			if (pbP2HP->value() > detail[11].toInt()){
+				// hp decreased
+				lbP2SkillName.setText(QString::number(detail[11].toInt() - pbP2HP->value()));
+				getDecreased(lbP2);
+				lbP2SkillName->clear();
+			} else if (pbP2HP->value() < detail[11].toInt()){
+				// hp increased
+				lbP2SkillName->setText(QString::number(detail[11].toInt() - pbP2HP->value()));
+				getImproved(lbP2);
+				lbP2SkillName->clear();
+			}
+						pbP2HP->setValue(detail[11].toInt());
+			if (detail[12] == '0')
+			{
+				lbP2SkillName->setText(tr("攻击下降"));
+				getDecreased(lbP2);
+				lbP2SkillName->clear();
+			}
+			else if (detail[12] == '2')
+			{
+				lbP2SkillName->setText(tr("攻击上升"));
+				getImproved(lbP2);
+				lbP2SkillName->clear();
+			}
+			if (detail[13] == '0')
+			{
+				lbP2SkillName->setText(tr("防御下降"));
+				getDecreased(lbP2);
+				lbP2SkillName->clear();
+			}
+			else if (detail[13] == '2')
+			{
+				lbP2SkillName->setText(tr("防御上升"));
+				getImproved(lbP2);
+				lbP2SkillName->clear();
+			}
+			if (detail[14] == '0')
+			{
+				lbP2SkillName->setText(tr("速度下降"));
+				getDecreased(lbP2);
+				lbP2SkillName->clear();
+			}
+			else if (detail[14] == '2')
+			{
+				lbP2SkillName->setText(tr("速度上升"));
+				getImproved(lbP2);
+				lbP2SkillName->clear();
+			}
+			auto skillName = btnSkill_2->text().split(' ')[0];
+			btnSkill_2->setText(skillName + ' ' + detail[7]);
+			skillName = btnSkill_3->text().split(' ')[0];
+			btnSkill_3->setText(skillName + ' ' + detail[8]);
+			skillName = btnSkill_4->text().split(' ')[0];
+			btnSkill_4->setText(skillName + ' ' + detail[9]);
+			lbP2SkillName->clear();
+		}
+
+		// judge result
+		if (pbP2HP->value() == 0){
+			QMessageBox::information(this, tr("恭喜"), tr("你赢得了战斗"));
+			changeState(MAIN);
+		} else if (pbP1HP->value() == 0){
+			QMessageBox::information(this, tr("抱歉"), tr("您战败了"));
+			changeState(MAIN);
+		}
 
 		break;
 	}

@@ -98,6 +98,8 @@ private:
 	QProgressBar * pbP2HP;
 //	QProgressBar * pbP1AtkInterval;
 //	QProgressBar * pbP2AtkInterval;
+	QLabel * lbP1SkillName;
+	QLabel * lbP2SkillName;
 
 
 	// pokemon table and player table
@@ -123,6 +125,8 @@ private:
 
 	void changeState(int aim);
 	void login();
+	void getImproved(QLabel * lb);
+	void getDecreased(QLabel *lb);
 private slots:
 	void getServerMsg();
 };

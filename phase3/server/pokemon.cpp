@@ -82,13 +82,15 @@ int PokemonBase::expCurve(int level) const
 	return 0;
 }
 
-bool PokemonBase::dodge(int attacker, int aim) const
+bool PokemonBase::dodge(int attacker, int aim, string &msg) const
 {
 	if ((attacker + f(40)) / 80 - aim / 150 < 0)
 	{
 		// dbout << "Miss!\n";
+		msg += '1 ';
 		return true;
 	}
+	msg += '0 ';
 	return false;
 }
 
@@ -354,7 +356,7 @@ bool Pokemon::gainExp(int count)
 }
 
 // auto attack
-bool Pokemon::attack(Pokemon &aim)
+bool Pokemon::attack(Pokemon &aim, string &msg)
 {
 	int skillIndex = 0;
 	//judge usable skill by LV and PP
@@ -394,7 +396,7 @@ bool Pokemon::attack(Pokemon &aim)
 }
 
 // manual attack
-bool Pokemon::attack(Pokemon &aim, int skillIndex)
+bool Pokemon::attack(Pokemon &aim, int skillIndex, string &msg)
 {
 	//manual fight, get skillIndex
 	// dbout << _name << ", your turn!\n";
@@ -446,10 +448,10 @@ bool Pokemon::attack(Pokemon &aim, int skillIndex)
 	if (skillIndex * 5 <= _lv && _cpp[skillIndex - 1]) //check again by LV and PP
 	{
 		--_cpp[skillIndex - 1]; //consume PP
-		return races[_raceIndex]->attack(*this, aim, skillIndex);
+		return races[_raceIndex]->attack(*this, aim, msg, skillIndex);
 	}
 
-	return races[_raceIndex]->attack(*this, aim, 0);
+	return races[_raceIndex]->attack(*this, aim, msg, 0);
 }
 
 bool Pokemon::takeDamage(int n)
@@ -488,43 +490,89 @@ Race<0>::Race() : PokemonBase(ATK)
 }
 
 template <>
-bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
+bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillIndex) const
 {
 	// dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
+
+	msg += attacker.skillName(skillIndex) + ' ';
 
 	switch (skillIndex)
 	{
 	case 1: //spark
 	{
-		if (dodge(attacker.cspeed(), aim.cspeed()))
+		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
 		int dmg = attacker.catk() + attacker.lv() * 2 - aim.cdef() / 2 + f(4);
-		return aim.takeDamage(dmg);
+		// return aim.takeDamage(dmg);
+		bool result = aim.takeDamage(dmg);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		return result;
 
 		break;
 	}
 	case 2: //rage
 		attacker.changeAtk(attacker.atk() / 8);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 2 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
 		break;
 	case 3: //fireball
 	{
-		if (dodge(attacker.cspeed(), aim.cspeed()))
+		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
 		int dmg = attacker.catk() * 1.5 - aim.cdef() + 8 + f(4 + attacker.lv());
-		return aim.takeDamage(dmg);
+		bool result = aim.takeDamage(dmg);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		return result;
 
 		break;
 	}
 	default:
 	{
 		//simple attack
-		if (dodge(attacker.cspeed(), aim.cspeed()))
+		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
 		int dmg = attacker.catk() - aim.cdef() + f(4);
-		return aim.takeDamage(dmg);
+		bool result = aim.takeDamage(dmg);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		return result;
 
 		break;
 	}
@@ -556,47 +604,92 @@ Race<1>::Race() : PokemonBase(HP)
 }
 
 template <>
-bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
+bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillIndex) const
 {
 	// dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
+
+	msg += attacker.skillName(skillIndex) + ' ';
 
 	switch (skillIndex)
 	{
 	case 1: //photosynthesis
 	{
 		attacker.changeHp(attacker.catk() / 2 + attacker.cdef() + f(4));
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
 		break;
 	}
 	case 2: //life drain
 	{
-		if (dodge(attacker.cspeed(), aim.cspeed()))
+		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
 		int dmg = attacker.catk() + f(4 + attacker.lv());
 		if (dmg < 10)
 			dmg = 10;
 		attacker.changeHp(dmg);
-		return aim.takeDamage(dmg);
+		bool result = aim.takeDamage(dmg);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		return result;
 		break;
 	}
 	case 3: //razor leaf
 	{
-		if (dodge(attacker.cspeed(), aim.cspeed()))
+		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
 		int dmg = attacker.catk() * 2 - aim.cdef() + f(3 + attacker.lv());
-		return aim.takeDamage(dmg);
+		bool result = aim.takeDamage(dmg);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		return result;
 
 		break;
 	}
 	default:
 	{
 		//simple attack
-		if (dodge(attacker.cspeed(), aim.cspeed()))
+		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
 		int dmg = attacker.catk() - aim.cdef() + f(4);
-		return aim.takeDamage(dmg);
+		bool result = aim.takeDamage(dmg);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		return result;
 
 		break;
 	}
@@ -628,46 +721,93 @@ Race<2>::Race() : PokemonBase(DEF)
 }
 
 template <>
-bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
+bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillIndex) const
 {
 	// dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
+
+	msg += attacker.skillName(skillIndex) + ' ';
 
 	switch (skillIndex)
 	{
 	case 1: //iron defence
 	{
 		attacker.changeDef(2);
+		// bool result = aim.takeDamage(dmg);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 2 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		// return result;
 		break;
 	}
 	case 2: //water pulse
 	{
 		attacker.changeAtk(2);
-		if (dodge(attacker.cspeed(), aim.cspeed()))
+		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
 		int dmg = attacker.catk() - aim.cdef() + f(4 + attacker.lv());
-		return aim.takeDamage(dmg);
+		bool result = aim.takeDamage(dmg);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		return result;
 
 		break;
 	}
 	case 3: //hydro pump
 	{
-		if (dodge(attacker.cspeed(), aim.cspeed()))
+		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
 		int dmg = attacker.catk() * 2 - aim.cdef() + f(3 + attacker.lv());
-		return aim.takeDamage(dmg);
+		bool result = aim.takeDamage(dmg);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		return result;
 
 		break;
 	}
 	default:
 	{
 		//simple attack
-		if (dodge(attacker.cspeed(), aim.cspeed()))
+		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
 		int dmg = attacker.catk() - aim.cdef() + f(4);
-		return aim.takeDamage(dmg);
+		bool result = aim.takeDamage(dmg);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		return result;
 
 		break;
 	}
@@ -699,45 +839,92 @@ Race<3>::Race() : PokemonBase(SPE)
 }
 
 template <>
-bool Race<3>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
+bool Race<3>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillIndex) const
 {
 	// dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
+
+	msg += attacker.skillName(skillIndex) + ' ';
 
 	switch (skillIndex)
 	{
 	case 1: //agility
 	{
 		attacker.changeSpeed(attacker.speed() / 5);
+		// bool result = aim.takeDamage(dmg);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 1 2 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		// return result;
 		break;
 	}
 	case 2: //wing attack
 	{
-		if (dodge(attacker.cspeed(), aim.cspeed()))
+		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
 		int dmg = attacker.catk() + attacker.cspeed() / 4 - aim.cdef() + f(4 + attacker.lv());
-		return aim.takeDamage(dmg);
+		bool result = aim.takeDamage(dmg);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		return result;
 
 		break;
 	}
 	case 3: //take down
 	{
-		if (dodge(attacker.cspeed(), aim.cspeed()))
+		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
 		int dmg = attacker.catk() - aim.cdef() + attacker.cspeed() / 2 + f(3 + attacker.lv());
-		return aim.takeDamage(dmg);
+		bool result = aim.takeDamage(dmg);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		return result;
 
 		break;
 	}
 	default:
 	{
 		//simple attack
-		if (dodge(attacker.cspeed(), aim.cspeed()))
+		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
 		int dmg = attacker.catk() - aim.cdef() + f(4);
-		return aim.takeDamage(dmg);
+		bool result = aim.takeDamage(dmg);
+		msg += to_string(aim.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		msg += to_string(attacker.hp()) + " 1 1 1 ";
+		for (int i = 0; i < 3; ++i)
+		{
+			msg += to_string(aim.cpp(i)) + ' ';
+		}
+		return result;
 
 		break;
 	}

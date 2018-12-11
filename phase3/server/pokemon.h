@@ -104,8 +104,8 @@ public:
 
 	//about battle
 	void restoreAll();
-	bool attack(Pokemon &aim); // auto attack
-	bool attack(Pokemon &aim, int skillIndex); // manual attack
+	bool attack(Pokemon &aim, string &msg); // auto attack
+	bool attack(Pokemon &aim, int skillIndex, string &msg); // manual attack
 	bool takeDamage(int n);
 	bool gainExp(int count); //return true if level-up
 	//getter
@@ -131,5 +131,5 @@ class Race : public PokemonBase
 public:
 	Race();
 	virtual ~Race() = default;
-	bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const;
+	bool attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillIndex = 0) const;
 };

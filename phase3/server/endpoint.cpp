@@ -576,7 +576,8 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 	}
 	result += to_string(p1.pp(0)) + ' ';
 	result += to_string(p1.pp(1)) + ' ';
-	result += to_string(p1.pp(2)) + '\n';
+	result += to_string(p1.pp(2)) + ' ';
+	result += to_string(p1.lv()) + '\n';
 
 	Pokemon *p2 = Pokemon::getEnemy(enemyRaceID, enemyLV);
 

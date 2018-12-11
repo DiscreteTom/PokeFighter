@@ -892,6 +892,7 @@ void MainWindow::getServerMsg()
 			btnSkill_2->setText(btnSkill_2->text() + ' ' + detail[10]);
 			btnSkill_3->setText(btnSkill_3->text() + ' ' + detail[11]);
 			btnSkill_4->setText(btnSkill_4->text() + ' ' + detail[12]);
+			currentPokemonLV = detail[13].toInt();
 			detail = ps[1].split(' ');
 			if (detail[0] == "妙蛙种子")
 			{
@@ -918,9 +919,12 @@ void MainWindow::getServerMsg()
 		if (msg == "turn")
 		{
 			btnSkill_1->setDisabled(false);
-			btnSkill_2->setDisabled(false);
-			btnSkill_3->setDisabled(false);
-			btnSkill_4->setDisabled(false);
+			if (currentPokemonLV >= 5 && btnSkill_2->text().split(' ')[1].toInt() > 0)
+				btnSkill_2->setDisabled(false);
+			if (currentPokemonLV >= 10 && btnSkill_3->text().split(' ')[1].toInt() > 0)
+				btnSkill_3->setDisabled(false);
+			if (currentPokemonLV >= 15 && btnSkill_4->text().split(' ')[1].toInt() > 0)
+				btnSkill_4->setDisabled(false);
 			break;
 		}
 		auto detail = msg.split(' ');

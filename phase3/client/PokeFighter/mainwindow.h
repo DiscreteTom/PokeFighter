@@ -121,6 +121,7 @@ private:
 	QString battlePokemonID;
 	bool gettingDuelStatistic;
 	bool battleStart;
+	int currentPokemonLV;
 
 	void changeState(int aim);
 	void login();

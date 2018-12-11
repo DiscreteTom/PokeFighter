@@ -520,7 +520,9 @@ bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 
 		break;
 	}
-	case 2: //rage
+	case 2:				 //rage
+		msg += "0 "; // can not dodge
+
 		attacker.changeAtk(attacker.atk() / 8);
 		msg += to_string(aim.hp()) + " 1 1 1 ";
 		for (int i = 0; i < 3; ++i)
@@ -614,6 +616,8 @@ bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 	{
 	case 1: //photosynthesis
 	{
+		msg += "0 "; // can not dodge
+
 		attacker.changeHp(attacker.catk() / 2 + attacker.cdef() + f(4));
 		msg += to_string(aim.hp()) + " 1 1 1 ";
 		for (int i = 0; i < 3; ++i)
@@ -731,6 +735,8 @@ bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 	{
 	case 1: //iron defence
 	{
+		msg += "0 "; // can not dodge
+
 		attacker.changeDef(2);
 		// bool result = aim.takeDamage(dmg);
 		msg += to_string(aim.hp()) + " 1 1 1 ";
@@ -849,6 +855,8 @@ bool Race<3>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 	{
 	case 1: //agility
 	{
+		msg += "0 "; // can not dodge
+
 		attacker.changeSpeed(attacker.speed() / 5);
 		// bool result = aim.takeDamage(dmg);
 		msg += to_string(aim.hp()) + " 1 1 1 ";

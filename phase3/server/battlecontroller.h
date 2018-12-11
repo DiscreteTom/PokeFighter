@@ -20,6 +20,6 @@ private:
 
 public:
 	BattleController(Pokemon &playerPokemon, Pokemon &enemyPokemon, SOCKET &connSocket);
-	void start();
+	bool start(); // return true if playerPokemon won
 	// bool useSkill(int skillIndex);// return true if battle finished
 };

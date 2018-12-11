@@ -4,7 +4,7 @@ BattleController::BattleController(Pokemon &playerPokemon, Pokemon &enemyPokemon
 {
 }
 
-void BattleController::start()
+bool BattleController::start()
 {
 	// dbout << p1.name() << " VS " << p2.name() << "!\n";
 	// dbout << "Battle Start!\n\n";
@@ -68,11 +68,11 @@ void BattleController::start()
 	if (p1.hp())
 	{
 		// dbout << p1.name() << " won!\n\n";
-		return;
+		return true;
 	}
 	else
 	{
 		// dbout << p2.name() << " won!\n\n";
-		return;
+		return false;
 	}
 }

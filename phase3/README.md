@@ -83,7 +83,7 @@ getPlayerList
 getPokemonList [playerID]
 getPokemon <pokemonID>
 pokemonChangeName <pokemonID> <newName>
-battle <type: "LV_UP" | "DUEL"> <pokemonID> <enemyRaceID> <enemyLV>
+battle <pokemonID> <enemyRaceID> <enemyLV>
 useSkill <skillID>
 getDuelStatistic
 ```
@@ -103,10 +103,10 @@ getDuelStatistic
 发送到客户端的战斗信息格式：
 
 ```shell
-<playerRound: 0 | 1> <skillName> <defenderHP> <defenderAtk: 0 | 1 | 2> <defenderDef: 0 | 1 | 2> <defenderSpeed: 0 | 1 | 2> <defenderPP1> <defenderPP2> <defenderPP3> <attackerHP> <attackerAtk: 0 | 1 | 2> <attackerDef: 0 | 1 | 2> <attackerSpeed: 0 | 1 | 2> <attackerPP1> <attackerPP2> <attackerPP3>
+<playerRound: 0 | 1> <skillName> <dodge: 0 | 1> <defenderHP> <defenderAtk: 0 | 1 | 2> <defenderDef: 0 | 1 | 2> <defenderSpeed: 0 | 1 | 2> <defenderPP1> <defenderPP2> <defenderPP3> <attackerHP> <attackerAtk: 0 | 1 | 2> <attackerDef: 0 | 1 | 2> <attackerSpeed: 0 | 1 | 2> <attackerPP1> <attackerPP2> <attackerPP3>
 ```
 
-其中playerRound为1表示玩家的回合，为0表示对手的回合。属性为0表示下降，为1表示不变，为2表示上升。
+其中playerRound为1表示玩家的回合，为0表示对手的回合。属性为0表示下降，为1表示不变，为2表示上升。HP显示精灵剩余血量。闪避为0表示闪避失败
 
 客户端需要监视精灵血量，当血量为0时战斗终止。
 

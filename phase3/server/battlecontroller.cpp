@@ -19,6 +19,7 @@ bool BattleController::start()
 
 	while (1)
 	{
+		recv(connSocket, buf, BUF_LENGTH, 0);
 		while (timer1 < p1.cspeed() && timer2 < p2.cspeed())
 		{
 			++timer1;

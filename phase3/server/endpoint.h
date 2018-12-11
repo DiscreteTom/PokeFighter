@@ -61,7 +61,7 @@ class Endpoint
 	void battle(const string &pokemonID, int enemyRaceID, int enemyLV);
 
 	// other functions
-	void savePokemonToDB(const Pokemon &p);
+	void savePokemonToDB(const Pokemon &p, int id = -1);
 
 public:
 	Endpoint(int playerID, sqlite3 *&db, Hub &hub);

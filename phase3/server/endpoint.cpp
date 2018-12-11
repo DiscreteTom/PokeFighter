@@ -417,23 +417,44 @@ void Endpoint::getPokemonList(int playerID)
 	sqlite3_free_table(sqlResult);
 }
 
-void Endpoint::savePokemonToDB(const Pokemon &p)
+void Endpoint::savePokemonToDB(const Pokemon &p, int id)
 {
-	string sql = "INSERT INTO Pokemon(userid, name, race, atk, def, maxHp, speed, lv, exp) VALUES('";
-	sql += to_string(playerID) + "','";
-	sql += p.name() + "',";
-	sql += to_string(p.raceIndex()) + ",";
-	sql += to_string(p.atk()) + ",";
-	sql += to_string(p.def()) + ",";
-	sql += to_string(p.maxHp()) + ",";
-	sql += to_string(p.speed()) + ",";
-	sql += to_string(p.lv()) + ",";
-	sql += to_string(p.exp()) + ");";
-	char *errMsg;
-	if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
+	if (id == -1)
 	{
-		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
-		sqlite3_free(errMsg);
+		string sql = "INSERT INTO Pokemon(userid, name, race, atk, def, maxHp, speed, lv, exp) VALUES('";
+		sql += to_string(playerID) + "','";
+		sql += p.name() + "',";
+		sql += to_string(p.raceIndex()) + ",";
+		sql += to_string(p.atk()) + ",";
+		sql += to_string(p.def()) + ",";
+		sql += to_string(p.maxHp()) + ",";
+		sql += to_string(p.speed()) + ",";
+		sql += to_string(p.lv()) + ",";
+		sql += to_string(p.exp()) + ");";
+		char *errMsg;
+		if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
+		{
+			cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+			sqlite3_free(errMsg);
+		}
+	}
+	else
+	{
+		string sql = "update Pokemon set atk=";
+		sql += to_string(p.atk()) + ", def=";
+		sql += to_string(p.def()) + ", maxHp=";
+		sql += to_string(p.maxHp()) + ", speed=";
+		sql += to_string(p.speed()) + ", lv=";
+		sql += to_string(p.lv()) + ", exp=";
+		sql += to_string(p.exp());
+		sql += " where id=";
+		sql += to_string(id) + ";";
+		char *errMsg;
+		if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
+		{
+			cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+			sqlite3_free(errMsg);
+		}
 	}
 }
 
@@ -539,10 +560,13 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 	// construct player pokemon
 	Pokemon p1 = Pokemon(sqlResult[10], stoi(sqlResult[11]), stoi(sqlResult[12]), stoi(sqlResult[13]), stoi(sqlResult[14]), stoi(sqlResult[15]), stoi(sqlResult[16]), stoi(sqlResult[17]));
 
+	int currentPokemonID = stoi(sqlResult[9]);
+
 	string result = "";
 	result += p1.raceName() + ' ';
-	result += p1.maxHp() + ' ';
-	for (int i = 0; i < 4; ++i){
+	result += to_string(p1.maxHp()) + ' ';
+	for (int i = 0; i < 4; ++i)
+	{
 		result += p1.skillName(i) + ' ';
 		result += p1.skillDscp(i) + ' ';
 	}
@@ -550,25 +574,33 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 	result += to_string(p1.pp(1)) + ' ';
 	result += to_string(p1.pp(2)) + '\n';
 
-	Pokemon p2 = *Pokemon::getEnemy(enemyRaceID, enemyLV);
+	Pokemon *p2 = Pokemon::getEnemy(enemyRaceID, enemyLV);
 
-	result += p2.raceName() + ' ';
-	result += p2.maxHp() + ' ';
+	result += p2->raceName() + ' ';
+	result += to_string(p2->maxHp()) + ' ';
 
 	strcpy(buf, result.c_str());
 	send(connSocket, buf, BUF_LENGTH, 0);
 
-	BattleController battle = BattleController(p1, p2, connSocket);
-	if (battle.start()){
-		if (p1.lv() > p2.lv() + 5){
+	BattleController battle = BattleController(p1, *p2, connSocket);
+	if (battle.start())
+	{
+		if (p1.lv() > p2->lv() + 5)
+		{
 			// no exp
-		} else if (p1.lv() >= p2.lv()){
-			p1.gainExp(p1.lv() - p2.lv() + 3 + f(2));
-		} else {
-			p1.gainExp((p2.lv() - p1.lv()) * 5);
+		}
+		else if (p1.lv() >= p2->lv())
+		{
+			p1.gainExp(p1.lv() - p2->lv() + 3 + f(2));
+		}
+		else
+		{
+			p1.gainExp((p2->lv() - p1.lv()) * 5 + f(5));
 		}
 	}
 
-	savePokemonToDB(p1);
-	delete &p2;
+	savePokemonToDB(p1, currentPokemonID);
+	delete p2;
+
+	sqlite3_free_table(sqlResult);
 }

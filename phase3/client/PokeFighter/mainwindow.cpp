@@ -94,7 +94,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	btnSkill_3 = new QPushButton(this);
 	btnSkill_4 = new QPushButton(this);
 	pbP1HP = new QProgressBar(this);
+	pbP1HP->setFormat("%v/%m");
 	pbP2HP = new QProgressBar(this);
+	pbP2HP->setFormat("%v/%m");
 	//	pbP1AtkInterval = new QProgressBar(this);
 	//	pbP2AtkInterval = new QProgressBar(this);
 	lbP1SkillName = new QLabel(this);
@@ -943,8 +945,13 @@ void MainWindow::getServerMsg()
 			// not dodge
 			if (pbP2HP->value() > detail[3].toInt())
 			{
+				// hp decreased
 				lbP2SkillName->setText(QString::number(detail[3].toInt() - pbP2HP->value()));
 				getDecreased(lbP2);
+				while (pbP2HP->value() > detail[3].toInt()){
+					mySleep(10);
+					pbP2HP->setValue(pbP2HP->value() - 1);
+				}
 				lbP2SkillName->clear();
 			}
 			else if (pbP2HP->value() < detail[3].toInt())
@@ -952,9 +959,12 @@ void MainWindow::getServerMsg()
 				// hp increased
 				lbP2SkillName->setText(QString::number(detail[3].toInt() - pbP2HP->value()));
 				getImproved(lbP2);
+				while (pbP2HP->value() < detail[3].toInt()){
+					mySleep(10);
+					pbP2HP->setValue(pbP2HP->value() + 1);
+				}
 				lbP2SkillName->clear();
 			}
-			pbP2HP->setValue(detail[3].toInt());
 			if (detail[4] == '0')
 			{
 				lbP2SkillName->setText(tr("攻击下降"));
@@ -996,6 +1006,10 @@ void MainWindow::getServerMsg()
 				// hp decreased
 				lbP1SkillName->setText(QString::number(detail[10].toInt() - pbP1HP->value()));
 				getDecreased(lbP1);
+				while (pbP1HP->value() > detail[10].toInt()){
+					mySleep(10);
+					pbP1HP->setValue(pbP1HP->value() - 1);
+				}
 				lbP1SkillName->clear();
 			}
 			else if (pbP1HP->value() < detail[10].toInt())
@@ -1003,9 +1017,12 @@ void MainWindow::getServerMsg()
 				// hp increased
 				lbP1SkillName->setText(QString::number(detail[10].toInt() - pbP1HP->value()));
 				getImproved(lbP1);
+				while (pbP1HP->value() < detail[10].toInt()){
+					mySleep(10);
+					pbP1HP->setValue(pbP1HP->value() + 1);
+				}
 				lbP1SkillName->clear();
 			}
-			pbP1HP->setValue(detail[10].toInt());
 			if (detail[11] == '0')
 			{
 				lbP1SkillName->setText(tr("攻击下降"));
@@ -1066,8 +1083,13 @@ void MainWindow::getServerMsg()
 			// not dodge
 			if (pbP1HP->value() > detail[3].toInt())
 			{
+				// hp decreased
 				lbP1SkillName->setText(QString::number(detail[3].toInt() - pbP1HP->value()));
 				getDecreased(lbP1);
+				while (pbP1HP->value() > detail[3].toInt()){
+					mySleep(10);
+					pbP1HP->setValue(pbP1HP->value() - 1);
+				}
 				lbP1SkillName->clear();
 			}
 			else if (pbP1HP->value() < detail[3].toInt())
@@ -1075,9 +1097,12 @@ void MainWindow::getServerMsg()
 				// hp increased
 				lbP1SkillName->setText(QString::number(detail[3].toInt() - pbP1HP->value()));
 				getImproved(lbP1);
+				while (pbP1HP->value() < detail[3].toInt()){
+					mySleep(10);
+					pbP1HP->setValue(pbP1HP->value() + 1);
+				}
 				lbP1SkillName->clear();
 			}
-			pbP1HP->setValue(detail[3].toInt());
 			if (detail[4] == '0')
 			{
 				lbP1SkillName->setText(tr("攻击下降"));
@@ -1119,6 +1144,10 @@ void MainWindow::getServerMsg()
 				// hp decreased
 				lbP2SkillName->setText(QString::number(detail[10].toInt() - pbP2HP->value()));
 				getDecreased(lbP2);
+				while (pbP2HP->value() > detail[10].toInt()){
+					mySleep(10);
+					pbP2HP->setValue(pbP2HP->value() - 1);
+				}
 				lbP2SkillName->clear();
 			}
 			else if (pbP2HP->value() < detail[10].toInt())
@@ -1126,9 +1155,12 @@ void MainWindow::getServerMsg()
 				// hp increased
 				lbP2SkillName->setText(QString::number(detail[10].toInt() - pbP2HP->value()));
 				getImproved(lbP2);
+				while (pbP2HP->value() < detail[10].toInt()){
+					mySleep(10);
+					pbP2HP->setValue(pbP2HP->value() + 1);
+				}
 				lbP2SkillName->clear();
 			}
-			pbP2HP->setValue(detail[10].toInt());
 			if (detail[11] == '0')
 			{
 				lbP2SkillName->setText(tr("攻击下降"));

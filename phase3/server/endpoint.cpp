@@ -608,6 +608,7 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 
 		if (isDuel)
 		{
+			// change win rate
 			string sql3 = "update User set win=" + to_string(stoi(sqlResult2[2]) + 1) + ", total=" + to_string(stoi(sqlResult2[3]) + 1) + " where id=" + to_string(playerID) + ";";
 			char *errMsg3;
 			if (sqlite3_exec(db, sql3.c_str(), nonUseCallback, NULL, &errMsg3) != SQLITE_OK)
@@ -615,6 +616,9 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 				cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg3 << endl;
 				sqlite3_free(errMsg3);
 			}
+
+			// get a new pokemon
+			savePokemonToDB(p2);
 		}
 
 		if (p1.lv() > p2->lv() + 5)

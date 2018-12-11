@@ -553,13 +553,6 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 
 	result += p2.raceName() + ' ';
 	result += p2.maxHp() + ' ';
-	for (int i = 0; i < 4; ++i){
-		result += p2.skillName(i) + ' ';
-		result += p2.skillDscp(i) + ' ';
-	}
-	result += to_string(p2.pp(0)) + ' ';
-	result += to_string(p2.pp(1)) + ' ';
-	result += to_string(p2.pp(2)) + '\n';
 
 	strcpy(buf, result.c_str());
 	send(connSocket, buf, BUF_LENGTH, 0);

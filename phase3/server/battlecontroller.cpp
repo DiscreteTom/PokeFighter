@@ -27,6 +27,7 @@ bool BattleController::start()
 		{
 			if (p1.cspeed() >= p2.cspeed())
 			{
+				send(connSocket, "turn", BUF_LENGTH, 0);
 				recv(connSocket, buf, BUF_LENGTH, 0);
 				int index;
 				sscanf(buf, "%d", index);
@@ -48,6 +49,7 @@ bool BattleController::start()
 					break;
 				strcpy(buf, msg.c_str);
 				send(connSocket, buf, BUF_LENGTH, 0);
+				send(connSocket, "turn", BUF_LENGTH, 0);
 				recv(connSocket, buf, BUF_LENGTH, 0);
 				int index;
 				sscanf(buf, "%d", index);
@@ -71,6 +73,7 @@ bool BattleController::start()
 		}
 		else
 		{
+			send(connSocket, "turn", BUF_LENGTH, 0);
 			recv(connSocket, buf, BUF_LENGTH, 0);
 			int index;
 			sscanf(buf, "%d", index);

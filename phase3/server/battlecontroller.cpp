@@ -1,6 +1,6 @@
 #include "battlecontroller.h"
 
-BattleController::BattleController(Pokemon &playerPokemon, Pokemon &enemyPokemon) : p1(pokemon1), p2(pokemon2)
+BattleController::BattleController(Pokemon &playerPokemon, Pokemon &enemyPokemon, SOCKET &connSocket) : p1(pokemon1), p2(pokemon2), connSocket(connSocket)
 {
 }
 
@@ -27,16 +27,22 @@ void BattleController::start()
 		{
 			if (p1.cspeed() >= p2.cspeed())
 			{
-				if (p1.attack(p2, false))// player manual fight
+				recv(connSocket, buf, BUF_LENGTH, 0);
+				int index;
+				sscanf(buf, "%d", index);
+				if (p1.attack(p2, index)) // player manual fight
 					break;
-				if (p2.attack(p1, true)) // enemy auto fight
+				if (p2.attack(p1)) // enemy auto fight
 					break;
 			}
 			else
 			{
-				if (p2.attack(p1, true))
+				if (p2.attack(p1))
 					break;
-				if (p1.attack(p2, false))
+				recv(connSocket, buf, BUF_LENGTH, 0);
+				int index;
+				sscanf(buf, "%d", index);
+				if (p1.attack(p2, index))
 					break;
 			}
 			timer1 = timer2 = 0;
@@ -44,13 +50,16 @@ void BattleController::start()
 		else if (timer1 >= p1.cspeed())
 		{
 			//p2 attack
-			if (p2.attack(p1, true))
+			if (p2.attack(p1))
 				break;
 			timer1 = 0;
 		}
 		else
 		{
-			if (p1.attack(p2, false))
+			recv(connSocket, buf, BUF_LENGTH, 0);
+			int index;
+			sscanf(buf, "%d", index);
+			if (p1.attack(p2, index))
 				break;
 			timer2 = 0;
 		}

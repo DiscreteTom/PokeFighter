@@ -513,7 +513,7 @@ bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 1 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		return result;
 
@@ -531,7 +531,7 @@ bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 2 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		break;
 	case 3: //fireball
@@ -549,7 +549,7 @@ bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 1 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		return result;
 
@@ -571,7 +571,7 @@ bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 1 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		return result;
 
@@ -626,7 +626,7 @@ bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 1 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		break;
 	}
@@ -648,7 +648,7 @@ bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 1 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		return result;
 		break;
@@ -668,7 +668,7 @@ bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 1 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		return result;
 
@@ -690,7 +690,7 @@ bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 1 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		return result;
 
@@ -746,7 +746,7 @@ bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 1 2 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		// return result;
 		break;
@@ -767,7 +767,7 @@ bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 2 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		return result;
 
@@ -788,7 +788,7 @@ bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 1 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		return result;
 
@@ -810,7 +810,7 @@ bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 1 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		return result;
 
@@ -866,7 +866,7 @@ bool Race<3>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 1 1 2 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		// return result;
 		break;
@@ -886,7 +886,7 @@ bool Race<3>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 1 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		return result;
 
@@ -907,7 +907,7 @@ bool Race<3>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 1 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		return result;
 
@@ -929,7 +929,7 @@ bool Race<3>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 		msg += to_string(attacker.hp()) + " 1 1 1 ";
 		for (int i = 0; i < 3; ++i)
 		{
-			msg += to_string(aim.cpp(i)) + ' ';
+			msg += to_string(attacker.cpp(i)) + ' ';
 		}
 		return result;
 

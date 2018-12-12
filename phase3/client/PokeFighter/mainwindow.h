@@ -108,6 +108,8 @@ private:
 
 	// pokemon table and player table
 	QTableWidget *table;
+	QLabel *lbPokemonNumBadge;
+	QLabel *lbPokemonMasterBadge;
 
 	// logon window
 	LogonDlg *logonDlg;

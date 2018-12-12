@@ -112,6 +112,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
 	// pokemon table and player table
 	table = new QTableWidget(this);
+	lbPokemonMasterBadge = new QLabel(this);
+	lbPokemonNumBadge = new QLabel(this);
 
 	// logon window
 	logonDlg = new LogonDlg(this);
@@ -379,6 +381,8 @@ void MainWindow::changeState(int aim)
 	btnBet[1]->hide();
 	btnBet[2]->hide();
 	btnBet[0]->hide();
+	lbPokemonMasterBadge->hide();
+	lbPokemonNumBadge->hide();
 	table->hide();
 	table->clear();
 	btnPlay->setDefault(false);
@@ -468,6 +472,15 @@ void MainWindow::changeState(int aim)
 			layout->addWidget(lbWinRate, 0, 2, 1, 1, Qt::AlignHCenter);
 			layout->addWidget(table, 1, 0, 1, 3);
 			layout->addWidget(btnBack, 2, 0, 1, 3);
+		}
+		else if (state == POKEMON_TABLE)
+		{
+			lbPokemonMasterBadge->show();
+			lbPokemonNumBadge->show();
+			layout->addWidget(lbPokemonNumBadge, 0, 0, 1, 1);
+			layout->addWidget(lbPokemonMasterBadge, 0, 1, 1, 1);
+			layout->addWidget(table, 1, 0, 1, 2);
+			layout->addWidget(btnBack, 2, 0, 1, 2);
 		}
 		else
 		{
@@ -855,6 +868,55 @@ void MainWindow::getServerMsg()
 					changingPokemonName = true;
 				}
 			}); // must be connected after data input
+
+			// deal with badge
+			int masterPokemon = 0; // number of lv-15 pokemon
+			for (int i = 0; i < table->rowCount(); ++i)
+			{
+				if (table->item(i, 3)->text() == "15")
+					++masterPokemon;
+			}
+			int pokemonNum = pokemons.size() - 1; // because pokemons[pokemons.size() - 1] == ""
+			if (pokemonNum >= 20)
+			{
+				lbPokemonNumBadge->setPixmap(QPixmap(":/img/img/goldbadge.png"));
+				lbPokemonNumBadge->setToolTip(tr("金质精灵爱好者徽章，赐予精灵数量不少于20只的玩家"));
+			}
+			else if (pokemonNum >= 10)
+			{
+				lbPokemonNumBadge->setPixmap(QPixmap(":/img/img/silverbadge.png"));
+				lbPokemonNumBadge->setToolTip(tr("银质精灵爱好者徽章，赐予精灵数量不少于10只的玩家"));
+			}
+			else if (pokemonNum >= 5)
+			{
+				lbPokemonNumBadge->setPixmap(QPixmap(":/img/img/copperbadge.png"));
+				lbPokemonNumBadge->setToolTip(tr("铜质精灵爱好者徽章，赐予精灵数量不少于5只的玩家"));
+			}
+			else
+			{
+				lbPokemonNumBadge->setText(tr("精灵爱好者徽章：无"));
+				lbPokemonNumBadge->setToolTip(tr("精灵数量大于5时可以获得精灵爱好者徽章"));
+			}
+			if (masterPokemon >= 5)
+			{
+				lbPokemonMasterBadge->setPixmap(QPixmap(":/img/img/goldenbadge2.png"));
+				lbPokemonMasterBadge->setToolTip(tr("禁止精灵大师徽章，赐予15级精灵数量不少于5只的玩家"));
+			}
+			else if (masterPokemon >= 3)
+			{
+				lbPokemonMasterBadge->setPixmap(QPixmap(":/img/img/silverbadge2.png"));
+				lbPokemonMasterBadge->setToolTip(tr("银质精灵大师徽章，赐予15级精灵数量不少于5只的玩家"));
+			}
+			else if (masterPokemon >= 1)
+			{
+				lbPokemonMasterBadge->setPixmap(QPixmap(":/img/img/copperbadge2.png"));
+				lbPokemonMasterBadge->setToolTip(tr("铜质精灵大师徽章，赐予拥有15级精灵的玩家"));
+			}
+			else
+			{
+				lbPokemonMasterBadge->setText(tr("精灵大师徽章：无"));
+				lbPokemonMasterBadge->setToolTip(tr("拥有15级精灵可以获得精灵大师徽章"));
+			}
 		}
 		else // msg is pokemon detail
 		{
@@ -1248,7 +1310,7 @@ void MainWindow::getServerMsg()
 		if (pbP2HP->value() == 0)
 		{
 			if (state == LV_UP_BATTLE)
-			QMessageBox::information(this, tr("恭喜"), tr("你赢得了战斗"));
+				QMessageBox::information(this, tr("恭喜"), tr("你赢得了战斗"));
 			else
 				QMessageBox::information(this, tr("恭喜"), tr("你赢得了决斗，获得了敌对精灵"));
 			changeState(MAIN);
@@ -1257,7 +1319,8 @@ void MainWindow::getServerMsg()
 		else if (pbP1HP->value() == 0)
 		{
 			QMessageBox::information(this, tr("抱歉"), tr("您战败了"));
-			if (state == DUEL_BATTLE){
+			if (state == DUEL_BATTLE)
+			{
 				changeState(CHOOSE_BET);
 				chooseBetIndex = 0;
 				client->write("chooseBet", BUF_LENGTH);
@@ -1270,17 +1333,18 @@ void MainWindow::getServerMsg()
 
 		break;
 	}
-	case CHOOSE_BET:{
+	case CHOOSE_BET:
+	{
 		++chooseBetIndex;
 		auto dlg = new PokemonDlg(msg, false, this);
 		if (chooseBetIndex == 1)
-		dlg->move(dlg->x() - dlg->width(), dlg->y());
+			dlg->move(dlg->x() - dlg->width(), dlg->y());
 		else if (chooseBetIndex == 3)
 			dlg->move(dlg->x() + dlg->width(), dlg->y());
 		lbBet[chooseBetIndex - 1]->setPixmap(QPixmap(*dlg->getPixmap()));
 		btnBet[chooseBetIndex - 1]->setText(tr("我选择") + dlg->getName());
 		auto id = dlg->getID();
-		connect(btnBet[chooseBetIndex], &QPushButton::clicked, [this, id]{
+		connect(btnBet[chooseBetIndex], &QPushButton::clicked, [this, id] {
 			QString str = "discard ";
 			str += id;
 			client->write(str.toLocal8Bit(), BUF_LENGTH);

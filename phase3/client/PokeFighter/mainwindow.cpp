@@ -861,7 +861,7 @@ void MainWindow::getServerMsg()
 				else if (detail[2] == "杰尼龟")
 					t->setIcon(QIcon(":/img/img/squirtle.png"));
 				else if (detail[2] == "波波")
-					t->setIcon(QIcon(":/img/img/pidget.png"));
+					t->setIcon(QIcon(":/img/img/pidgey.png"));
 				table->setItem(i, 2, t);
 				t = new QTableWidgetItem(detail[3]);
 				t->setFlags(t->flags() ^ Qt::ItemIsEditable);

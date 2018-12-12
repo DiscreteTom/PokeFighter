@@ -333,7 +333,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::changeState(int aim)
 {
-	setStyleSheet(tr("background-image:url(\":/img/img/start.jpg\");"));
+	setStyleSheet(tr(".MainWindow{background-image:url(\":/img/img/start.jpg\");}"));
 
 	// hide all widget
 	lbStartTitle->hide();

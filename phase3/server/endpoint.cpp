@@ -636,7 +636,7 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 		}
 		else if (p1.lv() >= p2->lv())
 		{
-			p1.gainExp(p1.lv() - p2->lv() + 3 + f(2));
+			p1.gainExp((p2->lv() - p1.lv() + 5) + 3 + f(2));
 		}
 		else
 		{

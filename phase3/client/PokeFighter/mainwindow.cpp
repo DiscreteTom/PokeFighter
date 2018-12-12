@@ -520,7 +520,7 @@ void MainWindow::changeState(int aim)
 		btnBack->show();
 		if (state == (CHOOSE_ENEMY | DUEL_BATTLE))
 		{
-			sbEnemyLV->setValue(15);
+			sbEnemyLV->setValue(currentPokemonLV);
 			sbEnemyLV->setDisabled(true);
 		}
 		else
@@ -846,6 +846,7 @@ void MainWindow::getServerMsg()
 					auto btn = new QPushButton(tr("就决定是你了！"), this);
 					connect(btn, &QPushButton::clicked, this, [this, detail] {
 						battlePokemonID = detail[0];
+						currentPokemonLV = detail[3].toInt();
 						changeState((state ^ POKEMON_TABLE) | CHOOSE_ENEMY);
 					});
 					table->setCellWidget(i, 5, btn);

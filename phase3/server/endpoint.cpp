@@ -689,11 +689,12 @@ void Endpoint::chooseBet()
 
 	// get 3 random id
 	int id[3];
-	id[0] = stoi(ids[rand() % ids.size()]);
-	ids.erase(ids.begin() + id[0]);
-	id[1] = stoi(ids[rand() % ids.size()]);
-	ids.erase(ids.begin() + id[1]);
-	id[2] = stoi(ids[rand() % ids.size()]);
+	int index[3];
+	for (int i = 0; i < 3; ++i) {
+		index[i] = rand() % ids.size();
+		id[i] = stoi(ids[index[i]]);
+		ids.erase(ids.begin() + index[i]);
+	}
 
 	sqlite3_free_table(sqlResult);
 

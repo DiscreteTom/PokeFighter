@@ -851,7 +851,14 @@ void MainWindow::getServerMsg()
 				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
 				table->setItem(i, 0, t);
 				t = new QTableWidgetItem(detail[1]);
-				t->setToolTip(tr("双击以更改精灵名称"));
+				if (currentPlayerID == 0)
+				{
+					t->setToolTip(tr("双击以更改精灵名称"));
+				}
+				else
+				{
+					t->setFlags(t->flags() ^ Qt::ItemIsEditable);
+				}
 				table->setItem(i, 1, t);
 				t = new QTableWidgetItem(detail[2]);
 				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
@@ -938,7 +945,7 @@ void MainWindow::getServerMsg()
 			if (masterPokemon >= 5)
 			{
 				lbPokemonMasterBadge->setPixmap(QPixmap(":/img/img/goldenbadge2.png").scaledToHeight(80));
-				lbPokemonMasterBadge->setToolTip(tr("禁止精灵大师徽章，赐予15级精灵数量不少于5只的玩家"));
+				lbPokemonMasterBadge->setToolTip(tr("金质精灵大师徽章，赐予15级精灵数量不少于5只的玩家"));
 			}
 			else if (masterPokemon >= 3)
 			{

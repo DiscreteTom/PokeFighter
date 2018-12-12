@@ -196,8 +196,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 		client->disconnectFromHost();
 	});
 	connect(btnShowPokemonList, &QPushButton::clicked, this, [this] {
-		changeState(POKEMON_TABLE);
 		currentPlayerID = 0;
+		showPokemonDlg = false;
+		changeState(POKEMON_TABLE);
 		client->write("getPokemonList", BUF_LENGTH);
 	});
 	connect(btnLvUpBattle, &QPushButton::clicked, this, [this] {
@@ -332,12 +333,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	client = new QTcpSocket(this);
 	connect(client, &QTcpSocket::readyRead, this, &MainWindow::getServerMsg);
 
-	changeState(START);
-
 	changingPokemonName = false;
 	gettingDuelStatistic = false;
 	battleStart = false;
 	chooseBetIndex = 0;
+	showPokemonDlg = false;
+
+	changeState(START);
 
 	//	setFixedSize(1600, 900);
 	setFixedSize(1366, 966); // size of start.jpg
@@ -852,6 +854,14 @@ void MainWindow::getServerMsg()
 				table->setItem(i, 1, t);
 				t = new QTableWidgetItem(detail[2]);
 				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
+				if (detail[2] == "小火龙")
+					t->setIcon(QIcon(":/img/img/charmander.png"));
+				else if (detail[2] == "妙蛙种子")
+					t->setIcon(QIcon(":/img/img/bulbasaur.png"));
+				else if (detail[2] == "杰尼龟")
+					t->setIcon(QIcon(":/img/img/squirtle.png"));
+				else if (detail[2] == "波波")
+					t->setIcon(QIcon(":/img/img/pidget.png"));
 				table->setItem(i, 2, t);
 				t = new QTableWidgetItem(detail[3]);
 				t->setFlags(t->flags() ^ Qt::ItemIsEditable);

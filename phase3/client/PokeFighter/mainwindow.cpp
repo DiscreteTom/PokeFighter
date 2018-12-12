@@ -551,6 +551,7 @@ void MainWindow::changeState(int aim)
 		}
 		else
 		{
+			sbEnemyLV->setValue(currentPokemonLV);
 			sbEnemyLV->setDisabled(false);
 		}
 		layout->addWidget(lbChooseEnemy, 0, 0, 1, 2);
@@ -1102,6 +1103,8 @@ void MainWindow::getServerMsg()
 				lbP2SkillName->setText(tr("闪避！"));
 				mySleep(500);
 				lbP2SkillName->clear();
+				lbP2SkillName->clear();
+				client->write("done", BUF_LENGTH);
 				break;
 			}
 			// not dodge
@@ -1253,6 +1256,8 @@ void MainWindow::getServerMsg()
 				lbP1SkillName->setText(tr("闪避！"));
 				mySleep(500);
 				lbP1SkillName->clear();
+				lbP2SkillName->clear();
+				client->write("done", BUF_LENGTH);
 				break;
 			}
 			// not dodge

@@ -18,7 +18,9 @@ LogonDlg::LogonDlg(QWidget *parent) :
 	lePassword = new QLineEdit(this);
 	leRepeat = new QLineEdit(this);
 	btnOK = new QPushButton(tr("确认"), this);
+	btnOK->setObjectName("logon_btnOK");
 	btnCancel = new QPushButton(tr("取消"), this);
+	btnCancel->setObjectName("logon_btnCancel");
 	leUsername->setPlaceholderText(tr("请输入用户名"));
 	leUsername->setToolTip(tr("不能包含空白字符，长度为6-30位"));
 	lePassword->setPlaceholderText(tr("请输入密码"));

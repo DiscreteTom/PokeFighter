@@ -21,8 +21,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	lbStartTitle->setObjectName("lbStartTitle");
 	btnPlay = new QPushButton(tr("开始游戏"), this);
 	btnPlay->setObjectName("btnPlay");
+	btnPlay->setIcon(QPixmap(":/img/img/play.png"));
 	btnExit = new QPushButton(tr("退出"), this);
 	btnExit->setObjectName("btnExit");
+	btnExit->setIcon(QPixmap(":/img/img/exit.png"));
 
 	// login layout
 	lbLoginLabel = new QLabel(tr("登录"), this);
@@ -73,16 +75,27 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
 	// choose enemy layout
 	lbChooseEnemy = new QLabel(tr("选择你的对手："), this);
+	lbChooseEnemy->setObjectName("lbChooseEnemy");
 	lbEnemyLV = new QLabel(tr("对手等级："), this);
+	lbEnemyLV->setObjectName("lbEnemyLV");
 	sbEnemyLV = new QSpinBox(this);
+	sbEnemyLV->setObjectName("sbEnemyLV");
 	btnEnemyRace0 = new QPushButton(tr("小火龙"), this);
+	btnEnemyRace0->setObjectName("btnEnemyRace0");
 	btnEnemyRace0->setIcon(QPixmap(":/img/img/charmander.png"));
+	btnEnemyRace0->setIconSize(QSize(300, 300));
 	btnEnemyRace1 = new QPushButton(tr("妙蛙种子"), this);
+	btnEnemyRace1->setObjectName("btnEnemyRace1");
 	btnEnemyRace1->setIcon(QPixmap(":/img/img/bulbasaur.png"));
+	btnEnemyRace1->setIconSize(QSize(300, 300));
 	btnEnemyRace2 = new QPushButton(tr("杰尼龟"), this);
+	btnEnemyRace2->setObjectName("btnEnemyRace2");
 	btnEnemyRace2->setIcon(QPixmap(":/img/img/squirtle.png"));
+	btnEnemyRace2->setIconSize(QSize(300, 300));
 	btnEnemyRace3 = new QPushButton(tr("波波"), this);
+	btnEnemyRace3->setObjectName("btnEnemyRace3");
 	btnEnemyRace3->setIcon(QPixmap(":/img/img/pidgey.png"));
+	btnEnemyRace3->setIconSize(QSize(300, 300));
 	sbEnemyLV->setMaximum(15);
 	sbEnemyLV->setMinimum(1);
 
@@ -90,17 +103,23 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	lbP1 = new QLabel(tr("精灵1"), this);
 	lbP2 = new QLabel(tr("精灵2"), this);
 	btnSkill_1 = new QPushButton(this);
+	btnSkill_1->setObjectName("btnSkill_1");
 	btnSkill_2 = new QPushButton(this);
+	btnSkill_2->setObjectName("btnSkill_2");
 	btnSkill_3 = new QPushButton(this);
+	btnSkill_3->setObjectName("btnSkill_3");
 	btnSkill_4 = new QPushButton(this);
+	btnSkill_4->setObjectName("btnSkill_4");
 	pbP1HP = new QProgressBar(this);
-	pbP1HP->setFormat("%v/%m");
+	pbP1HP->setFormat("HP: %v/%m");
 	pbP2HP = new QProgressBar(this);
-	pbP2HP->setFormat("%v/%m");
+	pbP2HP->setFormat("HP: %v/%m");
 	//	pbP1AtkInterval = new QProgressBar(this);
 	//	pbP2AtkInterval = new QProgressBar(this);
 	lbP1SkillName = new QLabel(this);
+	lbP1SkillName->setObjectName("lbP1SkillName");
 	lbP2SkillName = new QLabel(this);
+	lbP2SkillName->setObjectName("lbP2SkillName");
 
 	// choose bet layout
 	lbBet[1] = new QLabel(this);
@@ -528,7 +547,7 @@ void MainWindow::changeState(int aim)
 			sbEnemyLV->setDisabled(false);
 		}
 		layout->addWidget(lbChooseEnemy, 0, 0, 1, 2);
-		layout->addWidget(lbEnemyLV, 0, 2, 1, 1);
+		layout->addWidget(lbEnemyLV, 0, 2, 1, 1, Qt::AlignRight);
 		layout->addWidget(sbEnemyLV, 0, 3, 1, 1);
 		layout->addWidget(btnEnemyRace0, 1, 0, 1, 2);
 		layout->addWidget(btnEnemyRace1, 1, 2, 1, 2);
@@ -553,12 +572,12 @@ void MainWindow::changeState(int aim)
 		//		pbP2AtkInterval->show();
 		layout->addWidget(pbP1HP, 0, 0, 1, 2);
 		//		layout->addWidget(pbP1AtkInterval, 1, 0, 1, 2);
-		layout->addWidget(lbP1SkillName, 1, 0, 1, 2);
+		layout->addWidget(lbP1SkillName, 1, 0, 1, 2, Qt::AlignCenter);
 		layout->addWidget(pbP2HP, 0, 2, 1, 2);
 		//		layout->addWidget(pbP2AtkInterval, 1, 2, 1, 2);
-		layout->addWidget(lbP2SkillName, 1, 2, 1, 2);
-		layout->addWidget(lbP1, 2, 0, 1, 2);
-		layout->addWidget(lbP2, 2, 2, 1, 2);
+		layout->addWidget(lbP2SkillName, 1, 2, 1, 2, Qt::AlignCenter);
+		layout->addWidget(lbP1, 2, 0, 1, 2, Qt::AlignCenter);
+		layout->addWidget(lbP2, 2, 2, 1, 2, Qt::AlignCenter);
 		layout->addWidget(btnSkill_1, 3, 0, 1, 1);
 		layout->addWidget(btnSkill_2, 3, 1, 1, 1);
 		layout->addWidget(btnSkill_3, 3, 2, 1, 1);
@@ -962,19 +981,19 @@ void MainWindow::getServerMsg()
 			auto detail = ps[0].split(' ');
 			if (detail[0] == "妙蛙种子")
 			{
-				lbP1->setPixmap(QPixmap(":/img/img/bulbasaur.png"));
+				lbP1->setPixmap(QPixmap(":/img/img/bulbasaur.png").scaledToHeight(500));
 			}
 			else if (detail[0] == "小火龙")
 			{
-				lbP1->setPixmap(QPixmap(":/img/img/charmander.png"));
+				lbP1->setPixmap(QPixmap(":/img/img/charmander.png").scaledToHeight(500));
 			}
 			else if (detail[0] == "杰尼龟")
 			{
-				lbP1->setPixmap(QPixmap(":/img/img/squirtle.png"));
+				lbP1->setPixmap(QPixmap(":/img/img/squirtle.png").scaledToHeight(500));
 			}
 			else if (detail[0] == "波波")
 			{
-				lbP1->setPixmap(QPixmap(":/img/img/pidgey.png"));
+				lbP1->setPixmap(QPixmap(":/img/img/pidgey.png").scaledToHeight(500));
 			}
 			pbP1HP->setMaximum(detail[1].toInt());
 			pbP1HP->setValue(detail[1].toInt());
@@ -993,19 +1012,19 @@ void MainWindow::getServerMsg()
 			detail = ps[1].split(' ');
 			if (detail[0] == "妙蛙种子")
 			{
-				lbP2->setPixmap(QPixmap(":/img/img/bulbasaur.png"));
+				lbP2->setPixmap(QPixmap(":/img/img/bulbasaur.png").scaledToHeight(500));
 			}
 			else if (detail[0] == "小火龙")
 			{
-				lbP2->setPixmap(QPixmap(":/img/img/charmander.png"));
+				lbP2->setPixmap(QPixmap(":/img/img/charmander.png").scaledToHeight(500));
 			}
 			else if (detail[0] == "杰尼龟")
 			{
-				lbP2->setPixmap(QPixmap(":/img/img/squirtle.png"));
+				lbP2->setPixmap(QPixmap(":/img/img/squirtle.png").scaledToHeight(500));
 			}
 			else if (detail[0] == "波波")
 			{
-				lbP2->setPixmap(QPixmap(":/img/img/pidgey.png"));
+				lbP2->setPixmap(QPixmap(":/img/img/pidgey.png").scaledToHeight(500));
 			}
 			pbP2HP->setMaximum(detail[1].toInt());
 			pbP2HP->setValue(detail[1].toInt());
@@ -1053,7 +1072,7 @@ void MainWindow::getServerMsg()
 			else if (pbP2HP->value() < detail[3].toInt())
 			{
 				// hp increased
-				lbP2SkillName->setText(QString::number(detail[3].toInt() - pbP2HP->value()));
+				lbP2SkillName->setText(QString("+") + QString::number(detail[3].toInt() - pbP2HP->value()));
 				getImproved(lbP2);
 				while (pbP2HP->value() < detail[3].toInt())
 				{
@@ -1113,7 +1132,7 @@ void MainWindow::getServerMsg()
 			else if (pbP1HP->value() < detail[10].toInt())
 			{
 				// hp increased
-				lbP1SkillName->setText(QString::number(detail[10].toInt() - pbP1HP->value()));
+				lbP1SkillName->setText(QString("+") + QString::number(detail[10].toInt() - pbP1HP->value()));
 				getImproved(lbP1);
 				while (pbP1HP->value() < detail[10].toInt())
 				{
@@ -1195,7 +1214,7 @@ void MainWindow::getServerMsg()
 			else if (pbP1HP->value() < detail[3].toInt())
 			{
 				// hp increased
-				lbP1SkillName->setText(QString::number(detail[3].toInt() - pbP1HP->value()));
+				lbP1SkillName->setText(QString("+") + QString::number(detail[3].toInt() - pbP1HP->value()));
 				getImproved(lbP1);
 				while (pbP1HP->value() < detail[3].toInt())
 				{
@@ -1255,7 +1274,7 @@ void MainWindow::getServerMsg()
 			else if (pbP2HP->value() < detail[10].toInt())
 			{
 				// hp increased
-				lbP2SkillName->setText(QString::number(detail[10].toInt() - pbP2HP->value()));
+				lbP2SkillName->setText(QString("+") + QString::number(detail[10].toInt() - pbP2HP->value()));
 				getImproved(lbP2);
 				while (pbP2HP->value() < detail[10].toInt())
 				{

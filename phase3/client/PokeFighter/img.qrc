@@ -11,5 +11,7 @@
         <file>img/goldenbadge2.png</file>
         <file>img/silverbadge.png</file>
         <file>img/silverbadge2.png</file>
+        <file>img/exit.png</file>
+        <file>img/play.png</file>
     </qresource>
 </RCC>

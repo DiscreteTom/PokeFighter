@@ -5,6 +5,7 @@
 #include <QThread>
 #include <QTime>
 #include <QHostAddress>
+#include <QMediaPlaylist>
 #include "netconfig.h"
 #include "pokemondlg.h"
 #include "authentication.h"
@@ -341,7 +342,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	//	setFixedSize(1600, 900);
 	setFixedSize(1366, 966); // size of start.jpg
 
-	mediaPlayer->setMedia(QUrl("qrc:/music/media/op.mp3"));
+	QMediaPlaylist *playlist = new QMediaPlaylist();
+	playlist->addMedia(QUrl("qrc:/music/media/op.mp3"));
+	playlist->setPlaybackMode(QMediaPlaylist::Loop);
+
+	mediaPlayer->setPlaylist(playlist);
 	mediaPlayer->setVolume(50);
 	mediaPlayer->play();
 }

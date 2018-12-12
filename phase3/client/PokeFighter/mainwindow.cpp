@@ -1344,7 +1344,7 @@ void MainWindow::getServerMsg()
 		lbBet[chooseBetIndex - 1]->setPixmap(QPixmap(*dlg->getPixmap()));
 		btnBet[chooseBetIndex - 1]->setText(tr("我选择") + dlg->getName());
 		auto id = dlg->getID();
-		connect(btnBet[chooseBetIndex], &QPushButton::clicked, [this, id] {
+		connect(btnBet[chooseBetIndex - 1], &QPushButton::clicked, [this, id] {
 			QString str = "discard ";
 			str += id;
 			client->write(str.toLocal8Bit(), BUF_LENGTH);

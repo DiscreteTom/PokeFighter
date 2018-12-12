@@ -316,7 +316,7 @@ bool Pokemon::gainExp(int count)
 		int atk, def, maxHp, speed;
 		atk = 4 + f(1);
 		def = 2 + f(1);
-		maxHp = 8 + f(2);
+		maxHp = 20 + f(5);
 		speed = 5 + f(1);
 
 		//race talent
@@ -326,7 +326,7 @@ bool Pokemon::gainExp(int count)
 			atk += 3;
 			break;
 		case HP:
-			maxHp += 5;
+			maxHp += 15;
 			break;
 		case DEF:
 			def += 3;

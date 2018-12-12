@@ -14,6 +14,7 @@
 #include <QMediaPlayer>
 #include <QSpinBox>
 #include <QProgressBar>
+#include "pokemondlg.h"
 
 namespace Ui
 {
@@ -105,6 +106,7 @@ private:
 	// choose bet layout
 	QLabel *lbBet[3];
 	QPushButton *btnBet[3];
+	PokemonDlg * pkmDlg[3];
 
 	// pokemon table and player table
 	QTableWidget *table;

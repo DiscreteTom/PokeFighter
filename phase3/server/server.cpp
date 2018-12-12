@@ -395,9 +395,9 @@ bool Hub::isValidUsername(const string &str)
 {
 	for (auto c : str)
 	{
-		if (c == '\b' || c == '\n' || c == '\t')
+		if (c == ' ' || c == '\n' || c == '\t')
 		{
-			// contains \b \n \t
+			// contains blank \n \t
 			return false;
 		}
 	}

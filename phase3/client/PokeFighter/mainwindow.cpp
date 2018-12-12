@@ -338,6 +338,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	battleStart = false;
 	chooseBetIndex = 0;
 	showPokemonDlg = false;
+	pkmDlg[0] = NULL;
+	pkmDlg[1] = NULL;
+	pkmDlg[2] = NULL;
 
 	changeState(START);
 
@@ -1436,19 +1439,26 @@ void MainWindow::getServerMsg()
 	case CHOOSE_BET:
 	{
 		++chooseBetIndex;
-		auto dlg = new PokemonDlg(msg, false, this);
+		pkmDlg[chooseBetIndex - 1] = new PokemonDlg(msg, false, this);
 		if (chooseBetIndex == 1)
-			dlg->move(dlg->x() - dlg->width(), dlg->y());
+			pkmDlg[chooseBetIndex - 1]->move(pkmDlg[chooseBetIndex - 1]->x() - pkmDlg[chooseBetIndex - 1]->width(), pkmDlg[chooseBetIndex - 1]->y());
 		else if (chooseBetIndex == 3)
-			dlg->move(dlg->x() + dlg->width(), dlg->y());
-		lbBet[chooseBetIndex - 1]->setPixmap(QPixmap(*dlg->getPixmap()));
-		btnBet[chooseBetIndex - 1]->setText(tr("我选择") + dlg->getName());
-		auto id = dlg->getID();
+			pkmDlg[chooseBetIndex - 1]->move(pkmDlg[chooseBetIndex - 1]->x() + pkmDlg[chooseBetIndex - 1]->width(), pkmDlg[chooseBetIndex - 1]->y());
+		lbBet[chooseBetIndex - 1]->setPixmap(QPixmap(*pkmDlg[chooseBetIndex - 1]->getPixmap()));
+		btnBet[chooseBetIndex - 1]->setText(tr("我选择") + pkmDlg[chooseBetIndex - 1]->getName());
+		auto id = pkmDlg[chooseBetIndex - 1]->getID();
 		connect(btnBet[chooseBetIndex - 1], &QPushButton::clicked, [this, id] {
 			QString str = "discard ";
 			str += id;
 			client->write(str.toLocal8Bit(), BUF_LENGTH);
+			for (int i = 0; i < 3; ++i){
+				if (pkmDlg[i] != NULL)
+					pkmDlg[i]->deleteLater();
+			}
 			changeState(MAIN);
+		});
+		connect(pkmDlg[chooseBetIndex - 1], &PokemonDlg::destroyed, [this]{
+			pkmDlg[chooseBetIndex - 1] = NULL;
 		});
 		if (chooseBetIndex < 4)
 			client->write("done", BUF_LENGTH);

@@ -998,16 +998,49 @@ void MainWindow::getServerMsg()
 			pbP1HP->setMaximum(detail[1].toInt());
 			pbP1HP->setValue(detail[1].toInt());
 			btnSkill_1->setText(detail[2]);
-			btnSkill_2->setText(detail[4]);
-			btnSkill_3->setText(detail[6]);
-			btnSkill_4->setText(detail[8]);
+			if (currentPokemonLV < 5)
+			{
+				btnSkill_2->setIcon(QIcon(":/img/img/lock.png"));
+				btnSkill_2->setText(tr("等级5解锁"));
+			}
+			else
+			{
+				btnSkill_2->setText(detail[4]);
+				btnSkill_2->setIcon(QIcon());
+			}
+			if (currentPokemonLV < 10)
+			{
+				btnSkill_3->setIcon(QIcon(":/img/img/lock.png"));
+				btnSkill_3->setText(tr("等级10解锁"));
+			}
+			else
+			{
+				btnSkill_3->setIcon(QIcon());
+				btnSkill_3->setText(detail[6]);
+			}
+			if (currentPokemonLV < 15)
+			{
+				btnSkill_4->setIcon(QIcon(":/img/img/lock.png"));
+				btnSkill_4->setText(tr("等级15解锁"));
+			}
+			else
+			{
+				btnSkill_4->setIcon(QIcon());
+				btnSkill_4->setText(detail[8]);
+			}
 			btnSkill_1->setToolTip(detail[3]);
-			btnSkill_2->setToolTip(detail[5]);
-			btnSkill_3->setToolTip(detail[7]);
-			btnSkill_4->setToolTip(detail[9]);
-			btnSkill_2->setText(btnSkill_2->text() + ' ' + detail[10]);
-			btnSkill_3->setText(btnSkill_3->text() + ' ' + detail[11]);
-			btnSkill_4->setText(btnSkill_4->text() + ' ' + detail[12]);
+			if (currentPokemonLV >= 5)
+				btnSkill_2->setToolTip(detail[5]);
+			if (currentPokemonLV >= 10)
+				btnSkill_3->setToolTip(detail[7]);
+			if (currentPokemonLV >= 15)
+				btnSkill_4->setToolTip(detail[9]);
+			if (currentPokemonLV >= 5)
+				btnSkill_2->setText(btnSkill_2->text() + ' ' + detail[10]);
+			if (currentPokemonLV >= 10)
+				btnSkill_3->setText(btnSkill_3->text() + ' ' + detail[11]);
+			if (currentPokemonLV >= 15)
+				btnSkill_4->setText(btnSkill_4->text() + ' ' + detail[12]);
 			currentPokemonLV = detail[13].toInt();
 			detail = ps[1].split(' ');
 			if (detail[0] == "妙蛙种子")
@@ -1178,11 +1211,20 @@ void MainWindow::getServerMsg()
 				lbP1SkillName->clear();
 			}
 			auto skillName = btnSkill_2->text().split(' ')[0];
-			btnSkill_2->setText(skillName + ' ' + detail[14]);
+			if (currentPokemonLV < 5)
+				btnSkill_2->setText(tr("等级5解锁"));
+			else
+				btnSkill_2->setText(skillName + ' ' + detail[14]);
 			skillName = btnSkill_3->text().split(' ')[0];
-			btnSkill_3->setText(skillName + ' ' + detail[15]);
+			if (currentPokemonLV < 10)
+				btnSkill_3->setText(tr("等级10解锁"));
+			else
+				btnSkill_3->setText(skillName + ' ' + detail[15]);
 			skillName = btnSkill_4->text().split(' ')[0];
-			btnSkill_4->setText(skillName + ' ' + detail[16]);
+			if (currentPokemonLV < 15)
+				btnSkill_4->setText(tr("等级15解锁"));
+			else
+				btnSkill_4->setText(skillName + ' ' + detail[16]);
 			lbP1SkillName->clear();
 		}
 		else
@@ -1320,11 +1362,20 @@ void MainWindow::getServerMsg()
 				lbP2SkillName->clear();
 			}
 			auto skillName = btnSkill_2->text().split(' ')[0];
-			btnSkill_2->setText(skillName + ' ' + detail[7]);
+			if (currentPokemonLV < 5)
+				btnSkill_2->setText(tr("等级5解锁"));
+			else
+				btnSkill_2->setText(skillName + ' ' + detail[7]);
 			skillName = btnSkill_3->text().split(' ')[0];
-			btnSkill_3->setText(skillName + ' ' + detail[8]);
+			if (currentPokemonLV < 10)
+				btnSkill_3->setText(tr("等级10解锁"));
+			else
+				btnSkill_3->setText(skillName + ' ' + detail[8]);
 			skillName = btnSkill_4->text().split(' ')[0];
-			btnSkill_4->setText(skillName + ' ' + detail[9]);
+			if (currentPokemonLV < 15)
+				btnSkill_4->setText(tr("等级15解锁"));
+			else
+				btnSkill_4->setText(skillName + ' ' + detail[9]);
 			lbP2SkillName->clear();
 		}
 

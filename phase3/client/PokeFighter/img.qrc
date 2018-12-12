@@ -13,5 +13,6 @@
         <file>img/silverbadge2.png</file>
         <file>img/exit.png</file>
         <file>img/play.png</file>
+        <file>img/lock.png</file>
     </qresource>
 </RCC>

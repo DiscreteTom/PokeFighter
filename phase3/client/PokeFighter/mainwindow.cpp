@@ -114,6 +114,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	table = new QTableWidget(this);
 	lbPokemonMasterBadge = new QLabel(this);
 	lbPokemonNumBadge = new QLabel(this);
+	lbPokemonMasterBadge->setFixedHeight(80);
+	lbPokemonNumBadge->setFixedHeight(80);
 
 	// logon window
 	logonDlg = new LogonDlg(this);
@@ -477,8 +479,8 @@ void MainWindow::changeState(int aim)
 		{
 			lbPokemonMasterBadge->show();
 			lbPokemonNumBadge->show();
-			layout->addWidget(lbPokemonNumBadge, 0, 0, 1, 1);
-			layout->addWidget(lbPokemonMasterBadge, 0, 1, 1, 1);
+			layout->addWidget(lbPokemonNumBadge, 0, 0, 1, 1, Qt::AlignHCenter);
+			layout->addWidget(lbPokemonMasterBadge, 0, 1, 1, 1, Qt::AlignHCenter);
 			layout->addWidget(table, 1, 0, 1, 2);
 			layout->addWidget(btnBack, 2, 0, 1, 2);
 		}
@@ -879,17 +881,17 @@ void MainWindow::getServerMsg()
 			int pokemonNum = pokemons.size() - 1; // because pokemons[pokemons.size() - 1] == ""
 			if (pokemonNum >= 20)
 			{
-				lbPokemonNumBadge->setPixmap(QPixmap(":/img/img/goldbadge.png"));
+				lbPokemonNumBadge->setPixmap(QPixmap(":/img/img/goldbadge.png").scaledToHeight(80));
 				lbPokemonNumBadge->setToolTip(tr("金质精灵爱好者徽章，赐予精灵数量不少于20只的玩家"));
 			}
 			else if (pokemonNum >= 10)
 			{
-				lbPokemonNumBadge->setPixmap(QPixmap(":/img/img/silverbadge.png"));
+				lbPokemonNumBadge->setPixmap(QPixmap(":/img/img/silverbadge.png").scaledToHeight(80));
 				lbPokemonNumBadge->setToolTip(tr("银质精灵爱好者徽章，赐予精灵数量不少于10只的玩家"));
 			}
 			else if (pokemonNum >= 5)
 			{
-				lbPokemonNumBadge->setPixmap(QPixmap(":/img/img/copperbadge.png"));
+				lbPokemonNumBadge->setPixmap(QPixmap(":/img/img/copperbadge.png").scaledToHeight(80));
 				lbPokemonNumBadge->setToolTip(tr("铜质精灵爱好者徽章，赐予精灵数量不少于5只的玩家"));
 			}
 			else
@@ -899,17 +901,17 @@ void MainWindow::getServerMsg()
 			}
 			if (masterPokemon >= 5)
 			{
-				lbPokemonMasterBadge->setPixmap(QPixmap(":/img/img/goldenbadge2.png"));
+				lbPokemonMasterBadge->setPixmap(QPixmap(":/img/img/goldenbadge2.png").scaledToHeight(80));
 				lbPokemonMasterBadge->setToolTip(tr("禁止精灵大师徽章，赐予15级精灵数量不少于5只的玩家"));
 			}
 			else if (masterPokemon >= 3)
 			{
-				lbPokemonMasterBadge->setPixmap(QPixmap(":/img/img/silverbadge2.png"));
+				lbPokemonMasterBadge->setPixmap(QPixmap(":/img/img/silverbadge2.png").scaledToHeight(80));
 				lbPokemonMasterBadge->setToolTip(tr("银质精灵大师徽章，赐予15级精灵数量不少于5只的玩家"));
 			}
 			else if (masterPokemon >= 1)
 			{
-				lbPokemonMasterBadge->setPixmap(QPixmap(":/img/img/copperbadge2.png"));
+				lbPokemonMasterBadge->setPixmap(QPixmap(":/img/img/copperbadge2.png").scaledToHeight(80));
 				lbPokemonMasterBadge->setToolTip(tr("铜质精灵大师徽章，赐予拥有15级精灵的玩家"));
 			}
 			else

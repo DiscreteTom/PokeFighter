@@ -24,28 +24,32 @@ PokemonDlg::PokemonDlg(const QString &detail, bool myPokemonTable, QWidget *pare
 
 		if (i != 1)
 		{
+			// just name can be edit, other item should be disabled
 			t->setFlags(t->flags() ^ Qt::ItemIsEnabled);
 			t->setBackgroundColor(QColor("#eff0f1"));
 		}
 		else
 		{
-
 			if (myPokemonTable)
 			{
+				// can just change my pokemon's name
 				t->setToolTip(tr("双击以更改精灵名称"));
 			}
 			else
 			{
+				// set disabled
 				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
 				t->setBackgroundColor(QColor("#eff0f1"));
 			}
 		}
 		table->setItem(i, 0, t);
 	}
+
+	// pokemon change name
 	connect(table, &QTableWidget::cellChanged, this, [this, detail] { emit pokemonChangeName(detail[0], table->item(1, 0)->text()); });
 
 	// img
-	lbImg = new QLabel(this); // name
+	lbImg = new QLabel(this);
 	// if (details[2] == "Bulbasaur")
 	if (details[2] == "妙蛙种子")
 	{

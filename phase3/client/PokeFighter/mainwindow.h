@@ -14,6 +14,7 @@
 #include <QMediaPlayer>
 #include <QSpinBox>
 #include <QProgressBar>
+#include "pokemondlg.h"
 
 namespace Ui
 {
@@ -41,7 +42,8 @@ private:
 		CHANGE_PSW = 32,
 		LV_UP_BATTLE = 64,
 		DUEL_BATTLE = 128,
-		CHOOSE_ENEMY = 256
+		CHOOSE_ENEMY = 256,
+		CHOOSE_BET = 512
 	};
 
 	int state;
@@ -96,13 +98,18 @@ private:
 	QPushButton *btnSkill_4;
 	QProgressBar *pbP1HP;
 	QProgressBar *pbP2HP;
-	//	QProgressBar * pbP1AtkInterval;
-	//	QProgressBar * pbP2AtkInterval;
 	QLabel *lbP1SkillName;
 	QLabel *lbP2SkillName;
 
+	// choose bet layout
+	QLabel *lbBet[3];
+	QPushButton *btnBet[3];
+	PokemonDlg *pkmDlg[3];
+
 	// pokemon table and player table
 	QTableWidget *table;
+	QLabel *lbPokemonNumBadge;
+	QLabel *lbPokemonMasterBadge;
 
 	// logon window
 	LogonDlg *logonDlg;
@@ -122,11 +129,12 @@ private:
 	bool gettingDuelStatistic;
 	bool battleStart;
 	int currentPokemonLV;
+	int chooseBetIndex;
 
 	void changeState(int aim);
 	void login();
-	void getImproved(QLabel *lb);
-	void getDecreased(QLabel *lb);
+	void getImproved(QLabel *lb);	// simple animation
+	void getDecreased(QLabel *lb); // simple animation
 	void mySleep(int n);
 private slots:
 	void getServerMsg();

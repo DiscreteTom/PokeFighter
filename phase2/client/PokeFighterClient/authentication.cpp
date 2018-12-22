@@ -1,11 +1,11 @@
 #include "authentication.h"
 
-
 bool isValidPassword(const QString &str)
 {
 	if (str.length() > 30 || str.length() < 6)
 		return false;
-	for (auto c : str){
+	for (auto c : str)
+	{
 		if (c != '_' && !(c <= 'z' && c >= 'a') && !(c <= 'Z' && c >= 'A') && !(c >= '0' && c <= '9'))
 			return false;
 	}
@@ -14,11 +14,14 @@ bool isValidPassword(const QString &str)
 
 bool isValidUsername(const QString &str)
 {
-	if (str.length() > 30 || str.length() < 6){
+	if (str.length() > 30 || str.length() < 6)
+	{
 		return false;
 	}
-	for (auto c : str){
-		if (c == '\t' || c == '\b' || c == '\t'){
+	for (auto c : str)
+	{
+		if (c == '\t' || c == ' ' || c == '\t')
+		{
 			return false;
 		}
 	}

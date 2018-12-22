@@ -86,6 +86,8 @@ pokemonChangeName <pokemonID> <newName>
 battle <type: LV_UP | DUEL> <pokemonID> <enemyRaceID> <enemyLV>
 useSkill <skillID>
 getDuelStatistic
+chooseBet
+discard <pokemonID>
 ```
 
 编码相关：

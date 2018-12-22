@@ -5,5 +5,14 @@
         <file>img/pidgey.png</file>
         <file>img/squirtle.png</file>
         <file>img/start.jpg</file>
+        <file>img/copperbadge.png</file>
+        <file>img/copperbadge2.png</file>
+        <file>img/goldbadge.png</file>
+        <file>img/goldenbadge2.png</file>
+        <file>img/silverbadge.png</file>
+        <file>img/silverbadge2.png</file>
+        <file>img/exit.png</file>
+        <file>img/play.png</file>
+        <file>img/lock.png</file>
     </qresource>
 </RCC>

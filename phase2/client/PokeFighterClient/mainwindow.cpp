@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
 	// start layout
 	lbStartTitle = new QLabel(tr("宠物小精灵对战程序"), this);
-	lbStartTitle->setObjectName("lbStartTitle");
+	lbStartTitle->setObjectName("lbStartTitle"); // for stylesheet
 	btnPlay = new QPushButton(tr("开始游戏"), this);
 	btnPlay->setObjectName("btnPlay");
 	btnExit = new QPushButton(tr("退出"), this);
@@ -72,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	connect(btnLogon, &QPushButton::clicked, this, [this] {
 		if (logonDlg->exec() == QDialog::Accepted)
 		{
+			// auto set username and password after logon
 			leUsername->setText(logonDlg->getUsername());
 			lePassword->setText(logonDlg->getPassword());
 		}
@@ -109,7 +110,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	});
 	connect(btnShowPokemonList, &QPushButton::clicked, this, [this] {
 		changeState(POKEMON_TABLE);
-		currentPlayerID = 0;
+		currentPlayerID = 0; // show my pokemon table
 		client->write("getPokemonList", BUF_LENGTH);
 	});
 	connect(btnDisplayAllPlayer, &QPushButton::clicked, this, [this] {
@@ -158,9 +159,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
 	changingPokemonName = false;
 
-	//	setFixedSize(1600, 900);
 	setFixedSize(1366, 966); // size of start.jpg
 
+	// bgm
 	mediaPlayer->setMedia(QUrl("qrc:/music/media/op.mp3"));
 	mediaPlayer->setVolume(50);
 	mediaPlayer->play();
@@ -174,7 +175,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::changeState(MainWindow::State aim)
 {
-	// hide all widget
+	// hide and reset all widget
 	lbStartTitle->hide();
 	btnPlay->hide();
 	btnExit->hide();
@@ -480,9 +481,11 @@ void MainWindow::getServerMsg()
 		{
 			auto dlg = new PokemonDlg(msg, currentPlayerID == 0, this);
 			connect(dlg, &PokemonDlg::pokemonChangeName, this, [this](const QString &pokemonID, const QString &newName) {
-				for (int i = 0; i < table->rowCount(); ++i){
-					if (table->item(i, 0)->text() == pokemonID){
-						table->item(i, 1)->setText(newName);// will call table::cellChanged
+				for (int i = 0; i < table->rowCount(); ++i)
+				{
+					if (table->item(i, 0)->text() == pokemonID)
+					{
+						table->item(i, 1)->setText(newName); // will call table::cellChanged
 					}
 				}
 			});

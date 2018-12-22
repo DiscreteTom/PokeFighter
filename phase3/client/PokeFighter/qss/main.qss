@@ -1,37 +1,83 @@
 *{
-	font-family: "å¾®è½¯é›…é»‘"
+	font-family: "Î¢ÈíÑÅºÚ";
+	font-weight: 75;
 }
 
-
-.MainWindow{
-	background-image:url(":/img/img/start.jpg");
-}
-
-#btnPlay, #btnExit, #btnLogin, #btnLogon, #btnBack{
-	width: 200px;
-	height: 80px;
+#btnPlay, #btnExit, #btnLogin, #btnLogon, #btnBack, #btnLogout, #btnShowPokemonList,
+#btnDisplayAllPlayer, #btnChangePassword, #btnOK, #btnLvUpBattle, #btnDuelBattle,
+#logon_btnOK, #logon_btnCancel, #btnEnemyRace0, #btnEnemyRace1, #btnEnemyRace2, #btnEnemyRace3,
+#btnSkill_1, #btnSkill_2, #btnSkill_3, #btnSkill_4, #sbEnemyLV {
 	border: 2px solid #8f8f91;
 	border-radius: 6px;
 	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 																		stop: 0 #f6f7fa, stop: 1 #dadbde);
-	min-width: 80px;
 	font-size: 20px;
 }
 
-#btnPlay:pressed, #btnExit:pressed, #btnLogin:pressed, #btnLogon:pressed, #btnBack:pressed{
+#btnPlay:pressed, #btnExit:pressed, #btnLogin:pressed, #btnLogon:pressed, #btnBack:pressed,
+#btnLogout:pressed, #btnShowPokemonList:pressed, #btnDisplayAllPlayer:pressed, #btnChangePassword:pressed,
+#btnOK:pressed, #btnDuelBattle:pressed, #btnLvUpBattle:pressed,
+#logon_btnOK:pressed, #logon_btnCancel:pressed,
+#btnEnemyRace0:pressed, #btnEnemyRace1:pressed, #btnEnemyRace2:pressed, #btnEnemyRace3:pressed,
+#btnSkill_1:pressed, #btnSkill_2:pressed, #btnSkill_3:pressed, #btnSkill_4:pressed {
 	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 																		stop: 0 #dadbde, stop: 1 #f6f7fa);
 }
 
-#btnPlay:flat, #btnExit:flat, #btnLogin:flat, #btnLogon:flat, #btnBack:flat{
+#btnPlay:flat, #btnExit:flat, #btnLogin:flat, #btnLogon:flat, #btnBack:flat, #btnLogout:flat,
+#btnShowPokemonList:flat, #btnDisplayAllPlayer:flat, #btnChangePassword:flat, #btnOK:flat,
+#btnDuelBattle:flat, #btnLvUpBattle:flat, #logon_btnOK:flat, #logon_btnCancel:flat,
+#btnEnemyRace0:flat, #btnEnemyRace1:flat, #btnEnemyRace2:flat, #btnEnemyRace3:flat,
+#btnSkill_1:flat, #btnSkill_2:flat, #btnSkill_3:flat, #btnSkill_4:flat {
 	border: none; /* no border for a flat push button */
 }
 
-#btnPlay:default, #btnExit:default, #btnLogin:default, #btnLogon:default, #btnBack:default{
+#btnPlay:default, #btnExit:default, #btnLogin:default, #btnLogon:default, #btnBack:default,
+#btnLogout:default, #btnShowPokemonList:default, #btnDisplayAllPlayer:default, #btnChangePassword:default,
+#btnOK:default, #btnDualBattle:default, #btnLvUpBattle:default,
+#logon_btnOK:default, #logon_btnCancel:default,
+#btnEnemyRace0:default, #btnEnemyRace1:default, #btnEnemyRace2:default, #btnEnemyRace3:default,
+#btnSkill_1:default, #btnSkill_2:default, #btnSkill_3:default, #btnSkill_4:default {
 	border-color: navy; /* make the default button prominent */
 }
 
-#lbStartTitle, #lbLoginLabel{
+#btnPlay, #btnExit, #btnLogin, #btnLogon, #btnBack, #btnLogout, #btnShowPokemonList,
+#btnDisplayAllPlayer, #btnChangePassword, #btnOK, #btnLvUpBattle, #btnDuelBattle {
+	width: 200px;
+	height: 80px;
+}
+
+#logon_btnOK, #logon_btnCancel{
+	width: 200px;
+	height: 40px;
+}
+
+#btnEnemyRace1, #btnEnemyRace2, #btnEnemyRace3, #btnEnemyRace0{
+	height: 300px;
+}
+
+#lbStartTitle, #lbLoginLabel, #lbP1SkillName, #lbP2SkillName{
 	font-size: 30pt;
 	font-weight: 75;
+}
+
+#lbP1SkillName, #lbP2SkillName{
+	max-height: 50px;
+}
+
+#lbWin, #lbTotal, #lbWinRate, #lbEnemyLV, #lbChooseEnemy{
+	font-size: 20pt;
+	font-weight: 75;
+}
+
+/* #leUsername, #lePassword, #leNewPassword { */
+.QLineEdit{
+	width: 300px;
+	height: 50px;
+	font-size: 18pt;
+	border: 2px solid gray;
+	border-radius: 10px;
+	padding: 0 8px;
+	background: white;
+	selection-background-color: darkgray;
 }

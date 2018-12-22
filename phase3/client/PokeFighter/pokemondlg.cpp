@@ -24,18 +24,19 @@ PokemonDlg::PokemonDlg(const QString &detail, bool myPokemonTable, QWidget *pare
 
 		if (i != 1)
 		{
+			// only pokemon name can be changed
 			t->setFlags(t->flags() ^ Qt::ItemIsEnabled);
 			t->setBackgroundColor(QColor("#eff0f1"));
 		}
 		else
 		{
-
 			if (myPokemonTable)
 			{
 				t->setToolTip(tr("双击以更改精灵名称"));
 			}
 			else
 			{
+				// can not change other players' pokemons' name
 				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
 				t->setBackgroundColor(QColor("#eff0f1"));
 			}

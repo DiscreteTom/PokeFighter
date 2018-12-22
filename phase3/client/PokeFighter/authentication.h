@@ -6,5 +6,4 @@
 bool isValidPassword(const QString &str);
 bool isValidUsername(const QString &str);
 
-
 #endif // AUTHENTICATION_H

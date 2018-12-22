@@ -5,6 +5,7 @@
 #include <QThread>
 #include <QTime>
 #include <QHostAddress>
+#include <QMediaPlaylist>
 #include "netconfig.h"
 #include "pokemondlg.h"
 #include "authentication.h"
@@ -21,8 +22,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	lbStartTitle->setObjectName("lbStartTitle");
 	btnPlay = new QPushButton(tr("开始游戏"), this);
 	btnPlay->setObjectName("btnPlay");
+	btnPlay->setIcon(QPixmap(":/img/img/play.png"));
 	btnExit = new QPushButton(tr("退出"), this);
 	btnExit->setObjectName("btnExit");
+	btnExit->setIcon(QPixmap(":/img/img/exit.png"));
 
 	// login layout
 	lbLoginLabel = new QLabel(tr("登录"), this);
@@ -73,16 +76,27 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
 	// choose enemy layout
 	lbChooseEnemy = new QLabel(tr("选择你的对手："), this);
+	lbChooseEnemy->setObjectName("lbChooseEnemy");
 	lbEnemyLV = new QLabel(tr("对手等级："), this);
+	lbEnemyLV->setObjectName("lbEnemyLV");
 	sbEnemyLV = new QSpinBox(this);
+	sbEnemyLV->setObjectName("sbEnemyLV");
 	btnEnemyRace0 = new QPushButton(tr("小火龙"), this);
+	btnEnemyRace0->setObjectName("btnEnemyRace0");
 	btnEnemyRace0->setIcon(QPixmap(":/img/img/charmander.png"));
+	btnEnemyRace0->setIconSize(QSize(300, 300));
 	btnEnemyRace1 = new QPushButton(tr("妙蛙种子"), this);
+	btnEnemyRace1->setObjectName("btnEnemyRace1");
 	btnEnemyRace1->setIcon(QPixmap(":/img/img/bulbasaur.png"));
+	btnEnemyRace1->setIconSize(QSize(300, 300));
 	btnEnemyRace2 = new QPushButton(tr("杰尼龟"), this);
+	btnEnemyRace2->setObjectName("btnEnemyRace2");
 	btnEnemyRace2->setIcon(QPixmap(":/img/img/squirtle.png"));
+	btnEnemyRace2->setIconSize(QSize(300, 300));
 	btnEnemyRace3 = new QPushButton(tr("波波"), this);
+	btnEnemyRace3->setObjectName("btnEnemyRace3");
 	btnEnemyRace3->setIcon(QPixmap(":/img/img/pidgey.png"));
+	btnEnemyRace3->setIconSize(QSize(300, 300));
 	sbEnemyLV->setMaximum(15);
 	sbEnemyLV->setMinimum(1);
 
@@ -90,18 +104,36 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	lbP1 = new QLabel(tr("精灵1"), this);
 	lbP2 = new QLabel(tr("精灵2"), this);
 	btnSkill_1 = new QPushButton(this);
+	btnSkill_1->setObjectName("btnSkill_1");
 	btnSkill_2 = new QPushButton(this);
+	btnSkill_2->setObjectName("btnSkill_2");
 	btnSkill_3 = new QPushButton(this);
+	btnSkill_3->setObjectName("btnSkill_3");
 	btnSkill_4 = new QPushButton(this);
+	btnSkill_4->setObjectName("btnSkill_4");
 	pbP1HP = new QProgressBar(this);
+	pbP1HP->setFormat("HP: %v/%m");
 	pbP2HP = new QProgressBar(this);
-	//	pbP1AtkInterval = new QProgressBar(this);
-	//	pbP2AtkInterval = new QProgressBar(this);
+	pbP2HP->setFormat("HP: %v/%m");
 	lbP1SkillName = new QLabel(this);
+	lbP1SkillName->setObjectName("lbP1SkillName");
 	lbP2SkillName = new QLabel(this);
+	lbP2SkillName->setObjectName("lbP2SkillName");
+
+	// choose bet layout
+	lbBet[1] = new QLabel(this);
+	lbBet[2] = new QLabel(this);
+	lbBet[0] = new QLabel(this);
+	btnBet[1] = new QPushButton(this);
+	btnBet[2] = new QPushButton(this);
+	btnBet[0] = new QPushButton(this);
 
 	// pokemon table and player table
 	table = new QTableWidget(this);
+	lbPokemonMasterBadge = new QLabel(this);
+	lbPokemonNumBadge = new QLabel(this);
+	lbPokemonMasterBadge->setFixedHeight(80);
+	lbPokemonNumBadge->setFixedHeight(80);
 
 	// logon window
 	logonDlg = new LogonDlg(this);
@@ -115,6 +147,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	connect(btnLogon, &QPushButton::clicked, this, [this] {
 		if (logonDlg->exec() == QDialog::Accepted)
 		{
+			// auto set username and password if logon succeed
 			leUsername->setText(logonDlg->getUsername());
 			lePassword->setText(logonDlg->getPassword());
 		}
@@ -162,8 +195,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 		client->disconnectFromHost();
 	});
 	connect(btnShowPokemonList, &QPushButton::clicked, this, [this] {
-		changeState(POKEMON_TABLE);
 		currentPlayerID = 0;
+		showPokemonDlg = false;
+		changeState(POKEMON_TABLE);
 		client->write("getPokemonList", BUF_LENGTH);
 	});
 	connect(btnLvUpBattle, &QPushButton::clicked, this, [this] {
@@ -298,16 +332,26 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	client = new QTcpSocket(this);
 	connect(client, &QTcpSocket::readyRead, this, &MainWindow::getServerMsg);
 
-	changeState(START);
-
+	// init player data
 	changingPokemonName = false;
 	gettingDuelStatistic = false;
 	battleStart = false;
+	chooseBetIndex = 0;
+	showPokemonDlg = false;
+	pkmDlg[0] = NULL;
+	pkmDlg[1] = NULL;
+	pkmDlg[2] = NULL;
 
-	//	setFixedSize(1600, 900);
+	changeState(START);
+
 	setFixedSize(1366, 966); // size of start.jpg
 
-	mediaPlayer->setMedia(QUrl("qrc:/music/media/op.mp3"));
+	// set bgm and loop
+	QMediaPlaylist *playlist = new QMediaPlaylist();
+	playlist->addMedia(QUrl("qrc:/music/media/op.mp3"));
+	playlist->setPlaybackMode(QMediaPlaylist::Loop);
+
+	mediaPlayer->setPlaylist(playlist);
 	mediaPlayer->setVolume(50);
 	mediaPlayer->play();
 }
@@ -320,9 +364,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::changeState(int aim)
 {
-	setStyleSheet(tr("background-image:url(\":/img/img/start.jpg\");"));
+	setStyleSheet(tr(".MainWindow{background-image:url(\":/img/img/start.jpg\");}"));
 
-	// hide all widget
+	// hide and reset all widget
 	lbStartTitle->hide();
 	btnPlay->hide();
 	btnExit->hide();
@@ -358,10 +402,16 @@ void MainWindow::changeState(int aim)
 	btnSkill_4->hide();
 	pbP1HP->hide();
 	pbP2HP->hide();
-	//	pbP1AtkInterval->hide();
-	//	pbP2AtkInterval->hide();
 	lbP1SkillName->hide();
 	lbP2SkillName->hide();
+	lbBet[1]->hide();
+	lbBet[2]->hide();
+	lbBet[0]->hide();
+	btnBet[1]->hide();
+	btnBet[2]->hide();
+	btnBet[0]->hide();
+	lbPokemonMasterBadge->hide();
+	lbPokemonNumBadge->hide();
 	table->hide();
 	table->clear();
 	btnPlay->setDefault(false);
@@ -452,6 +502,15 @@ void MainWindow::changeState(int aim)
 			layout->addWidget(table, 1, 0, 1, 3);
 			layout->addWidget(btnBack, 2, 0, 1, 3);
 		}
+		else if (state == POKEMON_TABLE)
+		{
+			lbPokemonMasterBadge->show();
+			lbPokemonNumBadge->show();
+			layout->addWidget(lbPokemonNumBadge, 0, 0, 1, 1, Qt::AlignHCenter);
+			layout->addWidget(lbPokemonMasterBadge, 0, 1, 1, 1, Qt::AlignHCenter);
+			layout->addWidget(table, 1, 0, 1, 2);
+			layout->addWidget(btnBack, 2, 0, 1, 2);
+		}
 		else
 		{
 			layout->addWidget(table, 0, 0);
@@ -488,15 +547,16 @@ void MainWindow::changeState(int aim)
 		btnBack->show();
 		if (state == (CHOOSE_ENEMY | DUEL_BATTLE))
 		{
-			sbEnemyLV->setValue(15);
+			sbEnemyLV->setValue(currentPokemonLV);
 			sbEnemyLV->setDisabled(true);
 		}
 		else
 		{
+			sbEnemyLV->setValue(currentPokemonLV);
 			sbEnemyLV->setDisabled(false);
 		}
 		layout->addWidget(lbChooseEnemy, 0, 0, 1, 2);
-		layout->addWidget(lbEnemyLV, 0, 2, 1, 1);
+		layout->addWidget(lbEnemyLV, 0, 2, 1, 1, Qt::AlignRight);
 		layout->addWidget(sbEnemyLV, 0, 3, 1, 1);
 		layout->addWidget(btnEnemyRace0, 1, 0, 1, 2);
 		layout->addWidget(btnEnemyRace1, 1, 2, 1, 2);
@@ -516,21 +576,32 @@ void MainWindow::changeState(int aim)
 		lbP1SkillName->show();
 		lbP2SkillName->show();
 		pbP1HP->show();
-		//		pbP1AtkInterval->show();
 		pbP2HP->show();
-		//		pbP2AtkInterval->show();
 		layout->addWidget(pbP1HP, 0, 0, 1, 2);
-		//		layout->addWidget(pbP1AtkInterval, 1, 0, 1, 2);
-		layout->addWidget(lbP1SkillName, 1, 0, 1, 2);
+		layout->addWidget(lbP1SkillName, 1, 0, 1, 2, Qt::AlignCenter);
 		layout->addWidget(pbP2HP, 0, 2, 1, 2);
-		//		layout->addWidget(pbP2AtkInterval, 1, 2, 1, 2);
-		layout->addWidget(lbP2SkillName, 1, 2, 1, 2);
-		layout->addWidget(lbP1, 2, 0, 1, 2);
-		layout->addWidget(lbP2, 2, 2, 1, 2);
+		layout->addWidget(lbP2SkillName, 1, 2, 1, 2, Qt::AlignCenter);
+		layout->addWidget(lbP1, 2, 0, 1, 2, Qt::AlignCenter);
+		layout->addWidget(lbP2, 2, 2, 1, 2, Qt::AlignCenter);
 		layout->addWidget(btnSkill_1, 3, 0, 1, 1);
 		layout->addWidget(btnSkill_2, 3, 1, 1, 1);
 		layout->addWidget(btnSkill_3, 3, 2, 1, 1);
 		layout->addWidget(btnSkill_4, 3, 3, 1, 1);
+		break;
+	case CHOOSE_BET:
+		setStyleSheet("");
+		lbBet[1]->show();
+		lbBet[2]->show();
+		lbBet[0]->show();
+		btnBet[1]->show();
+		btnBet[2]->show();
+		btnBet[0]->show();
+		layout->addWidget(lbBet[0], 0, 0, 1, 1, Qt::AlignHCenter);
+		layout->addWidget(lbBet[1], 0, 1, 1, 1, Qt::AlignHCenter);
+		layout->addWidget(lbBet[2], 0, 2, 1, 1, Qt::AlignHCenter);
+		layout->addWidget(btnBet[0], 1, 0, 1, 1);
+		layout->addWidget(btnBet[1], 1, 1, 1, 1);
+		layout->addWidget(btnBet[2], 1, 2, 1, 1);
 		break;
 	default:
 		break;
@@ -583,6 +654,7 @@ void MainWindow::login()
 
 void MainWindow::getImproved(QLabel *lb)
 {
+	// move downward and move upward
 	lb->move(lb->x(), lb->y() + 50);
 	mySleep(50);
 	lb->move(lb->x(), lb->y() + 50);
@@ -607,7 +679,7 @@ void MainWindow::getImproved(QLabel *lb)
 
 void MainWindow::getDecreased(QLabel *lb)
 {
-	// P1 lose HP
+	// blink several times
 	lb->hide();
 	mySleep(200);
 	lb->show();
@@ -618,6 +690,7 @@ void MainWindow::getDecreased(QLabel *lb)
 	mySleep(200);
 }
 
+// sleep but not stop event loop
 void MainWindow::mySleep(int n)
 {
 	QTime t;
@@ -650,6 +723,7 @@ void MainWindow::getServerMsg()
 		return;
 	}
 
+	// parse msg
 	switch (state)
 	{
 	case LOGIN:
@@ -777,10 +851,25 @@ void MainWindow::getServerMsg()
 				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
 				table->setItem(i, 0, t);
 				t = new QTableWidgetItem(detail[1]);
-				t->setToolTip(tr("双击以更改精灵名称"));
+				if (currentPlayerID == 0)
+				{
+					t->setToolTip(tr("双击以更改精灵名称"));
+				}
+				else
+				{
+					t->setFlags(t->flags() ^ Qt::ItemIsEditable);
+				}
 				table->setItem(i, 1, t);
 				t = new QTableWidgetItem(detail[2]);
 				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
+				if (detail[2] == "小火龙")
+					t->setIcon(QIcon(":/img/img/charmander.png"));
+				else if (detail[2] == "妙蛙种子")
+					t->setIcon(QIcon(":/img/img/bulbasaur.png"));
+				else if (detail[2] == "杰尼龟")
+					t->setIcon(QIcon(":/img/img/squirtle.png"));
+				else if (detail[2] == "波波")
+					t->setIcon(QIcon(":/img/img/pidgey.png"));
 				table->setItem(i, 2, t);
 				t = new QTableWidgetItem(detail[3]);
 				t->setFlags(t->flags() ^ Qt::ItemIsEditable);
@@ -799,6 +888,7 @@ void MainWindow::getServerMsg()
 					auto btn = new QPushButton(tr("就决定是你了！"), this);
 					connect(btn, &QPushButton::clicked, this, [this, detail] {
 						battlePokemonID = detail[0];
+						currentPokemonLV = detail[3].toInt();
 						changeState((state ^ POKEMON_TABLE) | CHOOSE_ENEMY);
 					});
 					table->setCellWidget(i, 5, btn);
@@ -823,6 +913,55 @@ void MainWindow::getServerMsg()
 					changingPokemonName = true;
 				}
 			}); // must be connected after data input
+
+			// deal with badge
+			int masterPokemon = 0; // number of lv-15 pokemon
+			for (int i = 0; i < table->rowCount(); ++i)
+			{
+				if (table->item(i, 3)->text() == "15")
+					++masterPokemon;
+			}
+			int pokemonNum = pokemons.size() - 1; // because pokemons[pokemons.size() - 1] == ""
+			if (pokemonNum >= 20)
+			{
+				lbPokemonNumBadge->setPixmap(QPixmap(":/img/img/goldbadge.png").scaledToHeight(80));
+				lbPokemonNumBadge->setToolTip(tr("金质精灵爱好者徽章，赐予精灵数量不少于20只的玩家"));
+			}
+			else if (pokemonNum >= 10)
+			{
+				lbPokemonNumBadge->setPixmap(QPixmap(":/img/img/silverbadge.png").scaledToHeight(80));
+				lbPokemonNumBadge->setToolTip(tr("银质精灵爱好者徽章，赐予精灵数量不少于10只的玩家"));
+			}
+			else if (pokemonNum >= 5)
+			{
+				lbPokemonNumBadge->setPixmap(QPixmap(":/img/img/copperbadge.png").scaledToHeight(80));
+				lbPokemonNumBadge->setToolTip(tr("铜质精灵爱好者徽章，赐予精灵数量不少于5只的玩家"));
+			}
+			else
+			{
+				lbPokemonNumBadge->setText(tr("精灵爱好者徽章：无"));
+				lbPokemonNumBadge->setToolTip(tr("精灵数量大于5时可以获得精灵爱好者徽章"));
+			}
+			if (masterPokemon >= 5)
+			{
+				lbPokemonMasterBadge->setPixmap(QPixmap(":/img/img/goldenbadge2.png").scaledToHeight(80));
+				lbPokemonMasterBadge->setToolTip(tr("金质精灵大师徽章，赐予15级精灵数量不少于5只的玩家"));
+			}
+			else if (masterPokemon >= 3)
+			{
+				lbPokemonMasterBadge->setPixmap(QPixmap(":/img/img/silverbadge2.png").scaledToHeight(80));
+				lbPokemonMasterBadge->setToolTip(tr("银质精灵大师徽章，赐予15级精灵数量不少于5只的玩家"));
+			}
+			else if (masterPokemon >= 1)
+			{
+				lbPokemonMasterBadge->setPixmap(QPixmap(":/img/img/copperbadge2.png").scaledToHeight(80));
+				lbPokemonMasterBadge->setToolTip(tr("铜质精灵大师徽章，赐予拥有15级精灵的玩家"));
+			}
+			else
+			{
+				lbPokemonMasterBadge->setText(tr("精灵大师徽章：无"));
+				lbPokemonMasterBadge->setToolTip(tr("拥有15级精灵可以获得精灵大师徽章"));
+			}
 		}
 		else // msg is pokemon detail
 		{
@@ -865,50 +1004,83 @@ void MainWindow::getServerMsg()
 			auto detail = ps[0].split(' ');
 			if (detail[0] == "妙蛙种子")
 			{
-				lbP1->setPixmap(QPixmap(":/img/img/bulbasaur.png"));
+				lbP1->setPixmap(QPixmap(":/img/img/bulbasaur.png").scaledToHeight(500));
 			}
 			else if (detail[0] == "小火龙")
 			{
-				lbP1->setPixmap(QPixmap(":/img/img/charmander.png"));
+				lbP1->setPixmap(QPixmap(":/img/img/charmander.png").scaledToHeight(500));
 			}
 			else if (detail[0] == "杰尼龟")
 			{
-				lbP1->setPixmap(QPixmap(":/img/img/squirtle.png"));
+				lbP1->setPixmap(QPixmap(":/img/img/squirtle.png").scaledToHeight(500));
 			}
 			else if (detail[0] == "波波")
 			{
-				lbP1->setPixmap(QPixmap(":/img/img/pidgey.png"));
+				lbP1->setPixmap(QPixmap(":/img/img/pidgey.png").scaledToHeight(500));
 			}
 			pbP1HP->setMaximum(detail[1].toInt());
 			pbP1HP->setValue(detail[1].toInt());
 			btnSkill_1->setText(detail[2]);
-			btnSkill_2->setText(detail[4]);
-			btnSkill_3->setText(detail[6]);
-			btnSkill_4->setText(detail[8]);
+			if (currentPokemonLV < 5)
+			{
+				btnSkill_2->setIcon(QIcon(":/img/img/lock.png"));
+				btnSkill_2->setText(tr("等级5解锁"));
+			}
+			else
+			{
+				btnSkill_2->setText(detail[4]);
+				btnSkill_2->setIcon(QIcon());
+			}
+			if (currentPokemonLV < 10)
+			{
+				btnSkill_3->setIcon(QIcon(":/img/img/lock.png"));
+				btnSkill_3->setText(tr("等级10解锁"));
+			}
+			else
+			{
+				btnSkill_3->setIcon(QIcon());
+				btnSkill_3->setText(detail[6]);
+			}
+			if (currentPokemonLV < 15)
+			{
+				btnSkill_4->setIcon(QIcon(":/img/img/lock.png"));
+				btnSkill_4->setText(tr("等级15解锁"));
+			}
+			else
+			{
+				btnSkill_4->setIcon(QIcon());
+				btnSkill_4->setText(detail[8]);
+			}
 			btnSkill_1->setToolTip(detail[3]);
-			btnSkill_2->setToolTip(detail[5]);
-			btnSkill_3->setToolTip(detail[7]);
-			btnSkill_4->setToolTip(detail[9]);
-			btnSkill_2->setText(btnSkill_2->text() + ' ' + detail[10]);
-			btnSkill_3->setText(btnSkill_3->text() + ' ' + detail[11]);
-			btnSkill_4->setText(btnSkill_4->text() + ' ' + detail[12]);
+			if (currentPokemonLV >= 5)
+				btnSkill_2->setToolTip(detail[5]);
+			if (currentPokemonLV >= 10)
+				btnSkill_3->setToolTip(detail[7]);
+			if (currentPokemonLV >= 15)
+				btnSkill_4->setToolTip(detail[9]);
+			if (currentPokemonLV >= 5)
+				btnSkill_2->setText(btnSkill_2->text() + ' ' + detail[10]);
+			if (currentPokemonLV >= 10)
+				btnSkill_3->setText(btnSkill_3->text() + ' ' + detail[11]);
+			if (currentPokemonLV >= 15)
+				btnSkill_4->setText(btnSkill_4->text() + ' ' + detail[12]);
 			currentPokemonLV = detail[13].toInt();
 			detail = ps[1].split(' ');
 			if (detail[0] == "妙蛙种子")
 			{
-				lbP2->setPixmap(QPixmap(":/img/img/bulbasaur.png"));
+				lbP2->setPixmap(QPixmap(":/img/img/bulbasaur.png").scaledToHeight(500));
 			}
 			else if (detail[0] == "小火龙")
 			{
-				lbP2->setPixmap(QPixmap(":/img/img/charmander.png"));
+				lbP2->setPixmap(QPixmap(":/img/img/charmander.png").scaledToHeight(500));
 			}
 			else if (detail[0] == "杰尼龟")
 			{
-				lbP2->setPixmap(QPixmap(":/img/img/squirtle.png"));
+				lbP2->setPixmap(QPixmap(":/img/img/squirtle.png").scaledToHeight(500));
 			}
 			else if (detail[0] == "波波")
 			{
-				lbP2->setPixmap(QPixmap(":/img/img/pidgey.png"));
+				lbP2->setPixmap(QPixmap(":/img/img/pidgey.png").scaledToHeight(500));
 			}
 			pbP2HP->setMaximum(detail[1].toInt());
 			pbP2HP->setValue(detail[1].toInt());
@@ -938,23 +1110,35 @@ void MainWindow::getServerMsg()
 				lbP2SkillName->setText(tr("闪避！"));
 				mySleep(500);
 				lbP2SkillName->clear();
+				lbP2SkillName->clear();
+				client->write("done", BUF_LENGTH);
 				break;
 			}
 			// not dodge
 			if (pbP2HP->value() > detail[3].toInt())
 			{
+				// hp decreased
 				lbP2SkillName->setText(QString::number(detail[3].toInt() - pbP2HP->value()));
 				getDecreased(lbP2);
+				while (pbP2HP->value() > detail[3].toInt())
+				{
+					mySleep(10);
+					pbP2HP->setValue(pbP2HP->value() - 1);
+				}
 				lbP2SkillName->clear();
 			}
 			else if (pbP2HP->value() < detail[3].toInt())
 			{
 				// hp increased
-				lbP2SkillName->setText(QString::number(detail[3].toInt() - pbP2HP->value()));
+				lbP2SkillName->setText(QString("+") + QString::number(detail[3].toInt() - pbP2HP->value()));
 				getImproved(lbP2);
+				while (pbP2HP->value() < detail[3].toInt())
+				{
+					mySleep(10);
+					pbP2HP->setValue(pbP2HP->value() + 1);
+				}
 				lbP2SkillName->clear();
 			}
-			pbP2HP->setValue(detail[3].toInt());
 			if (detail[4] == '0')
 			{
 				lbP2SkillName->setText(tr("攻击下降"));
@@ -996,16 +1180,25 @@ void MainWindow::getServerMsg()
 				// hp decreased
 				lbP1SkillName->setText(QString::number(detail[10].toInt() - pbP1HP->value()));
 				getDecreased(lbP1);
+				while (pbP1HP->value() > detail[10].toInt())
+				{
+					mySleep(10);
+					pbP1HP->setValue(pbP1HP->value() - 1);
+				}
 				lbP1SkillName->clear();
 			}
 			else if (pbP1HP->value() < detail[10].toInt())
 			{
 				// hp increased
-				lbP1SkillName->setText(QString::number(detail[10].toInt() - pbP1HP->value()));
+				lbP1SkillName->setText(QString("+") + QString::number(detail[10].toInt() - pbP1HP->value()));
 				getImproved(lbP1);
+				while (pbP1HP->value() < detail[10].toInt())
+				{
+					mySleep(10);
+					pbP1HP->setValue(pbP1HP->value() + 1);
+				}
 				lbP1SkillName->clear();
 			}
-			pbP1HP->setValue(detail[10].toInt());
 			if (detail[11] == '0')
 			{
 				lbP1SkillName->setText(tr("攻击下降"));
@@ -1043,11 +1236,20 @@ void MainWindow::getServerMsg()
 				lbP1SkillName->clear();
 			}
 			auto skillName = btnSkill_2->text().split(' ')[0];
-			btnSkill_2->setText(skillName + ' ' + detail[14]);
+			if (currentPokemonLV < 5)
+				btnSkill_2->setText(tr("等级5解锁"));
+			else
+				btnSkill_2->setText(skillName + ' ' + detail[14]);
 			skillName = btnSkill_3->text().split(' ')[0];
-			btnSkill_3->setText(skillName + ' ' + detail[15]);
+			if (currentPokemonLV < 10)
+				btnSkill_3->setText(tr("等级10解锁"));
+			else
+				btnSkill_3->setText(skillName + ' ' + detail[15]);
 			skillName = btnSkill_4->text().split(' ')[0];
-			btnSkill_4->setText(skillName + ' ' + detail[16]);
+			if (currentPokemonLV < 15)
+				btnSkill_4->setText(tr("等级15解锁"));
+			else
+				btnSkill_4->setText(skillName + ' ' + detail[16]);
 			lbP1SkillName->clear();
 		}
 		else
@@ -1061,23 +1263,35 @@ void MainWindow::getServerMsg()
 				lbP1SkillName->setText(tr("闪避！"));
 				mySleep(500);
 				lbP1SkillName->clear();
+				lbP2SkillName->clear();
+				client->write("done", BUF_LENGTH);
 				break;
 			}
 			// not dodge
 			if (pbP1HP->value() > detail[3].toInt())
 			{
+				// hp decreased
 				lbP1SkillName->setText(QString::number(detail[3].toInt() - pbP1HP->value()));
 				getDecreased(lbP1);
+				while (pbP1HP->value() > detail[3].toInt())
+				{
+					mySleep(10);
+					pbP1HP->setValue(pbP1HP->value() - 1);
+				}
 				lbP1SkillName->clear();
 			}
 			else if (pbP1HP->value() < detail[3].toInt())
 			{
 				// hp increased
-				lbP1SkillName->setText(QString::number(detail[3].toInt() - pbP1HP->value()));
+				lbP1SkillName->setText(QString("+") + QString::number(detail[3].toInt() - pbP1HP->value()));
 				getImproved(lbP1);
+				while (pbP1HP->value() < detail[3].toInt())
+				{
+					mySleep(10);
+					pbP1HP->setValue(pbP1HP->value() + 1);
+				}
 				lbP1SkillName->clear();
 			}
-			pbP1HP->setValue(detail[3].toInt());
 			if (detail[4] == '0')
 			{
 				lbP1SkillName->setText(tr("攻击下降"));
@@ -1119,16 +1333,25 @@ void MainWindow::getServerMsg()
 				// hp decreased
 				lbP2SkillName->setText(QString::number(detail[10].toInt() - pbP2HP->value()));
 				getDecreased(lbP2);
+				while (pbP2HP->value() > detail[10].toInt())
+				{
+					mySleep(10);
+					pbP2HP->setValue(pbP2HP->value() - 1);
+				}
 				lbP2SkillName->clear();
 			}
 			else if (pbP2HP->value() < detail[10].toInt())
 			{
 				// hp increased
-				lbP2SkillName->setText(QString::number(detail[10].toInt() - pbP2HP->value()));
+				lbP2SkillName->setText(QString("+") + QString::number(detail[10].toInt() - pbP2HP->value()));
 				getImproved(lbP2);
+				while (pbP2HP->value() < detail[10].toInt())
+				{
+					mySleep(10);
+					pbP2HP->setValue(pbP2HP->value() + 1);
+				}
 				lbP2SkillName->clear();
 			}
-			pbP2HP->setValue(detail[10].toInt());
 			if (detail[11] == '0')
 			{
 				lbP2SkillName->setText(tr("攻击下降"));
@@ -1166,29 +1389,77 @@ void MainWindow::getServerMsg()
 				lbP2SkillName->clear();
 			}
 			auto skillName = btnSkill_2->text().split(' ')[0];
-			btnSkill_2->setText(skillName + ' ' + detail[7]);
+			if (currentPokemonLV < 5)
+				btnSkill_2->setText(tr("等级5解锁"));
+			else
+				btnSkill_2->setText(skillName + ' ' + detail[7]);
 			skillName = btnSkill_3->text().split(' ')[0];
-			btnSkill_3->setText(skillName + ' ' + detail[8]);
+			if (currentPokemonLV < 10)
+				btnSkill_3->setText(tr("等级10解锁"));
+			else
+				btnSkill_3->setText(skillName + ' ' + detail[8]);
 			skillName = btnSkill_4->text().split(' ')[0];
-			btnSkill_4->setText(skillName + ' ' + detail[9]);
+			if (currentPokemonLV < 15)
+				btnSkill_4->setText(tr("等级15解锁"));
+			else
+				btnSkill_4->setText(skillName + ' ' + detail[9]);
 			lbP2SkillName->clear();
 		}
 
 		// judge result
 		if (pbP2HP->value() == 0)
 		{
-			QMessageBox::information(this, tr("恭喜"), tr("你赢得了战斗"));
+			if (state == LV_UP_BATTLE)
+				QMessageBox::information(this, tr("恭喜"), tr("你赢得了战斗"));
+			else
+				QMessageBox::information(this, tr("恭喜"), tr("你赢得了决斗，获得了敌对精灵"));
 			changeState(MAIN);
 			break;
 		}
 		else if (pbP1HP->value() == 0)
 		{
 			QMessageBox::information(this, tr("抱歉"), tr("您战败了"));
+			if (state == DUEL_BATTLE)
+			{
+				changeState(CHOOSE_BET);
+				chooseBetIndex = 0;
+				client->write("chooseBet", BUF_LENGTH);
+				break;
+			}
 			changeState(MAIN);
 			break;
 		}
 		client->write("done", BUF_LENGTH);
 
+		break;
+	}
+	case CHOOSE_BET:
+	{
+		++chooseBetIndex;
+		pkmDlg[chooseBetIndex - 1] = new PokemonDlg(msg, false, this);
+		if (chooseBetIndex == 1)
+			pkmDlg[chooseBetIndex - 1]->move(pkmDlg[chooseBetIndex - 1]->x() - pkmDlg[chooseBetIndex - 1]->width(), pkmDlg[chooseBetIndex - 1]->y());
+		else if (chooseBetIndex == 3)
+			pkmDlg[chooseBetIndex - 1]->move(pkmDlg[chooseBetIndex - 1]->x() + pkmDlg[chooseBetIndex - 1]->width(), pkmDlg[chooseBetIndex - 1]->y());
+		lbBet[chooseBetIndex - 1]->setPixmap(QPixmap(*pkmDlg[chooseBetIndex - 1]->getPixmap()));
+		btnBet[chooseBetIndex - 1]->setText(tr("我选择") + pkmDlg[chooseBetIndex - 1]->getName());
+		auto id = pkmDlg[chooseBetIndex - 1]->getID();
+		connect(btnBet[chooseBetIndex - 1], &QPushButton::clicked, [this, id] {
+			QString str = "discard ";
+			str += id;
+			client->write(str.toLocal8Bit(), BUF_LENGTH);
+			for (int i = 0; i < 3; ++i)
+			{
+				if (pkmDlg[i] != NULL)
+					pkmDlg[i]->deleteLater();
+			}
+			changeState(MAIN);
+		});
+		connect(pkmDlg[chooseBetIndex - 1], &PokemonDlg::destroyed, [this] {
+			pkmDlg[chooseBetIndex - 1] = NULL;
+		});
+		if (chooseBetIndex < 4)
+			client->write("done", BUF_LENGTH);
 		break;
 	}
 	default:

@@ -54,6 +54,7 @@ private:
 	void terminateFunc();
 	void mornitor(Endpoint *const endpoint);
 
+	// singleton
 	Hub(){};
 	Hub(Hub const &) = delete;
 	Hub(Hub &&) = delete;
@@ -61,7 +62,7 @@ private:
 	~Hub();
 
 public:
-	static Hub &getInstance();
+	static Hub &getInstance(); // singleton
 
 	void start(); // init database and socket
 	string getAllUser();

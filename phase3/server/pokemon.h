@@ -79,12 +79,11 @@ private:
 public:
 	Pokemon(int raceIndex, const string &name = "");																										 // init a new pokemon
 	Pokemon(const string &name, int raceIndex, int atk, int def, int maxHp, int speed, int lv, int exp); // ctor for database
-	// Pokemon(const Pokemon &) = delete;
 	~Pokemon();
 
 	static const PokemonBase *races[4];
 
-	static Pokemon * getEnemy(int raceIndex, int lv);
+	static Pokemon *getEnemy(int raceIndex, int lv);
 
 	//getter
 	string name() const { return _name; }
@@ -104,7 +103,7 @@ public:
 
 	//about battle
 	void restoreAll();
-	bool attack(Pokemon &aim, string &msg); // auto attack
+	bool attack(Pokemon &aim, string &msg);									// auto attack
 	bool attack(Pokemon &aim, int skillIndex, string &msg); // manual attack
 	bool takeDamage(int n);
 	bool gainExp(int count); //return true if level-up

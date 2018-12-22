@@ -7,7 +7,8 @@
 #include <QMessageBox>
 #include <QTcpSocket>
 
-namespace Ui {
+namespace Ui
+{
 class LogonDlg;
 }
 
@@ -29,13 +30,13 @@ public slots:
 private:
 	Ui::LogonDlg *ui;
 
-	QLineEdit * leUsername;
-	QLineEdit * lePassword;
-	QLineEdit * leRepeat; // repeat password
-	QPushButton * btnOK;
-	QPushButton * btnCancel;
+	QLineEdit *leUsername;
+	QLineEdit *lePassword;
+	QLineEdit *leRepeat; // repeat password
+	QPushButton *btnOK;
+	QPushButton *btnCancel;
 
-	QTcpSocket * client;
+	QTcpSocket *client;
 
 	void logon();
 private slots:

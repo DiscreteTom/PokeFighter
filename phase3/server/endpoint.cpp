@@ -262,6 +262,14 @@ void Endpoint::listenFunc()
 				isDuel = false;
 			battle(strs[2], stoi(strs[3]), stoi(strs[4]));
 		}
+		else if (strs[0] == "chooseBet" && strs.size() == 1)
+		{
+			chooseBet();
+		}
+		else if (strs[0] == "discard" && strs.size() == 2)
+		{
+			discard(strs[1]);
+		}
 		else
 		{
 			cout << "Endpoint[" << playerID << "]: Invalid request.\n";
@@ -330,7 +338,7 @@ void Endpoint::resetPassword(const string &oldPassword, const string &newPasswor
 		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
 		sqlite3_free(errMsg);
 		// strcpy(buf, "Reject: Server error.\n");
-		strcpy(buf, "·þÎñÆ÷´íÎó");
+		strcpy(buf, "æœåŠ¡å™¨é”™è¯¯");
 		send(connSocket, buf, BUF_LENGTH, 0);
 		return;
 	}
@@ -339,7 +347,7 @@ void Endpoint::resetPassword(const string &oldPassword, const string &newPasswor
 		// wrong password
 		sqlite3_free_table(sqlResult);
 		// strcpy(buf, "Reject: wrong old password.\n");
-		strcpy(buf, "¾ÉÃÜÂë²»ÕýÈ·");
+		strcpy(buf, "æ—§å¯†ç ä¸æ­£ç¡®");
 		send(connSocket, buf, BUF_LENGTH, 0);
 		return;
 	}
@@ -355,7 +363,7 @@ void Endpoint::resetPassword(const string &oldPassword, const string &newPasswor
 		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
 		sqlite3_free(errMsg);
 		// strcpy(buf, "Reject: Server error.\n");
-		strcpy(buf, "·þÎñÆ÷´íÎó");
+		strcpy(buf, "æœåŠ¡å™¨é”™è¯¯");
 		send(connSocket, buf, BUF_LENGTH, 0);
 		return;
 	}
@@ -376,6 +384,7 @@ void Endpoint::getPlayerList()
 
 void Endpoint::getPokemonList(int playerID)
 {
+	// get all pokemon from database
 	char **sqlResult;
 	int nRow;
 	int nColumn;
@@ -423,7 +432,7 @@ void Endpoint::getPokemonList(int playerID)
 
 void Endpoint::savePokemonToDB(const Pokemon &p, int id)
 {
-	if (id == -1)
+	if (id == -1) // pokemon not exist, insert it to database
 	{
 		string sql = "INSERT INTO Pokemon(userid, name, race, atk, def, maxHp, speed, lv, exp) VALUES('";
 		sql += to_string(playerID) + "','";
@@ -442,7 +451,7 @@ void Endpoint::savePokemonToDB(const Pokemon &p, int id)
 			sqlite3_free(errMsg);
 		}
 	}
-	else
+	else // pokemon already exist, update it
 	{
 		string sql = "update Pokemon set atk=";
 		sql += to_string(p.atk()) + ", def=";
@@ -579,6 +588,7 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 	result += to_string(p1.pp(2)) + ' ';
 	result += to_string(p1.lv()) + '\n';
 
+	// construct enemy pokemon
 	Pokemon *p2 = Pokemon::getEnemy(enemyRaceID, enemyLV);
 
 	result += p2->raceName() + ' ';
@@ -587,6 +597,7 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 	strcpy(buf, result.c_str());
 	send(connSocket, buf, BUF_LENGTH, 0);
 
+	// construct battle controller
 	BattleController battle = BattleController(p1, *p2, connSocket);
 
 	char **sqlResult2;
@@ -606,7 +617,6 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 	if (battle.start())
 	{
 		// win
-
 		if (isDuel)
 		{
 			// change win rate
@@ -622,13 +632,14 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 			savePokemonToDB(*p2);
 		}
 
+		// p1 gain exp
 		if (p1.lv() > p2->lv() + 5)
 		{
 			// no exp
 		}
 		else if (p1.lv() >= p2->lv())
 		{
-			p1.gainExp(p1.lv() - p2->lv() + 3 + f(2));
+			p1.gainExp((p2->lv() - p1.lv() + 5) + 3 + f(2));
 		}
 		else
 		{
@@ -638,7 +649,7 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 	else
 	{
 		//lose
-
+		// change win rate
 		string sql3 = "update User set total=" + to_string(stoi(sqlResult2[3]) + 1) + " where id=" + to_string(playerID) + ";";
 		char *errMsg3;
 		if (sqlite3_exec(db, sql3.c_str(), nonUseCallback, NULL, &errMsg3) != SQLITE_OK)
@@ -653,4 +664,60 @@ void Endpoint::battle(const string &pokemonID, int enemyRaceID, int enemyLV)
 	delete p2;
 
 	sqlite3_free_table(sqlResult);
+}
+
+void Endpoint::chooseBet()
+{
+	// get all pokemon id
+	char **sqlResult;
+	int nRow;
+	int nColumn;
+	char *errMsg;
+	string sql;
+	sql = "SELECT id FROM Pokemon where userid=" + to_string(playerID) + ";";
+	if (sqlite3_get_table(db, sql.c_str(), &sqlResult, &nRow, &nColumn, &errMsg) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+		sqlite3_free(errMsg);
+		strcpy(buf, "Reject: Server error.\n");
+		send(connSocket, buf, BUF_LENGTH, 0);
+		return;
+	}
+
+	vector<string> ids;
+	for (int i = 0; i < nRow; ++i)
+	{
+		ids.push_back(sqlResult[i + 1]);
+	}
+
+	// get 3 random id
+	int id[3];
+	int index[3];
+	for (int i = 0; i < 3; ++i)
+	{
+		index[i] = rand() % ids.size();
+		id[i] = stoi(ids[index[i]]);
+		ids.erase(ids.begin() + index[i]);
+	}
+
+	sqlite3_free_table(sqlResult);
+
+	// get 3 pokemon details
+	for (int i = 0; i < 3; ++i)
+	{
+		getPokemonByID(id[i]);
+		recv(connSocket, buf, BUF_LENGTH, 0); // read done
+	}
+}
+
+void Endpoint::discard(const string &pokemonID)
+{
+	string sql = "delete from Pokemon where id=";
+	sql += pokemonID + ";";
+	char *errMsg;
+	if (sqlite3_exec(db, sql.c_str(), nonUseCallback, NULL, &errMsg) != SQLITE_OK)
+	{
+		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
+		sqlite3_free(errMsg);
+	}
 }

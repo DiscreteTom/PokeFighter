@@ -21,6 +21,8 @@ using namespace std;
 /**
  * define interfaces before login
  * use interfaces in class Endpoint after login
+ * 
+ * this class is Singleton
 */
 class Hub
 {
@@ -54,6 +56,7 @@ private:
 	void terminateFunc();
 	void mornitor(Endpoint *const endpoint);
 
+	// for singleton
 	Hub(){};
 	Hub(Hub const &) = delete;
 	Hub(Hub &&) = delete;
@@ -63,8 +66,8 @@ private:
 public:
 	static Hub &getInstance();
 
-	void start(); // init database and socket
-	string getAllUser();
+	void start();				 // init database and socket
+	string getAllUser(); // for endpoint::getPlayerList
 };
 
 inline int nonUseCallback(void *notUsed, int argc, char **argv, char **azColName) { return 0; }

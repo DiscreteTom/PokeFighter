@@ -451,7 +451,7 @@ template <>
 Race<0>::Race() : PokemonBase(ATK)
 {
 	// _raceName = "Charmander";
-	_raceName = "Ğ¡»ğÁú";
+	_raceName = "å°ç«é¾™";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{
@@ -519,7 +519,7 @@ template <>
 Race<1>::Race() : PokemonBase(HP)
 {
 	// _raceName = "Bulbasaur";
-	_raceName = "ÃîÍÜÖÖ×Ó";
+	_raceName = "å¦™è›™ç§å­";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{
@@ -591,7 +591,7 @@ template <>
 Race<2>::Race() : PokemonBase(DEF)
 {
 	// _raceName = "Squirtle";
-	_raceName = "½ÜÄá¹ê";
+	_raceName = "æ°å°¼é¾Ÿ";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{
@@ -662,7 +662,7 @@ template <>
 Race<3>::Race() : PokemonBase(SPE)
 {
 	// _raceName = "Pidgey";
-	_raceName = "²¨²¨";
+	_raceName = "æ³¢æ³¢";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{

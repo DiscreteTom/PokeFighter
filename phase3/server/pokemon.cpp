@@ -2,6 +2,7 @@
 
 const PokemonBase *Pokemon::races[4] = {new Race<0>(), new Race<1>(), new Race<2>(), new Race<3>()};
 
+// generate a pokemon with raceIndex and lv
 Pokemon *Pokemon::getEnemy(int raceIndex, int lv)
 {
 	if (raceIndex < 0 || raceIndex > 3)
@@ -361,7 +362,7 @@ bool Pokemon::attack(Pokemon &aim, string &msg)
 	int skillIndex = 0;
 	//judge usable skill by LV and PP
 	bool usable[3];
-	int usableCount = 1;				//can use ÆÕÍ¨¹¥»÷ by default
+	int usableCount = 1;				//can use æ™®é€šæ”»å‡» by default
 	for (int i = 0; i < 3; ++i) //get all usable skill
 	{
 		if (_lv >= (i + 1) * 5 && _cpp[i])
@@ -469,20 +470,20 @@ template <>
 Race<0>::Race() : PokemonBase(ATK)
 {
 	// _raceName = "Charmander";
-	_raceName = "Ğ¡»ğÁú";
+	_raceName = "å°ç«é¾™";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{
 		_expCurve[i] = _expCurve[i - 1] + 5 * i;
 	}
-	_skillName[0] = "×²»÷";
-	_skillName[1] = "»ğ»¨";
-	_skillName[2] = "Å­Æø";
-	_skillName[3] = "»ğÇò";
-	_skillDscp[0] = "ÆÕÍ¨¹¥»÷";
-	_skillDscp[1] = "ºöÂÔµĞÈËÒ»°ë·ÀÓùµÄ¹¥»÷";
-	_skillDscp[2] = "Ôö¼Ó¹¥»÷Á¦";
-	_skillDscp[3] = "ÉËº¦ºÜ¸ßµÄ´óÕĞ";
+	_skillName[0] = "æ’å‡»";
+	_skillName[1] = "ç«èŠ±";
+	_skillName[2] = "æ€’æ°”";
+	_skillName[3] = "ç«çƒ";
+	_skillDscp[0] = "æ™®é€šæ”»å‡»";
+	_skillDscp[1] = "å¿½ç•¥æ•Œäººä¸€åŠé˜²å¾¡çš„æ”»å‡»";
+	_skillDscp[2] = "å¢åŠ æ”»å‡»åŠ›";
+	_skillDscp[3] = "ä¼¤å®³å¾ˆé«˜çš„å¤§æ‹›";
 	_pp[0] = 10;
 	_pp[1] = 3;
 	_pp[2] = 5;
@@ -557,7 +558,7 @@ bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 	}
 	default:
 	{
-		//ÆÕÍ¨¹¥»÷
+		//æ™®é€šæ”»å‡»
 		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
@@ -585,20 +586,20 @@ template <>
 Race<1>::Race() : PokemonBase(HP)
 {
 	// _raceName = "Bulbasaur";
-	_raceName = "ÃîÍÜÖÖ×Ó";
+	_raceName = "å¦™è›™ç§å­";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{
 		_expCurve[i] = _expCurve[i - 1] + 5 * i;
 	}
-	_skillName[0] = "×²»÷";
-	_skillName[1] = "¹âºÏ×÷ÓÃ";
-	_skillName[2] = "ÎüÑª";
-	_skillName[3] = "·ÉÒ¶¿ìµ¶";
-	_skillDscp[0] = "ÆÕÍ¨¹¥»÷";
-	_skillDscp[1] = "»Ö¸´ÉúÃüÖµ";
-	_skillDscp[2] = "ÎŞÊÓ·ÀÓù£¬Ôì³ÉÉËº¦²¢»Ö¸´×ÔÉíÉúÃüÖµ";
-	_skillDscp[3] = "ÉËº¦ºÜ¸ßµÄ´óÕĞ";
+	_skillName[0] = "æ’å‡»";
+	_skillName[1] = "å…‰åˆä½œç”¨";
+	_skillName[2] = "å¸è¡€";
+	_skillName[3] = "é£å¶å¿«åˆ€";
+	_skillDscp[0] = "æ™®é€šæ”»å‡»";
+	_skillDscp[1] = "æ¢å¤ç”Ÿå‘½å€¼";
+	_skillDscp[2] = "æ— è§†é˜²å¾¡ï¼Œé€ æˆä¼¤å®³å¹¶æ¢å¤è‡ªèº«ç”Ÿå‘½å€¼";
+	_skillDscp[3] = "ä¼¤å®³å¾ˆé«˜çš„å¤§æ‹›";
 	_pp[0] = 5;
 	_pp[1] = 10;
 	_pp[2] = 5;
@@ -676,7 +677,7 @@ bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 	}
 	default:
 	{
-		//ÆÕÍ¨¹¥»÷
+		//æ™®é€šæ”»å‡»
 		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
@@ -704,20 +705,20 @@ template <>
 Race<2>::Race() : PokemonBase(DEF)
 {
 	// _raceName = "Squirtle";
-	_raceName = "½ÜÄá¹ê";
+	_raceName = "æ°å°¼é¾Ÿ";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{
 		_expCurve[i] = _expCurve[i - 1] + 5 * i;
 	}
-	_skillName[0] = "×²»÷";
-	_skillName[1] = "Ìú±Ú";
-	_skillName[2] = "Ë®Ö®²¨¶¯";
-	_skillName[3] = "Ë®ÅÚ";
-	_skillDscp[0] = "ÆÕÍ¨¹¥»÷";
-	_skillDscp[1] = "Ôö¼Ó·ÀÓù";
-	_skillDscp[2] = "Ôì³ÉÉËº¦²¢Ôö¼Ó¹¥»÷";
-	_skillDscp[3] = "ÉËº¦ºÜ¸ßµÄ´óÕĞ";
+	_skillName[0] = "æ’å‡»";
+	_skillName[1] = "é“å£";
+	_skillName[2] = "æ°´ä¹‹æ³¢åŠ¨";
+	_skillName[3] = "æ°´ç‚®";
+	_skillDscp[0] = "æ™®é€šæ”»å‡»";
+	_skillDscp[1] = "å¢åŠ é˜²å¾¡";
+	_skillDscp[2] = "é€ æˆä¼¤å®³å¹¶å¢åŠ æ”»å‡»";
+	_skillDscp[3] = "ä¼¤å®³å¾ˆé«˜çš„å¤§æ‹›";
 	_pp[0] = 10;
 	_pp[1] = 10;
 	_pp[2] = 3;
@@ -796,7 +797,7 @@ bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 	}
 	default:
 	{
-		//ÆÕÍ¨¹¥»÷
+		//æ™®é€šæ”»å‡»
 		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 
@@ -824,20 +825,20 @@ template <>
 Race<3>::Race() : PokemonBase(SPE)
 {
 	// _raceName = "Pidgey";
-	_raceName = "²¨²¨";
+	_raceName = "æ³¢æ³¢";
 	_expCurve[0] = 5;
 	for (int i = 1; i < 14; ++i)
 	{
 		_expCurve[i] = _expCurve[i - 1] + 5 * i;
 	}
-	_skillName[0] = "×²»÷";
-	_skillName[1] = "¸ßËÙÒÆ¶¯";
-	_skillName[2] = "ÅÄ´ò";
-	_skillName[3] = "ÃÍ³å";
-	_skillDscp[0] = "ÆÕÍ¨¹¥»÷";
-	_skillDscp[1] = "ÌáÉı×ÔÉíËÙ¶È";
-	_skillDscp[2] = "×ÔÉíËÙ¶ÈÔ½¸ßÉËº¦Ô½¸ß";
-	_skillDscp[3] = "ÉËº¦ºÜ¸ßµÄ´óÕĞ¡£×ÔÉíËÙ¶ÈÔ½¸ßÉËº¦Ô½¸ß";
+	_skillName[0] = "æ’å‡»";
+	_skillName[1] = "é«˜é€Ÿç§»åŠ¨";
+	_skillName[2] = "æ‹æ‰“";
+	_skillName[3] = "çŒ›å†²";
+	_skillDscp[0] = "æ™®é€šæ”»å‡»";
+	_skillDscp[1] = "æå‡è‡ªèº«é€Ÿåº¦";
+	_skillDscp[2] = "è‡ªèº«é€Ÿåº¦è¶Šé«˜ä¼¤å®³è¶Šé«˜";
+	_skillDscp[3] = "ä¼¤å®³å¾ˆé«˜çš„å¤§æ‹›ã€‚è‡ªèº«é€Ÿåº¦è¶Šé«˜ä¼¤å®³è¶Šé«˜";
 	_pp[0] = 5;
 	_pp[1] = 10;
 	_pp[2] = 5;
@@ -915,7 +916,7 @@ bool Race<3>::attack(Pokemon &attacker, Pokemon &aim, string &msg, int skillInde
 	}
 	default:
 	{
-		//ÆÕÍ¨¹¥»÷
+		//æ™®é€šæ”»å‡»
 		if (dodge(attacker.cspeed(), aim.cspeed(), msg))
 			return false;
 

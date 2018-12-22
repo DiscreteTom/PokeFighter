@@ -48,7 +48,7 @@ public:
 	int pp(int n) const;
 
 	//about level-up
-	int expCurve(int level) const;// 2 <= level <= 15
+	int expCurve(int level) const; // 2 <= level <= 15
 
 	//virtual methods
 	virtual bool attack(Pokemon &attacker, Pokemon &aim, int skillIndex = 0) const = 0; //yes, this is a CONST method
@@ -113,7 +113,7 @@ public:
 
 int f(int n); //get a random number from -n to n
 
-template<int N>
+template <int N>
 class Race : public PokemonBase
 {
 public:

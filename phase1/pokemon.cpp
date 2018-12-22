@@ -427,7 +427,7 @@ int f(int n)
 	return rand() % (2 * n + 1) - n;
 }
 
-template<>
+template <>
 Race<0>::Race() : PokemonBase(ATK)
 {
 	_raceName = "Charmander";
@@ -449,7 +449,7 @@ Race<0>::Race() : PokemonBase(ATK)
 	_pp[2] = 5;
 }
 
-template<>
+template <>
 bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
 	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
@@ -494,7 +494,7 @@ bool Race<0>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 	return false;
 }
 
-template<>
+template <>
 Race<1>::Race() : PokemonBase(HP)
 {
 	_raceName = "Bulbasaur";
@@ -516,7 +516,7 @@ Race<1>::Race() : PokemonBase(HP)
 	_pp[2] = 5;
 }
 
-template<>
+template <>
 bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
 	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
@@ -565,7 +565,7 @@ bool Race<1>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 	return false;
 }
 
-template<>
+template <>
 Race<2>::Race() : PokemonBase(DEF)
 {
 	_raceName = "Squirtle";
@@ -587,7 +587,7 @@ Race<2>::Race() : PokemonBase(DEF)
 	_pp[2] = 3;
 }
 
-template<>
+template <>
 bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
 	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
@@ -635,7 +635,7 @@ bool Race<2>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 	return false;
 }
 
-template<>
+template <>
 Race<3>::Race() : PokemonBase(SPE)
 {
 	_raceName = "Pidgey";
@@ -657,8 +657,8 @@ Race<3>::Race() : PokemonBase(SPE)
 	_pp[2] = 5;
 }
 
-template<>
-bool Race<3 >::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
+template <>
+bool Race<3>::attack(Pokemon &attacker, Pokemon &aim, int skillIndex) const
 {
 	dbout << attacker.name() << " uses " << attacker.skillName(skillIndex) << "!\n";
 

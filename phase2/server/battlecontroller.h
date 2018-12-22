@@ -12,5 +12,5 @@ private:
 
 public:
 	BattleController(Pokemon &pokemon1, Pokemon &pokemon2, bool autoFight = true);
-	void start(); 
+	void start();
 };

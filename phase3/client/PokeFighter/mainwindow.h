@@ -98,15 +98,13 @@ private:
 	QPushButton *btnSkill_4;
 	QProgressBar *pbP1HP;
 	QProgressBar *pbP2HP;
-	//	QProgressBar * pbP1AtkInterval;
-	//	QProgressBar * pbP2AtkInterval;
 	QLabel *lbP1SkillName;
 	QLabel *lbP2SkillName;
 
 	// choose bet layout
 	QLabel *lbBet[3];
 	QPushButton *btnBet[3];
-	PokemonDlg * pkmDlg[3];
+	PokemonDlg *pkmDlg[3];
 
 	// pokemon table and player table
 	QTableWidget *table;
@@ -135,8 +133,8 @@ private:
 
 	void changeState(int aim);
 	void login();
-	void getImproved(QLabel *lb);
-	void getDecreased(QLabel *lb);
+	void getImproved(QLabel *lb);	// simple animation
+	void getDecreased(QLabel *lb); // simple animation
 	void mySleep(int n);
 private slots:
 	void getServerMsg();

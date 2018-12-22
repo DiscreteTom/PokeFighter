@@ -115,8 +115,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	pbP1HP->setFormat("HP: %v/%m");
 	pbP2HP = new QProgressBar(this);
 	pbP2HP->setFormat("HP: %v/%m");
-	//	pbP1AtkInterval = new QProgressBar(this);
-	//	pbP2AtkInterval = new QProgressBar(this);
 	lbP1SkillName = new QLabel(this);
 	lbP1SkillName->setObjectName("lbP1SkillName");
 	lbP2SkillName = new QLabel(this);
@@ -149,6 +147,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	connect(btnLogon, &QPushButton::clicked, this, [this] {
 		if (logonDlg->exec() == QDialog::Accepted)
 		{
+			// auto set username and password if logon succeed
 			leUsername->setText(logonDlg->getUsername());
 			lePassword->setText(logonDlg->getPassword());
 		}
@@ -333,6 +332,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 	client = new QTcpSocket(this);
 	connect(client, &QTcpSocket::readyRead, this, &MainWindow::getServerMsg);
 
+	// init player data
 	changingPokemonName = false;
 	gettingDuelStatistic = false;
 	battleStart = false;
@@ -344,9 +344,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
 	changeState(START);
 
-	//	setFixedSize(1600, 900);
 	setFixedSize(1366, 966); // size of start.jpg
 
+	// set bgm and loop
 	QMediaPlaylist *playlist = new QMediaPlaylist();
 	playlist->addMedia(QUrl("qrc:/music/media/op.mp3"));
 	playlist->setPlaybackMode(QMediaPlaylist::Loop);
@@ -366,7 +366,7 @@ void MainWindow::changeState(int aim)
 {
 	setStyleSheet(tr(".MainWindow{background-image:url(\":/img/img/start.jpg\");}"));
 
-	// hide all widget
+	// hide and reset all widget
 	lbStartTitle->hide();
 	btnPlay->hide();
 	btnExit->hide();
@@ -402,8 +402,6 @@ void MainWindow::changeState(int aim)
 	btnSkill_4->hide();
 	pbP1HP->hide();
 	pbP2HP->hide();
-	//	pbP1AtkInterval->hide();
-	//	pbP2AtkInterval->hide();
 	lbP1SkillName->hide();
 	lbP2SkillName->hide();
 	lbBet[1]->hide();
@@ -578,14 +576,10 @@ void MainWindow::changeState(int aim)
 		lbP1SkillName->show();
 		lbP2SkillName->show();
 		pbP1HP->show();
-		//		pbP1AtkInterval->show();
 		pbP2HP->show();
-		//		pbP2AtkInterval->show();
 		layout->addWidget(pbP1HP, 0, 0, 1, 2);
-		//		layout->addWidget(pbP1AtkInterval, 1, 0, 1, 2);
 		layout->addWidget(lbP1SkillName, 1, 0, 1, 2, Qt::AlignCenter);
 		layout->addWidget(pbP2HP, 0, 2, 1, 2);
-		//		layout->addWidget(pbP2AtkInterval, 1, 2, 1, 2);
 		layout->addWidget(lbP2SkillName, 1, 2, 1, 2, Qt::AlignCenter);
 		layout->addWidget(lbP1, 2, 0, 1, 2, Qt::AlignCenter);
 		layout->addWidget(lbP2, 2, 2, 1, 2, Qt::AlignCenter);
@@ -660,6 +654,7 @@ void MainWindow::login()
 
 void MainWindow::getImproved(QLabel *lb)
 {
+	// move downward and move upward
 	lb->move(lb->x(), lb->y() + 50);
 	mySleep(50);
 	lb->move(lb->x(), lb->y() + 50);
@@ -684,7 +679,7 @@ void MainWindow::getImproved(QLabel *lb)
 
 void MainWindow::getDecreased(QLabel *lb)
 {
-	// P1 lose HP
+	// blink several times
 	lb->hide();
 	mySleep(200);
 	lb->show();
@@ -695,6 +690,7 @@ void MainWindow::getDecreased(QLabel *lb)
 	mySleep(200);
 }
 
+// sleep but not stop event loop
 void MainWindow::mySleep(int n)
 {
 	QTime t;
@@ -727,6 +723,7 @@ void MainWindow::getServerMsg()
 		return;
 	}
 
+	// parse msg
 	switch (state)
 	{
 	case LOGIN:
@@ -1451,13 +1448,14 @@ void MainWindow::getServerMsg()
 			QString str = "discard ";
 			str += id;
 			client->write(str.toLocal8Bit(), BUF_LENGTH);
-			for (int i = 0; i < 3; ++i){
+			for (int i = 0; i < 3; ++i)
+			{
 				if (pkmDlg[i] != NULL)
 					pkmDlg[i]->deleteLater();
 			}
 			changeState(MAIN);
 		});
-		connect(pkmDlg[chooseBetIndex - 1], &PokemonDlg::destroyed, [this]{
+		connect(pkmDlg[chooseBetIndex - 1], &PokemonDlg::destroyed, [this] {
 			pkmDlg[chooseBetIndex - 1] = NULL;
 		});
 		if (chooseBetIndex < 4)

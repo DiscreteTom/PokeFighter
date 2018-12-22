@@ -5,23 +5,25 @@
 #include <QTableWidget>
 #include <QLabel>
 
-namespace Ui {
+namespace Ui
+{
 class PokemonDlg;
 }
 
+// dialog to show pokemon details
 class PokemonDlg : public QDialog
 {
 	Q_OBJECT
 
 public:
-	explicit PokemonDlg(const QString & detail, bool myPokemonTable = true, QWidget *parent = 0);
+	explicit PokemonDlg(const QString &detail, bool myPokemonTable = true, QWidget *parent = 0);
 	~PokemonDlg();
 
-	QTableWidget * table;
-	QLabel * lbImg;
+	QTableWidget *table; // attribute table
+	QLabel *lbImg;			 // race image
 
 signals:
-	void pokemonChangeName(const QString & pokemonID, const QString & newName);
+	void pokemonChangeName(const QString &pokemonID, const QString &newName);
 
 private:
 	Ui::PokemonDlg *ui;

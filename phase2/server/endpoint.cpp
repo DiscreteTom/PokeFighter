@@ -94,6 +94,7 @@ int Endpoint::start()
  * I try to run without this block of code
  * IT STILL WORKS!
  * DAMN!
+ *                       --DiscreteTom
 */
 
 // 	int iOptVal = 0;
@@ -317,7 +318,7 @@ void Endpoint::resetPassword(const string &oldPassword, const string &newPasswor
 		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
 		sqlite3_free(errMsg);
 		// strcpy(buf, "Reject: Server error.\n");
-		strcpy(buf, "·þÎñÆ÷´íÎó");
+		strcpy(buf, "æœåŠ¡å™¨é”™è¯¯");
 		send(connSocket, buf, BUF_LENGTH, 0);
 		return;
 	}
@@ -326,7 +327,7 @@ void Endpoint::resetPassword(const string &oldPassword, const string &newPasswor
 		// wrong password
 		sqlite3_free_table(sqlResult);
 		// strcpy(buf, "Reject: wrong old password.\n");
-		strcpy(buf, "¾ÉÃÜÂë²»ÕýÈ·");
+		strcpy(buf, "æ—§å¯†ç ä¸æ­£ç¡®");
 		send(connSocket, buf, BUF_LENGTH, 0);
 		return;
 	}
@@ -342,7 +343,7 @@ void Endpoint::resetPassword(const string &oldPassword, const string &newPasswor
 		cout << "Endpoint[" << playerID << "]: Sqlite3 error: " << errMsg << endl;
 		sqlite3_free(errMsg);
 		// strcpy(buf, "Reject: Server error.\n");
-		strcpy(buf, "·þÎñÆ÷´íÎó");
+		strcpy(buf, "æœåŠ¡å™¨é”™è¯¯");
 		send(connSocket, buf, BUF_LENGTH, 0);
 		return;
 	}

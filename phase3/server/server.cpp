@@ -10,6 +10,7 @@
 
 using namespace std;
 
+// for singleton
 Hub &Hub::getInstance()
 {
 	static Hub result;
@@ -238,6 +239,7 @@ void Hub::listenFunc()
 
 void Hub::terminateFunc()
 {
+	// press any key to stop server
 	_getch();
 	running = false;
 	closesocket(hubSocket);
@@ -266,7 +268,7 @@ void Hub::login(const string &username, const string &password)
 		{
 			cout << "Hub: Sqlite3 error: " << errMsg << endl;
 			// strcpy(buf, "Reject: Hub database error.\n");
-			strcpy(buf, "·şÎñÆ÷Êı¾İ¿â´íÎó");
+			strcpy(buf, "æœåŠ¡å™¨æ•°æ®åº“é”™è¯¯");
 			sqlite3_free(errMsg);
 		}
 		else // sqlite select succeed
@@ -276,7 +278,7 @@ void Hub::login(const string &username, const string &password)
 				// username and password mismatch
 				cout << "Hub: Login: username '" << username << "' and password '" << password << "' mismatch.\n";
 				// strcpy(buf, "Reject: Username and password dismatch.\n");
-				strcpy(buf, "ÓÃ»§Ãû»òÃÜÂë´íÎó");
+				strcpy(buf, "ç”¨æˆ·åæˆ–å¯†ç é”™è¯¯");
 			}
 			else
 			{
@@ -293,7 +295,7 @@ void Hub::login(const string &username, const string &password)
 						if (endpoint->isOnline())
 						{
 							// strcpy(buf, "Reject: Account is already online.\n");
-							strcpy(buf, "ÓÃ»§ÒÑÔÚÆäËûÉè±¸µÇÂ¼");
+							strcpy(buf, "ç”¨æˆ·å·²åœ¨å…¶ä»–è®¾å¤‡ç™»å½•");
 						}
 						else
 						{
@@ -313,7 +315,7 @@ void Hub::login(const string &username, const string &password)
 					{
 						delete p;
 						// strcpy(buf, "Reject: Hub endpoint error.\n");
-						strcpy(buf, "·şÎñÆ÷´íÎó");
+						strcpy(buf, "æœåŠ¡å™¨é”™è¯¯");
 					}
 					else // start normally, add this endpoint to endpoints
 					{
@@ -336,13 +338,13 @@ void Hub::logon(const string &username, const string &password)
 	{
 		cout << "Hub: Got an invalid username: " << username << endl;
 		// strcpy(buf, "Reject: Invalid username.\n");
-		strcpy(buf, "²»ºÏ·¨µÄÓÃ»§Ãû");
+		strcpy(buf, "ä¸åˆæ³•çš„ç”¨æˆ·å");
 	}
 	else if (!isValidPassword(password))
 	{
 		cout << "Hub: Got an invalid password: " << password << endl;
 		// strcpy(buf, "Reject: Invalid password.\n");
-		strcpy(buf, "²»ºÏ·¨µÄÃÜÂë");
+		strcpy(buf, "ä¸åˆæ³•çš„å¯†ç ");
 	}
 	else
 	{
@@ -355,7 +357,7 @@ void Hub::logon(const string &username, const string &password)
 		{
 			cout << "Hub: Sqlite3 error: " << errMsg << endl;
 			// strcpy(buf, "Reject: Hub database error.\n");
-			strcpy(buf, "·şÎñÆ÷Êı¾İ¿â´íÎó");
+			strcpy(buf, "æœåŠ¡å™¨æ•°æ®åº“é”™è¯¯");
 			sqlite3_free(errMsg);
 		}
 		else
@@ -369,7 +371,7 @@ void Hub::logon(const string &username, const string &password)
 				{
 					cout << "Hub: Sqlite3 error: " << errMsg << endl;
 					sqlite3_free(errMsg);
-					strcpy(buf, "·şÎñÆ÷Êı¾İ¿â´íÎó");
+					strcpy(buf, "æœåŠ¡å™¨æ•°æ®åº“é”™è¯¯");
 					// strcpy(buf, "Reject: Hub database error.\n");
 				}
 				else
@@ -383,7 +385,7 @@ void Hub::logon(const string &username, const string &password)
 				// username already exist
 				cout << "Hub: Logon: username '" << username << "' already exist.\n";
 				//strcpy(buf, "Reject: Duplicate username.\n");
-				strcpy(buf, "ÓÃ»§ÃûÒÑ´æÔÚ");
+				strcpy(buf, "ç”¨æˆ·åå·²å­˜åœ¨");
 			}
 			sqlite3_free_table(sqlResult);
 		}
@@ -443,12 +445,14 @@ void Hub::mornitor(Endpoint *const endpoint)
  */
 string Hub::getAllUser()
 {
-	struct temp{
+	struct temp
+	{
 		string name;
 		bool online;
 		string win;
 		string total;
 	};
+	// get user from database
 	char **sqlResult;
 	int nRow;
 	int nColumn;
@@ -458,19 +462,21 @@ string Hub::getAllUser()
 	{
 		cout << "Hub: Sqlite3 error: " << errMsg << endl;
 		// strcpy(buf, "Reject: Hub database error.\n");
-		// strcpy(buf, "·şÎñÆ÷Êı¾İ¿â´íÎó");
+		// strcpy(buf, "æœåŠ¡å™¨æ•°æ®åº“é”™è¯¯");
 		sqlite3_free(errMsg);
 	}
 
+	// construct player map
 	map<int, temp> playerMap;
-	for (int i = 0; i < nRow; ++i){
+	for (int i = 0; i < nRow; ++i)
+	{
 		temp t = {sqlResult[4 * (i + 1) + 1], false, sqlResult[4 * (i + 1) + 2], sqlResult[4 * (i + 1) + 3]};
 		playerMap.insert(make_pair(stoi(sqlResult[4 * (i + 1)]), t));
 	}
 
 	sqlite3_free_table(sqlResult);
 
-
+	// set player online
 	string result;
 	mtx.lock();
 	for (auto endpoint : endpoints)
@@ -479,10 +485,17 @@ string Hub::getAllUser()
 	}
 	mtx.unlock();
 
-	for (auto & player : playerMap){
-		if (player.second.online){
+	// show online player first
+	for (auto &player : playerMap)
+	{
+		if (player.second.online)
+		{
+			// result = onlinePlayer + result;
 			result = to_string(player.first) + ' ' + player.second.name + " 1 " + player.second.win + " " + player.second.total + "\n" + result;
-		} else {
+		}
+		else
+		{
+			// result = result + onlinePlayer
 			result += to_string(player.first) + ' ' + player.second.name + " 0 " + player.second.win + " " + player.second.total + "\n";
 		}
 	}

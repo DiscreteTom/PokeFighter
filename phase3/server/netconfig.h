@@ -8,4 +8,4 @@
  */
 
 const int REQ_QUEUE_LENGTH = 4; // request queue max length, usually 2-4
-const int BUF_LENGTH = 1024; // server buffer length MUST equals client buffer length
+const int BUF_LENGTH = 1024;		// server buffer length MUST equals client buffer length

@@ -60,12 +60,11 @@ private:
 	QPushButton *btnLogout;
 	QPushButton *btnShowPokemonList;
 	QPushButton *btnDisplayAllPlayer;
-	QPushButton * btnChangePassword;
+	QPushButton *btnChangePassword;
 
 	// change password layout
-	QLineEdit * leNewPassword;
-	QPushButton * btnOK;
-
+	QLineEdit *leNewPassword;
+	QPushButton *btnOK;
 
 	// pokemon table and player table
 	QTableWidget *table;
@@ -77,7 +76,7 @@ private:
 	QTcpSocket *client;
 
 	// media
-	QMediaPlayer * mediaPlayer;
+	QMediaPlayer *mediaPlayer;
 
 	// user data
 	QString username;

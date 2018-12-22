@@ -10,6 +10,7 @@ void BattleController::start()
 	dbout << p1.name() << " VS " << p2.name() << "!\n";
 	dbout << "Battle Start!\n\n";
 
+	// restore all pp and hp and other attributes before battle start
 	p1.restoreAll();
 	p2.restoreAll();
 
@@ -26,6 +27,7 @@ void BattleController::start()
 
 		if (timer1 >= p1.cspeed() && timer2 >= p2.cspeed())
 		{
+			// two pokemon attack at the same time, judge their speed
 			if (p1.cspeed() >= p2.cspeed())
 			{
 				if (p1.attack(p2, _auto))
@@ -51,6 +53,7 @@ void BattleController::start()
 		}
 		else
 		{
+			// p1 attack
 			if (p1.attack(p2, _auto))
 				break;
 			timer2 = 0;

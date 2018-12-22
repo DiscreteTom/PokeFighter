@@ -55,7 +55,7 @@ class Endpoint
 	void getPlayerList();
 	void getPokemonList(int playerID);
 	void getPokemonByID(int pokemonID);
-	void pokemonChangeName(const string & pokemonID, const string &newName);
+	void pokemonChangeName(const string &pokemonID, const string &newName);
 	void battle(int pokemonID, bool autoFight = false);
 	void useSkill(int skillID);
 	void getDuelStatistic();

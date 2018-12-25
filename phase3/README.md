@@ -62,8 +62,8 @@ Endpoint有一个timer，当用户超过timer没有给服务器发数据时服�
 通信方式：客户端发送一条请求，服务器回复一条信息，服务端不需持续监听。客户端发送注销请求时服务器不回复
 
 Endpoint断线重连方案：
-- Endpoint使用长连接，设置SOCKET为keep alive自动发送心跳包
-- 客户端断开时，recv函数返回SOCKET_ERROR，设置online为false并重新阻塞在accept，detach一个timer线程
+- Endpoint使用长连接
+- 客户端断开时，recv函数返回SOCKET_ERROR，设置online为false
 - Endpoint在accept成功后设置online为true
 - timer超时后如果online仍为false则判定玩家长时间未登陆而退出
 - 如果timer超时前玩家重新登陆则终止timer

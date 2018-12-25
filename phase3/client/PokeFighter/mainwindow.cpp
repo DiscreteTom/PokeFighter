@@ -950,7 +950,7 @@ void MainWindow::getServerMsg()
 			else if (masterPokemon >= 3)
 			{
 				lbPokemonMasterBadge->setPixmap(QPixmap(":/img/img/silverbadge2.png").scaledToHeight(80));
-				lbPokemonMasterBadge->setToolTip(tr("银质精灵大师徽章，赐予15级精灵数量不少于5只的玩家"));
+				lbPokemonMasterBadge->setToolTip(tr("银质精灵大师徽章，赐予15级精灵数量不少于3只的玩家"));
 			}
 			else if (masterPokemon >= 1)
 			{
@@ -1451,7 +1451,8 @@ void MainWindow::getServerMsg()
 			for (int i = 0; i < 3; ++i)
 			{
 				if (pkmDlg[i] != NULL)
-					pkmDlg[i]->deleteLater();
+//					pkmDlg[i]->deleteLater();
+					pkmDlg[i]->close();
 			}
 			changeState(MAIN);
 		});

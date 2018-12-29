@@ -1,5 +1,7 @@
 # 宠物小精灵对战系统
 
+![main](img/20.png)
+
 - [宠物小精灵对战系统](#%E5%AE%A0%E7%89%A9%E5%B0%8F%E7%B2%BE%E7%81%B5%E5%AF%B9%E6%88%98%E7%B3%BB%E7%BB%9F)
   - [题目一：宠物小精灵的加入](#%E9%A2%98%E7%9B%AE%E4%B8%80%E5%AE%A0%E7%89%A9%E5%B0%8F%E7%B2%BE%E7%81%B5%E7%9A%84%E5%8A%A0%E5%85%A5)
     - [题目要求](#%E9%A2%98%E7%9B%AE%E8%A6%81%E6%B1%82)
@@ -481,7 +483,7 @@ Pokemon类添加静态函数getEnemy，能够通过敌人种族和等级构造�
 Pokemon原本的attack函数拆分为两个函数，分别是：
 
 ```c++
-bool attack(Pokemon &aim, string &msg);									// auto attack
+bool attack(Pokemon &aim, string &msg); // auto attack
 bool attack(Pokemon &aim, int skillIndex, string &msg); // manual attack
 ```
 
@@ -489,10 +491,26 @@ bool attack(Pokemon &aim, int skillIndex, string &msg); // manual attack
 
 为了使战斗可控，改造BattleController类，在构造函数中把Socket传给BattleController，这样BattleController在内部就可以调用Socket::recv来阻塞战斗流程等待用户选择技能。
 
-**战斗同步问题**：客户端向服务器发起战斗请求时，服务器会在Endpoint内新建一个BattleController并运行此BattleController。BattleController判定为电脑控制的Pokemon行动时会把行动结果发送到客户端，客户端需要回复一个"done"表示已经执行完动画，然后服务器接收到"done"之后才能继续运行。当BattleController判定为玩家行动时，会向客户端发动"turn"，客户端把释放技能按钮设置为可用，然后根据用户的选择发送释放技能信息`useSkill <skillID>`给服务器，服务器会把行动结果返回给客户端，客户端仍需要回复"done"表示动画执行完毕。服务器向客户端发出的战斗信息格式如下：
+**战斗同步问题**：客户端向服务器发起战斗请求时，服务器会在Endpoint内新建一个BattleController并运行此BattleController。BattleController判定为电脑控制的Pokemon行动时会把行动结果发送到客户端，客户端需要回复一个"done"表示已经执行完动画，然后服务器接收到"done"之后才能继续运行。当BattleController判定为玩家行动时，会向客户端发动"turn"，客户端把释放技能按钮设置为可用，然后根据用户的选择发送释放技能信息`useSkill <skillID>`给服务器，服务器会把行动结果返回给客户端，客户端仍需要回复"done"表示动画执行完毕。服务器向客户端发出的战斗信息格式如下（信息之间使用空格隔开）：
 
 ```shell
-<playerRound: 0 | 1> <skillName> <dodge: 0 | 1> <defenderHP> <defenderAtk: 0 | 1 | 2> <defenderDef: 0 | 1 | 2> <defenderSpeed: 0 | 1 | 2> <defenderPP1> <defenderPP2> <defenderPP3> <attackerHP> <attackerAtk: 0 | 1 | 2> <attackerDef: 0 | 1 | 2> <attackerSpeed: 0 | 1 | 2> <attackerPP1> <attackerPP2> <attackerPP3>
+<playerRound: 0 | 1>
+<skillName>
+<dodge: 0 | 1>
+<defenderHP>
+<defenderAtk: 0 | 1 | 2>
+<defenderDef: 0 | 1 | 2>
+<defenderSpeed: 0 | 1 | 2>
+<defenderPP1>
+<defenderPP2>
+<defenderPP3>
+<attackerHP>
+<attackerAtk: 0 | 1 | 2>
+<attackerDef: 0 | 1 | 2>
+<attackerSpeed: 0 | 1 | 2>
+<attackerPP1>
+<attackerPP2>
+<attackerPP3>
 ```
 
 其中：

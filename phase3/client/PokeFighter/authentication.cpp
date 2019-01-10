@@ -20,7 +20,7 @@ bool isValidUsername(const QString &str)
 	}
 	for (auto c : str)
 	{
-		if (c == '\n' || c == '\t' || c == '\'' || c == '"' || c == '`' || c == ' ')
+		if (c == '\n' || c == '\t' || c == '\'' || c == '"' || c == '`' || c == ' ' || c == '\\' || c == '\r')
 		{
 			return false;
 		}
